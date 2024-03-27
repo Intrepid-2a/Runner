@@ -1,4 +1,4 @@
-import os, subprocess
+import os, subprocess, glob, copy
 
 def pullGitRepos(repos='all', main=True, clone=False):
     
@@ -71,6 +71,32 @@ def setupDataFolders(tasks='all'):
     os.chdir(original_WD)
 
 
+def findParticipantIDs(tasks='all', subtasks='all'):
+
+    if isinstance(tasks, str):
+        if tasks == 'all':
+            tasks = ['distance',
+                     'area',
+                     'curvature']
+
+    if isinstance(subtasks, str):
+        if subtasks == 'all':
+            subtasks = ['',
+                        'color',
+                        'mapping']
+
+    participantIDs = []
+
+    for task in tasks:
+        for subtask in subtasks:
+            fullpathnames = glob.glob(os.path.join('..', 'data', task, subtask, '*.txt'))
+            filenames = [os.path.basename(x) for x in fullpathnames]
+            taskIDs = [x.split('_')[0] for x in filenames]
+
+            participantIDs = list(set(participantIDs + taskIDs))
+            # participant data from distance task should be saved differently: participant should FIRST (like in the other tasks)
+    
+    return(participantIDs)
 
 
 def collectParticipantInfo():
@@ -79,7 +105,6 @@ def collectParticipantInfo():
     # how should this be structured?
     # like this?
     empty_participant = {
-        'location'    : None,
         'distance' :
             {
                 'color'       : False,
@@ -102,11 +127,52 @@ def collectParticipantInfo():
                 'right'       : False
             }
     }
+
+    if os.sys.platform == 'linux':
+        location = 'toronto'
+        pre = 'TOR'
+    else:
+        location = 'glasgow'
+        pre = 'GLA'
+    
     # then info could be populated with changed versions of the empty participant
     # keys can easily be extracted when generating new / unique participant IDs
     # or to show which tasks have already been completed by the participant
     # we can also write a function to count the number of data sets in each task
     # (having all 4 files... check the eye-tracking file as well?)
+
+    # first we collect participant IDs from the color calibration folders:
+    # that is the first task, so those are the only IDs that matter (right? right!?)
+
+    participantIDs = findParticipantIDs()
+
+    for ID in participantIDs:
+        participantInfo = copy.deepcopy(empty_participant)
+
+        for task in ['area', 'curvature', 'distance']:
+            for subtask in ['color','mapping','left','right']:
+
+                if subtask == 'color':
+                    # write test to see if a single color calibration file exists
+                    # participantInfo[task][subtask] == True
+                    pass
+
+                if subtask == 'mapping':
+                    # check both left and right hemisphere blind spot marker info
+                    # participantInfo[task][subtask] == True
+                    pass
+
+                if subtask == 'left':
+                    pass
+
+                if subtask == 'right':
+                    pass
+
+
+    
+    return(participantIDs)
+
+
 
 
 
