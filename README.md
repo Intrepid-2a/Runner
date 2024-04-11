@@ -15,7 +15,7 @@ The file `utility.py` has a few utility functions. Two of these recreate the com
 1. `pullGitRepos()`
 2. `setupDataFolders()`
 
-The first function `pullGitRepos()` by default only pulls updates from the remote origin if the folders already exist as local copies of the GitHub repositories. When first setting up the main project folder, you could set the argument `clone` to True to clone the GitHub repositories as well. By supplying a list of repository names in the `repos` argument, a subset of repositories can also be pulled or clones. 
+The first function `pullGitRepos()` by default only pulls updates from the remote origin if the folders already exist as local copies of the GitHub repositories. When first setting up the main project folder, you could set the argument `clone` to True to clone the GitHub repositories as well. By supplying a list of repository names in the `repos` argument, a subset of repositories can also be pulled or cloned. 
 
 The second function `setupDataFolders()` by default makes all folders that should exist and that will be used to collect data. By supplying a list of task names in the `tasks` argument, a subset of folders for specific tasks can also be created.
 
