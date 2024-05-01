@@ -226,11 +226,13 @@ class EyeTracker:
                 self.calibrationpoints = calibrationpoints
                 if calibrationpoints == 5:
                     self.__calibrationTargets = np.array([[0,0],   [-3,0],[0,3],[3,0],[0,-3]                                 ])
+                    # self.__calibrationTargets = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ])
                 if calibrationpoints == 9:
                     self.__calibrationTargets = np.array([[0,0],   [-3,0],[0,3],[3,0],[0,-3],     [6,6],[6,-6],[-6,6],[-6,-6]])
+                    # self.__calibrationTargets = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916],     [2*10.437,2*5.916],[2*10.437,-2*5.916],[-2*10.437,2*5.916],[-2*10.437,-2*5.916]  ])
                 # print(self.__calibrationTargets)
             else:
-                raise Warning("calibration points must be 9 (default) or 5")
+                raise Warning("calibration points must be 5 (default) or 9")
         else:
             raise Warning("calibration points must be a number")
 
@@ -661,27 +663,23 @@ class EyeTracker:
                                    'offsetY'    : offsetY      }
 
         # these checks can be much simpler! but leave it be for now...
-        if not calibrationPoints == None:
-
-            if isinstance(calibrationPoints, np.ndarray):
-                if len(calibrationPoints) >= 3:
-                    if all([isinstance(x, np.ndarray) and len(x) == 2 for x in calibrationPoints]):
-                        if all([len(x) == 2 for x in calibrationPoints]):
-                            if all([all([isinstance(y, numbers.Number) for y in x]) for x in calibrationPoints]):
-                                # seems more or less OK?
-                                self.__calibrationTargets = calibrationPoints
-                            else:
-                                raise Warning("all elements in calibrationPoints must be numeric")
+        if isinstance(calibrationPoints, np.ndarray):
+            if len(calibrationPoints) >= 3:
+                if all([isinstance(x, np.ndarray) and len(x) == 2 for x in calibrationPoints]):
+                    if all([len(x) == 2 for x in calibrationPoints]):
+                        if all([all([isinstance(y, numbers.Number) for y in x]) for x in calibrationPoints]):
+                            # seems more or less OK?
+                            self.__calibrationTargets = calibrationPoints
                         else:
-                            raise Warning("all rows in calibrationPoints must have 2 items")
+                            raise Warning("all elements in calibrationPoints must be numeric")
                     else:
-                        raise Warning("all rows in calibrationPoints must be numpy.ndarray")
+                        raise Warning("all rows in calibrationPoints must have 2 items")
                 else:
-                    raise Warning("calibrationPoints must have at least 3 rows")
+                    raise Warning("all rows in calibrationPoints must be numpy.ndarray")
             else:
-                raise Warning("calibrationPoints must be a numpy.ndarray")
+                raise Warning("calibrationPoints must have at least 3 rows")
         else:
-            pass # can leave to be default!
+            raise Warning("calibrationPoints must be a numpy.ndarray")
 
 
     def __DM_initialize(self):
@@ -1561,6 +1559,8 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                     calibrationpoints = 5,
                     colors            = colors )
 
+    if location == 'toronto':
+        ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
 
     fcols = [[-1,-1,-1],[1,1,1]]
     if 'both' in colors.keys():
@@ -1586,6 +1586,8 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
         paths['color']        = os.path.join('..', 'data', task, 'color' )
         paths['mapping']      = os.path.join('..', 'data', task, 'mapping' )
         paths['eyetracking']  = os.path.join('..', 'data', task, 'eyetracking', ID )
+
+    
 
 
     return( {'win'              : win,
