@@ -1611,12 +1611,13 @@ def getColors(colors={}, task=None, ID=None):
         # no color calibration done, skip
         return(colors)
 
+    # find the largest color calibration file index:
     idx = np.argmax([int(os.path.splitext(os.path.basename(x))[0].split('_')[3]) for x in all_files])
     
     col_file = open(all_files[idx],'r')
     col_param = col_file.read().replace('\t','\n').split('\n')
     col_file.close()
-    print(col_param)
+    # print(col_param)
     # let's flip this depending on the task run, in each of the experiments?
     # col_ipsi = eval(col_param[3]) if hemifield == 'left' else eval(col_param[5]) # left or right
     # col_cont = eval(col_param[5]) if hemifield == 'left' else eval(col_param[3]) # right or left
@@ -1630,7 +1631,7 @@ def getColors(colors={}, task=None, ID=None):
 
     # this comes down to black in ALL cases:
     colors['both']  = [eval(col_param[3])[1], eval(col_param[5])[0], -1]
-
+    # print(colors)
     return(colors)
 
     
