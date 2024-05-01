@@ -8,6 +8,7 @@ import os
 import json
 import copy
 import random
+import re
 
 from glob import glob
 
@@ -1482,7 +1483,10 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
     # for blind spot mapping, task == None, but it still needs the calibrated colors...
     # handle this in the function?
-    colors = getColors(colors=colors, task=task, ID=ID)
+
+    colors = getColors(colors=colors, 
+                       task=task, 
+                       ID=ID)
 
 
     # WINDOW OBJECT
@@ -1523,15 +1527,9 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
         mymonitor.setGammaGrid(gammaGrid)
     mymonitor.setSizePix(resolution)
 
-
-
     #win = visual.Window([1000, 500], allowGUI=True, monitor='ccni', units='deg', fullscr=True, color = back_col, colorSpace = 'rgb')
     win = visual.Window(resolution, monitor=mymonitor, allowGUI=True, units='deg', fullscr=True, color=colors['back'], colorSpace = 'rgb', screen=screen)
             # size = [34.5, 19.5]filefolder,
-
-    colors = getColors(colors = colors,
-                       task = task,
-                       ID = ID)
 
     fixation = visual.ShapeStim(win, 
                                 vertices = ((0, -1), (0, 1), (0,0), (-1, 0), (1, 0)), 
@@ -1582,6 +1580,14 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     # which returns an empty dictionary
     blindspotmarkers = makeBlindSpotMarkers(win=win, task=task, ID=ID, colors=colors)
 
+    paths = {} # worst case, we return an empty dictionary?
+    if not task == None:
+        paths['data']         = os.path.join('..', 'data', task )
+        paths['color']        = os.path.join('..', 'data', task, 'color' )
+        paths['mapping']      = os.path.join('..', 'data', task, 'mapping' )
+        paths['eyetracking']  = os.path.join('..', 'data', task, 'eyetracking' )
+
+
     return( {'win'              : win,
              'tracker'          : ET,
              'colors'           : colors,
@@ -1605,10 +1611,9 @@ def getColors(colors={}, task=None, ID=None):
         # no color calibration done, skip
         return(colors)
 
-    print('reading color calibration')
-    print(all_files)
-    print(all_files[-1])
-    col_file = open(all_files[-1],'r')
+    idx = np.argmax([int(os.path.splitext(os.path.basename(x))[0].split('_')[3]) for x in all_files])
+    
+    col_file = open(all_files[idx],'r')
     col_param = col_file.read().replace('\t','\n').split('\n')
     col_file.close()
     print(col_param)
