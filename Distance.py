@@ -140,6 +140,11 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     if hemifield == 'right':
         col_contra, col_ipsi = colors['left'], colors['right']
 
+    if hemifield == 'left':
+        col_ipsi, col_contra = colors['right'], colors['left']
+    if hemifield == 'right':
+        col_contra, col_ipsi = colors['right'], colors['left']
+
     hiFusion = setup['fusion']['hi']
     loFusion = setup['fusion']['lo']
 
@@ -435,7 +440,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         if abort:
             break
         
-        if not gaze_out: # what is this test?
+        if not gaze_out: # what is this even testing? gaze_out is always False... skip!!!!
         
             ## response
             fixation.ori += 45
