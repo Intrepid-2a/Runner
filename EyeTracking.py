@@ -1585,7 +1585,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
         paths['data']         = os.path.join('..', 'data', task )
         paths['color']        = os.path.join('..', 'data', task, 'color' )
         paths['mapping']      = os.path.join('..', 'data', task, 'mapping' )
-        paths['eyetracking']  = os.path.join('..', 'data', task, 'eyetracking' )
+        paths['eyetracking']  = os.path.join('..', 'data', task, 'eyetracking', ID )
 
 
     return( {'win'              : win,
@@ -1593,7 +1593,8 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
              'colors'           : colors,
              'fusion'           : fusion,
              'fixation'         : fixation,
-             'blindspotmarkers' : blindspotmarkers } )
+             'blindspotmarkers' : blindspotmarkers,
+             'paths'            : paths } )
 
 def getColors(colors={}, task=None, ID=None):
 
@@ -1649,8 +1650,10 @@ def makeBlindSpotMarkers(win, task, ID, colors):
     hemifields = []
 
     ## read blindspot parameters... if any...
-    if len(glob(main_path + 'mapping/' + ID + '_LH_blindspot*.txt')):
-        bs_file = open(glob(main_path + 'mapping/' + ID + '_LH_blindspot*.txt')[-1], 'r')
+    left_files = glob(os.path.join('..', 'data', task, 'mapping', ID + '_LH_blindspot*.txt' ) )
+    if len(left_files):
+        idx = np.argmax([int(os.path.splitext(os.path.basename(x))[0].split('_')[3]) for x in left_files])
+        bs_file = open(left_files[idx], 'r')
         bs_param = bs_file.read().replace('\t','\n').split('\n')
         bs_file.close()
         spot_left_cart = eval(bs_param[1])
@@ -1658,8 +1661,10 @@ def makeBlindSpotMarkers(win, task, ID, colors):
         spot_left_size = eval(bs_param[3])
         hemifields.append('left')
 
-    if len(glob(main_path + 'mapping/' + ID + '_RH_blindspot*.txt')):
-        bs_file = open(glob(main_path + 'mapping/' + ID + '_RH_blindspot*.txt')[-1],'r')
+    right_files = glob(os.path.join('..', 'data', task, 'mapping', ID + '_RH_blindspot*.txt' ) )
+    if len(right_files):
+        idx = np.argmax([int(os.path.splitext(os.path.basename(x))[0].split('_')[3]) for x in right_files])
+        bs_file = open(right_files[idx],'r')
         bs_param = bs_file.read().replace('\t','\n').split('\n')
         bs_file.close()
         spot_righ_cart = eval(bs_param[1])
@@ -1677,18 +1682,27 @@ def makeBlindSpotMarkers(win, task, ID, colors):
             spot_cart = spot_left_cart
             spot      = spot_left
             spot_size = spot_left_size
-        else:
+            tar       = spot_size[0] + 2 + 2
+        if hemifield == 'right':
             spot_cart = spot_righ_cart
             spot      = spot_righ
             spot_size = spot_righ_size
-
-        tar =  spot_size[0] + 2 + 2
+            tar       = spot_size[0] + 2 + 2
 
         # size of blind spot + 2 (dot width, padding)
         if hemifield == 'left' and spot_cart[1] < 0:
             ang_up = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2
         else:
             ang_up = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2
+        
+        blindspotmarkers[hemifield+'_prop'] = { 'cart'   : spot_cart,
+                                                'spot'   : spot,
+                                                'size'   : spot_size,
+                                                'tar'    : tar,
+                                                'ang_up' : ang_up       }
+
+        spot_size = [max(min(1,x),x-1) for x in spot_size]
+
 
         blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=colors[hemifield], lineColor = None)
         blindspot.pos = spot_cart

@@ -30,12 +30,12 @@ from EyeTracking import localizeSetup, EyeTracker
 ######
 
 def doDistanceTask(ID=None, hemifield=None, location=None):
+
     ## parameters
     nRevs   = 10   #
     nTrials = 30  # at least 10 reversals and 30 trials for each staircase (~ 30*8 staircases = 250 trials)
     # letter_height = 40 # 40 dva is pretty big?
     letter_height = 2
-  
 
     ## files
     # expInfo = {'ID':'test', 'hemifield':['left','right']}
@@ -119,60 +119,6 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         "Gaze_out",
         "Stair")
 
-    # ## blindspot parameters
-    # bs_file = open(glob(main_path + 'mapping/' + ID + '_LH_blindspot*.txt')[-1], 'r')
-    # bs_param = bs_file.read().replace('\t','\n').split('\n')
-    # bs_file.close()
-    # spot_left_cart = eval(bs_param[1])
-    # spot_left = cart2pol(spot_left_cart[0], spot_left_cart[1])
-    # spot_left_size = eval(bs_param[3])
-
-    # bs_file = open(glob(main_path + 'mapping/' + ID + '_RH_blindspot*.txt')[-1],'r')
-    # bs_param = bs_file.read().replace('\t','\n').split('\n')
-    # bs_file.close()
-    # spot_righ_cart = eval(bs_param[1])
-    # spot_righ = cart2pol(spot_righ_cart[0], spot_righ_cart[1])
-    # spot_righ_size = eval(bs_param[3])
-
-
-    # if hemifield == 'left':
-    #     spot_cart = spot_left_cart
-    #     spot      = spot_left
-    #     spot_size = spot_left_size
-    # else:
-    #     spot_cart = spot_righ_cart
-    #     spot      = spot_righ
-    #     spot_size = spot_righ_size
-
-    # '''
-    # distance of reference between dots (target)
-    # => width of blindspot + 2 (dot width, padding) + 2 (to account for a max jitter of 1 on either side)
-    # '''
-    # tar =  spot_size[0] + 2 + 2
-
-    # # size of blind spot + 2 (dot width, padding)
-    # if hemifield == 'left' and spot_cart[1] < 0:
-    #     ang_up = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2
-    # else:
-    #     ang_up = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2
-
-    # ## colour (eye) parameters
-    # col_file = open(glob(main_path + 'color/' + ID + '_col_cal*.txt')[-1],'r')
-    # col_param = col_file.read().replace('\t','\n').split('\n')
-    # col_file.close()
-    # col_ipsi = eval(col_param[3]) if hemifield == 'left' else eval(col_param[5]) # left or right
-    # col_cont = eval(col_param[5]) if hemifield == 'left' else eval(col_param[3]) # right or left
-    # col_back = [ 0.55, 0.45,  -1.0] #changed by belen to prevent red bleed
-    # col_both = [-0.7, -0.7, -0.7] 
-
-    ## window & elements
-    # win = visual.Window([1500,800],allowGUI=True, monitor='ExpMon',screen=1, units='pix', viewPos = [0,0], fullscr = True, color= col_back)
-    # win.mouseVisible = False
-    # fixation = visual.ShapeStim(win, vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
-
-    # hiFusion = fusionStim(win=win, pos=[0, 0.7], units = 'norm', col = [col_back, col_both])
-    # loFusion = fusionStim(win=win, pos=[0,-0.7], units = 'norm', col = [col_back, col_both])
-
 
     x = 1
     et_filename = 'dist' + ('LH' if hemifield == 'left' else 'RH')
@@ -181,6 +127,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
     # get everything shared from central:
     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+
+    print(setup['paths']) # not using yet, just testing
 
     # unpack all this
     win = setup['win']
@@ -230,29 +178,42 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     # blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=col_ipsi, lineColor = None)
     # blindspot.pos = spot_cart
     # blindspot.size = spot_size
-    blindspot.autoDraw = True 
+    # blindspot.autoDraw = True 
+
+    left_prop  = setup['blindspotmarkers']['left_prop']
+    right_prop = setup['blindspotmarkers']['right_prop']
+
+    spot_left    = left_prop['spot']
+    ang_up_left  = left_prop['ang_up']
+    tar_left     = left_prop['tar']
+
+    spot_right   = right_prop['spot']
+    ang_up_right = right_prop['ang_up']
+    tar_right    = right_prop['tar']
 
     ## prepare trials
     positions = {
-        "left-top": [(spot_left[0] - ang_up, spot_left[1] - tar/2), (spot_left[0] - ang_up, spot_left[1] + tar/2)],
-        "left-mid": [(spot_left[0] +     00, spot_left[1] - tar/2), (spot_left[0] +     00, spot_left[1] + tar/2)],
-        "left-bot": [(spot_left[0] + ang_up, spot_left[1] - tar/2), (spot_left[0] + ang_up, spot_left[1] + tar/2)],
-        "righ-top": [(spot_righ[0] + ang_up, spot_righ[1] - tar/2), (spot_righ[0] + ang_up, spot_righ[1] + tar/2)],
-        "righ-mid": [(spot_righ[0] +     00, spot_righ[1] - tar/2), (spot_righ[0] +     00, spot_righ[1] + tar/2)],
-        "righ-bot": [(spot_righ[0] - ang_up, spot_righ[1] - tar/2), (spot_righ[0] - ang_up, spot_righ[1] + tar/2)],
+        "left-top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
+        "left-mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)],
+        "left-bot": [(spot_left[0]  + ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  + ang_up_left,  spot_left[1]  + tar_left/2)],
+        "righ-top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
+        "righ-mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
+        "righ-bot": [(spot_right[0] - ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] - ang_up_right, spot_right[1] + tar_right/2)],
     }
 
     if hemifield == 'left':
         # First column is target, second column is foil
         pos_array = [["left-mid", "left-top"],
-                    ["left-mid", "left-bot"],
-                    ["left-top", "left-bot"],
-                    ["left-bot", "left-top"]]
+                     ["left-mid", "left-bot"],
+                     ["left-top", "left-bot"],
+                     ["left-bot", "left-top"]]
+        tar = tar_left
     else:
         pos_array = [["righ-mid", "righ-top"],
-                    ["righ-mid", "righ-bot"],
-                    ["righ-top", "righ-bot"],
-                    ["righ-bot", "righ-top"]]
+                     ["righ-mid", "righ-bot"],
+                     ["righ-top", "righ-bot"],
+                     ["righ-bot", "righ-top"]]
+        tar = tar_right
 
     pos_array_bsa = pos_array[0:2]
     pos_array_out = pos_array[2:4]
@@ -362,10 +323,10 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             point_3.fillColor = col_ipsi
             point_4.fillColor = col_ipsi
         else:
-            point_1.fillColor = col_cont
-            point_2.fillColor = col_cont
-            point_3.fillColor = col_cont
-            point_4.fillColor = col_cont
+            point_1.fillColor = col_contra
+            point_2.fillColor = col_contra
+            point_3.fillColor = col_contra
+            point_4.fillColor = col_contra
         
         hiFusion.resetProperties()
         loFusion.resetProperties()
@@ -418,10 +379,11 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         if not gaze_out:
             ## trial
             
-            hiFusion.draw()
-            loFusion.draw()
-            fixation.draw()
-            win.flip()
+            # blindspot.draw()
+            # hiFusion.draw()
+            # loFusion.draw()
+            # fixation.draw()
+            # win.flip()
             trial_clock.reset()
             gaze_in_region = True
         
@@ -436,7 +398,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                     gaze_out = True
                     break
 
-                fixation.draw()            
+                fixation.draw()
+                blindspot.draw()
                 hiFusion.draw()
                 loFusion.draw()
 
@@ -472,7 +435,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         if abort:
             break
         
-        if not gaze_out:
+        if not gaze_out: # what is this test?
         
             ## response
             fixation.ori += 45
