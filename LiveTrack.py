@@ -352,7 +352,8 @@ def SetDataComment(comment):
     result = _dll.crsLiveTrackSetDataComment(ctypes.byref(namebuf))
     if result!=0:
         print('LiveTrack: Error setting data comment')
-    else:
-        print('LiveTrack: Successfully set data comment')
+    # this floods the CLI:
+    # else:
+    #     print('LiveTrack: Successfully set data comment')
     return result
 
