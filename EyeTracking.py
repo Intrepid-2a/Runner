@@ -754,8 +754,10 @@ class EyeTracker:
         # initialise LiveTrack
         # LiveTrack.Init() # already done
 
+
+
         self.LiveTrack.SetResultsTypeRaw() # stream raw data
-        self.LiveTrack.StartTracking() # buffer data to lib
+        # self.LiveTrack.StartTracking() # buffer data to lib
         [ width, height, sampleRate, offsetX, offsetY ] = self.LiveTrack.GetCaptureConfig() # estimate sample rate
         fixDurSamples = round((float(minDur)/1000)*float(sampleRate)) # samples per fixation duration
 
@@ -775,7 +777,7 @@ class EyeTracker:
 
         visual.TextStim(self.psychopyWindow,'calibration', height = 1,wrapWidth=30, color = 'black').draw()
         self.psychopyWindow.flip()
-        time.sleep(0.25) # is this necessary?
+        time.sleep(0.3333) # is this necessary?
 
         for target_idx in range(ntargets):
             # plot a circle at the fixation position.
@@ -870,7 +872,7 @@ class EyeTracker:
         # Stop buffering data to the library
         ######################################################### NOT SURE ABOUT THIS:
 
-        self.LiveTrack.StopTracking()
+        # self.LiveTrack.StopTracking()
 
         # Clear the data in the buffer
         self.LiveTrack.ClearDataBuffer()
@@ -935,9 +937,17 @@ class EyeTracker:
         #     self.LiveTrackGS.VideoStop()
 
         self.LiveTrack.SetResultsTypeCalibrated()
+        # self.LiveTrack.StartTracking()
 
-        self.__N_calibrations += 1
+        cal_files = glob( os.path.join(self.filefolder, 'calibration_*.json' ) )
+        if len(cal_files):
+            idx = np.max([int(os.path.splitext(os.path.basename(x))[0].split('_')[1]) for x in cal_files]) + 1
+        else:
+            idx = 1
+
+        self.__N_calibrations = idx
         self.comment('calibration %d'%(self.__N_calibrations))
+
         if self.storefiles:
             self.savecalibration()
 
