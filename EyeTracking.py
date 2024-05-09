@@ -1560,7 +1560,8 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                     colors            = colors )
 
     if location == 'toronto':
-        ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
+        if not tracker == 'mouse':
+            ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
 
     fcols = [[-1,-1,-1],[1,1,1]]
     if 'both' in colors.keys():
@@ -1703,16 +1704,14 @@ def makeBlindSpotMarkers(win, task, ID, colors):
                                                 'tar'    : tar,
                                                 'ang_up' : ang_up       }
 
+        print(spot_size)
         spot_size = [max(min(1,x),x-1) for x in spot_size]
+        print(spot_size)
 
 
-        blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=colors[hemifield], lineColor = None)
-        blindspot.pos = spot_cart
-        blindspot.size = spot_size
-        # blindspot.autoDraw = True
-        # set autodraw only on the one used in the task
-
-        blindspotmarkers[hemifield] = blindspot
+        blindspotmarkers[hemifield] = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=colors[hemifield], lineColor = None)
+        blindspotmarkers[hemifield].pos = spot_cart
+        blindspotmarkers[hemifield].size = spot_size
 
     print(len(blindspotmarkers))
 

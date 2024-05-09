@@ -327,8 +327,8 @@ def doBlindSpotMapping(ID=None,task=None):
     pyg_keyboard = key.KeyStateHandler()
     cfg['hw']['win'].winHandle.push_handlers(pyg_keyboard)
 
-
-    cfg['hw']['tracker'].initialize()
+    if not location == 'toronto':
+        cfg['hw']['tracker'].initialize()
     cfg['hw']['tracker'].calibrate()
     cfg['hw']['tracker'].startcollecting()
     # print('tracking...')
