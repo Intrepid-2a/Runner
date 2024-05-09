@@ -334,7 +334,9 @@ def doBlindSpotMapping(ID=None,task=None):
     # print('tracking...')
 
     # testX = visual.TextStim(cfg['hw']['win'], 'X', height = 1,wrapWidth=30, color = 'black', pos=[-3,-3])
-
+    fixation_yes = setup['fixation']
+    fixation_no  = setup['fixation_x']
+    
 
     for hemifield in ['left', 'right']:
 
@@ -368,8 +370,8 @@ def doBlindSpotMapping(ID=None,task=None):
         
 
         cfg['hw']['win'].mouseVisible = False
-        fixation_yes = visual.ShapeStim(cfg['hw']['win'], vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 2, units = 'pix', size = (10, 10), closeShape = False, lineColor = colors['both'])
-        fixation_no = visual.ShapeStim(cfg['hw']['win'], vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 2, units = 'pix', size = (10, 10), closeShape = False, lineColor = colors['both'], ori = -45)
+        # fixation_yes = visual.ShapeStim(cfg['hw']['win'], vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 2, units = 'pix', size = (10, 10), closeShape = False, lineColor = colors['both'])
+        # fixation_no = visual.ShapeStim(cfg['hw']['win'], vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 2, units = 'pix', size = (10, 10), closeShape = False, lineColor = colors['both'], ori = -45)
         fixation = fixation_yes
         abort = False
 
