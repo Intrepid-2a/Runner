@@ -35,7 +35,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     nRevs   = 10   #
     nTrials = 30  # at least 10 reversals and 30 trials for each staircase (~ 30*8 staircases = 250 trials)
     # letter_height = 40 # 40 dva is pretty big?
-    letter_height = 2
+    letter_height = 1
 
     ## files
     # expInfo = {'ID':'test', 'hemifield':['left','right']}
@@ -404,6 +404,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 
                 if not tracker.gazeInFixationWindow():
                     gaze_out = True
+                    tracker.comment('trial aborted')
                     break
 
                 fixation.draw()
@@ -435,6 +436,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 k = event.getKeys(['q'])
                 if k and 'q' in k:
                     abort = True
+                    tracker.comment('trial aborted')
                     break
 
             if len(stim_comments) == 1:
@@ -458,6 +460,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 k = event.waitKeys()
             if k[0] in ['q']:
                 abort = True
+                tracker.comment('trial aborted')
                 break
             elif k[0] in ['space']:
                 position[which_stair] = position[which_stair] + [pos]
@@ -465,8 +468,10 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 resp = 'abort'
                 targ_chosen = 'abort'
                 reversal = 'abort'
+                tracker.comment('trial aborted')
             else:
                 resp = 1 if k[0] == 'left' else 2
+                tracker.comment('response')
                 
             fixation.ori -= 45
             
@@ -486,9 +491,9 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                     break
                     
                 #!!# calibrate
-                tracker.stopcollecting() # do we even have to stop/start collecting?
+                # tracker.stopcollecting() # do we even have to stop/start collecting?
                 tracker.calibrate()
-                tracker.startcollecting()
+                # tracker.startcollecting()
                 recalibrate = False
 
                 
@@ -523,9 +528,9 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                         break
 
                     #!!# calibrate
-                    tracker.stopcollecting() # do we even have to stop/start collecting?
+                    # tracker.stopcollecting() # do we even have to stop/start collecting?
                     tracker.calibrate()
-                    tracker.startcollecting()
+                    # tracker.startcollecting()
 
                     fixation.draw()
                     win.flip()
