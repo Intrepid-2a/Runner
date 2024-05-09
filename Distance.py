@@ -252,10 +252,11 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         
     #!!# calibrate
     #tracker.initialize() # this should be done in the central thing... dependent on location: in Toronto we need to override the calibrationTargets
-    tracker.calibrate()
-    tracker.startcollecting()
-    tracker.openfile()
 
+    tracker.openfile()
+    tracker.startcollecting()
+    tracker.calibrate()
+    
     fixation.draw()
     win.flip()
 
@@ -296,6 +297,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     trial = 1
     abort = False
     recalibrate = False
+    break_trial = 1
 
     while any(stairs_ongoing):
 
@@ -600,7 +602,23 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                                         trial])) + "\n")
         respFile.close()
         trial += 1
+        break_trial += 1
 
+        if break_trial > 5:
+            # do a break...
+
+            win.flip()
+            visual.TextStim(win, 'take a break!', height = letter_height, color = col_both).draw()
+            win.flip()
+            
+            tracker.comment('break')
+
+            k = event.waitKeys()
+            while k[0] not in ['space']:
+                k = event.waitKeys()
+
+            tracker.calibrate()
+            break_trial = 1
 
 
     if abort:
