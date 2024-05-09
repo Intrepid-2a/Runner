@@ -1535,10 +1535,20 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                                 units = 'deg', 
                                 size = (1, 1), # might be too small?
                                 closeShape = False, 
-                                lineColor = [-0.5, -0.5, -1.0]) # close to col_both?
+                                lineColor = [-1.0, -1.0, -1.0]) # close to col_both?
+
+    fixation_x = visual.ShapeStim(win, 
+                                  vertices = ((0, -1), (0, 1), (0,0), (-1, 0), (1, 0)), 
+                                  lineWidth = 5, 
+                                  units = 'deg', 
+                                  size = (1, 1), # might be too small?
+                                  closeShape = False, 
+                                  lineColor = [-1.0, -1.0, -1.0], # close to col_both?
+                                  ori = 45)
 
     if 'both' in colors.keys():
         fixation.lineColor = colors['both']
+        fixation_x.lineColor = colors['both']
 
 
     if not any(trackEyes):
@@ -1596,6 +1606,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
              'colors'           : colors,
              'fusion'           : fusion,
              'fixation'         : fixation,
+             'fixation_x'       : fixation_x,
              'blindspotmarkers' : blindspotmarkers,
              'paths'            : paths } )
 
