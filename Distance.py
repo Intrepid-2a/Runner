@@ -140,15 +140,18 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     if hemifield == 'right':
         col_contra, col_ipsi = colors['left'], colors['right']
 
-    if hemifield == 'left':
-        col_ipsi, col_contra = colors['right'], colors['left']
-    if hemifield == 'right':
-        col_contra, col_ipsi = colors['right'], colors['left']
+    # if hemifield == 'left':
+    #     col_ipsi, col_contra = colors['right'], colors['left']
+    # if hemifield == 'right':
+    #     col_contra, col_ipsi = colors['right'], colors['left']
+
+    # print(colors)
 
     hiFusion = setup['fusion']['hi']
     loFusion = setup['fusion']['lo']
 
     blindspot = setup['blindspotmarkers'][hemifield]
+    # print(blindspot.fillColor)
     
     fixation = setup['fixation']
 
@@ -248,7 +251,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         core.quit()
         
     #!!# calibrate
-    tracker.initialize()
+    #tracker.initialize() # this should be done in the central thing... dependent on location: in Toronto we need to override the calibrationTargets
     tracker.calibrate()
     tracker.startcollecting()
     tracker.openfile()
@@ -338,7 +341,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
         ## pre trial fixation
         tracker.waitForFixation()
-        gaze_out = False #? not sure what this variable is for but it needs to exist
+        gaze_out = False #? not sure what this variable is for but it needs to exist?
 
         # not sure, but the next while loop seems to be doing the same thing as "waitForFixation()"
         # 
@@ -467,7 +470,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 
             fixation.ori -= 45
             
-        else:
+        else: # we should NEVER get here...
         
             ## dealing with auto-aborted trials
         
@@ -593,6 +596,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         respFile.close()
         trial += 1
 
+
+
     if abort:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("Run manually ended at " + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M") + "!")
@@ -621,6 +626,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     k = event.waitKeys()
 
     #!!# close eye-tracker (eye-tracker object requires the window object - which should also be closed... but only after this last message)
+    win.close()
 
 
 if __name__ == "__main__":
