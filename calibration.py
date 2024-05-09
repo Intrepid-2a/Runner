@@ -338,6 +338,8 @@ def doBlindSpotMapping(ID=None,task=None):
 
     for hemifield in ['left', 'right']:
 
+        abort = False
+
         if hemifield == 'left':
             colors['ipsi'], colors['contra'] = colors['left'], colors['right']
             filename = ID.lower() + '_LH_blindspot_'
@@ -422,12 +424,13 @@ def doBlindSpotMapping(ID=None,task=None):
 
             # print(point.pos)
 
-        cfg['hw']['win'].getMovieFrame()
-        cfg['hw']['win'].saveMovieFrames(data_path + filename + str(x) + '.png')
+        if not abort:
+            cfg['hw']['win'].getMovieFrame()
+            cfg['hw']['win'].saveMovieFrames(data_path + filename + str(x) + '.png')
 
-        respFile = open(data_path + filename + str(x) + '.txt','w')
-        respFile.write('position:\t[{:.2f},{:.2f}]\nsize:\t[{:.2f},{:.2f}]'.format(point.pos[0], point.pos[1],  point.size[0], point.size[1]))
-        respFile.close()
+            respFile = open(data_path + filename + str(x) + '.txt','w')
+            respFile.write('position:\t[{:.2f},{:.2f}]\nsize:\t[{:.2f},{:.2f}]'.format(point.pos[0], point.pos[1],  point.size[0], point.size[1]))
+            respFile.close()
 
 
     cfg['hw']['tracker'].stopcollecting()
