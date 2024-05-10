@@ -1,5 +1,4 @@
 import os, subprocess, glob, copy, secrets
-from glob import glob
 
 def pullGitRepos(repos='all', main=True, clone=False):
     
@@ -185,11 +184,11 @@ def getParticipantTaskInfo(ID):
         for subtask in ['color','mapping','RH','LH']:
 
             if subtask in ['color', 'mapping']:
-                file_list = glob(os.path.join('..', 'data', task, subtask, ID + '_*.txt' ) )
+                file_list = glob.glob(os.path.join('..', 'data', task, subtask, ID + '_*.txt' ) )
 
             if subtask in ['LH', 'RH']:
                 print(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ))
-                file_list = glob(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ) )
+                file_list = glob.glob(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ) )
 
             if len(file_list):
                 info[task][subtask] = True
