@@ -4,7 +4,10 @@
 import wx, wx.adv, os
 
 # functions for Runner
-import utilities
+from utilities import *
+
+from calibration import *
+from Distance import *
 
 
 class MyFrame(wx.Frame):
@@ -71,6 +74,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
         self.Bind(wx.EVT_BUTTON, self.cloneGitHub, self.clone_button)
         self.Bind(wx.EVT_BUTTON, self.pullGitHub, self.pull_button)
+
+        self.Bind(wx.EVT_COMBOBOX, self.pickExisting, self.pick_existing)
 
         # UPLOAD functionality needs to be figured out still...
 
@@ -153,7 +158,13 @@ class MyFrame(wx.Frame):
         self.Layout() # frame method from wx
 
     def refresh(self):
-        pass
+        # self.pick_existing.choices = findParticipantIDs()
+        
+        self.pick_existing.Clear()
+        self.pick_existing.AppendItems(findParticipantIDs())
+
+    def pickExisting(self, event):
+        self.participantID.SetValue(self.pick_existing.GetValue())
 
     def disableChecks(self):
         self.folder_check.SetValue(False)
