@@ -1,4 +1,5 @@
 import os, subprocess, glob, copy, secrets
+from glob import glob
 
 def pullGitRepos(repos='all', main=True, clone=False):
     
@@ -174,6 +175,29 @@ def collectParticipantInfo():
 
     
     return(participantIDs)
+
+def getParticipantTaskInfo(ID):
+
+    info = {}
+
+    for task in ['area', 'curvature', 'distance']:
+        info[task] = {}
+        for subtask in ['color','mapping','RH','LH']:
+
+            if subtask in ['color', 'mapping']:
+                file_list = glob(os.path.join('..', 'data', task, subtask, ID + '_*.txt' ) )
+
+            if subtask in ['LH', 'RH']:
+                print(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ))
+                file_list = glob(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ) )
+
+            if len(file_list):
+                info[task][subtask] = True
+            else:
+                info[task][subtask] = False
+
+    return(info)              
+
 
 
 def generateRandomParticipantID(prepend='', nbytes=3):
