@@ -194,6 +194,43 @@ class MyFrame(wx.Frame):
         self.participantID.SetValue(newID)
 
 
+    def toggleParticipantTaskButtons(self, event):
+
+        info = getParticipantTaskInfo(self.participantID.GetValue())
+
+        # new check 8 things, and toggle the 16 buttons:
+        self.dist_color.Enable()
+        self.dist_mapping.Disable()
+        if info['distance']['color']:
+            self.dist_mapping.Enable()
+        self.dist_left.Disable()
+        self.dist_right.Disable()
+        if info['distance']['mapping']:
+            self.dist_left.Enable()
+            self.dist_right.Enable()
+
+        self.area_color.Enable()
+        self.area_mapping.Disable()
+        if info['area']['color']:
+            self.area_mapping.Enable()
+        self.area_left.Disable()
+        self.area_right.Disable()
+        if info['area']['mapping']:
+            self.area_left.Enable()
+            self.area_right.Enable()
+        
+        self.curve_color.Enable()
+        self.curve_mapping.Disable()
+        if info['curvature']['color']:
+            self.curve_mapping.Enable()
+        self.curve_left.Disable()
+        self.curve_right.Disable()
+        if info['curvature']['mapping']:
+            self.curve_left.Enable()
+            self.curve_right.Enable()
+
+
+
     def disableChecks(self):
         self.folder_check.SetValue(False)
         self.clone_check.SetValue(False)
