@@ -26,7 +26,7 @@ from psychopy.hardware import keyboard
 from pyglet.window import key
 
 
-def doColorCalibration(ID=None, task=None):
+def doColorCalibration(ID=None, task=None, location=None):
 
     expInfo = {}
     askQuestions = False
@@ -37,6 +37,9 @@ def doColorCalibration(ID=None, task=None):
     if task == None:
         expInfo['task'] = ['distance', 'area', 'curvature']
         askQuestions = True
+    # if location == None:
+    #     expInfo['location'] = ['glasgow', 'toronto']
+    #     askQuestions = True
 
     if askQuestions:
         dlg = gui.DlgFromDict(expInfo, title='Infos')
@@ -45,6 +48,8 @@ def doColorCalibration(ID=None, task=None):
         ID = expInfo['ID']
     if task == None:
         task = expInfo['task']
+    # if location == None:
+    #     location = expInfo[]
 
     ## path
     data_path = "../data/%s/color/"%(task)
@@ -71,10 +76,11 @@ def doColorCalibration(ID=None, task=None):
     trackEyes = [False,False]
 
     # need location
-    if os.sys.platform == 'linux':
-        location = 'toronto'
-    else:
-        location = 'glasgow'
+    if location == None:
+        if os.sys.platform == 'linux':
+            location = 'toronto'
+        else:
+            location = 'glasgow'
 
     # filefoder needs to be specified? maybe not for color calibration? no eye-tracking files will be written...
     # not sending colors to localize setup, since we're still determining them here: use defaults for now!
