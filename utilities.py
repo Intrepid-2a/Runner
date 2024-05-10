@@ -94,8 +94,10 @@ def findParticipantIDs(tasks='all', subtasks='all'):
             taskIDs = [x.split('_')[0] for x in filenames]
 
             participantIDs = list(set(participantIDs + taskIDs))
-            # participant data from distance task should be saved differently: participant should FIRST (like in the other tasks)
-    
+            
+    if '' in participantIDs:
+        participantIDs.remove('')
+
     return(participantIDs)
 
 
@@ -128,12 +130,13 @@ def collectParticipantInfo():
             }
     }
 
-    if os.sys.platform == 'linux':
-        location = 'toronto'
-        pre = 'TOR'
-    else:
-        location = 'glasgow'
-        pre = 'GLA'
+    # if location == None:
+    #     if os.sys.platform == 'linux':
+    #         location = 'toronto'
+    #     else:
+    #         location = 'glasgow'
+
+    # pre = {'toronto':'TOR', 'glasgow':'GLA'}[location]
     
     # then info could be populated with changed versions of the empty participant
     # keys can easily be extracted when generating new / unique participant IDs
