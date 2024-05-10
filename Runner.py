@@ -17,9 +17,19 @@ class MyFrame(wx.Frame):
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
 
-        self.SetSize(600, 400) ## too big?
+        self.SetSize(600, 480) ## too big?
 
         ### --- MAKE GUI ELEMENTS --- ###
+        self.existingParticipants = findParticipantIDs()
+
+
+        if os.sys.platform == 'linux':
+            self.location = 'Toronto'
+        else:
+            self.location = 'Glasgow'
+		  
+        self.location_radiobox = wx.RadioBox(self, label = 'location:', pos = (80,10), choices = ['Glasgow', 'Toronto'], majorDimension = 1, style = wx.RA_SPECIFY_ROWS) 
+        self.location_radiobox.SetStringSelection(self.location)
 
         # participant elements:
         self.text_participant = wx.StaticText(self, -1, "Participant ID:")
@@ -27,9 +37,10 @@ class MyFrame(wx.Frame):
         self.refresh_button = wx.Button(self, wx.ID_ANY, "refresh")
         self.refresh_button.SetBitmap(self.refresh_icon) 
         self.text_existing = wx.StaticText(self, -1, "Existing:")
-        self.pick_existing = wx.ComboBox(self, id=wx.ID_ANY, choices=[], style=wx.CB_READONLY)
+        self.pick_existing = wx.ComboBox(self, id=wx.ID_ANY, choices=self.existingParticipants, style=wx.CB_READONLY)
         self.random_generate = wx.Button(self, wx.ID_ANY, "generate random")
         self.participantID = wx.TextCtrl(self, wx.ID_ANY, "")
+
 
         # task elements:
         self.area_count = wx.StaticText(self, -1, "#")
@@ -70,12 +81,16 @@ class MyFrame(wx.Frame):
         self.__do_layout()
 
         ### --- BIND BUTTONS TO FUNCTIONS --- ###
+        
+        self.location_radiobox.Bind(wx.EVT_RADIOBOX,self.selectLocation)
+
+        self.Bind(wx.EVT_BUTTON, self.refresh, self.refresh_button)
+        self.Bind(wx.EVT_COMBOBOX, self.pickExisting, self.pick_existing)
+        self.Bind(wx.EVT_BUTTON, self.generateRandomID, self.random_generate)
 
         self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
         self.Bind(wx.EVT_BUTTON, self.cloneGitHub, self.clone_button)
         self.Bind(wx.EVT_BUTTON, self.pullGitHub, self.pull_button)
-
-        self.Bind(wx.EVT_COMBOBOX, self.pickExisting, self.pick_existing)
 
         # UPLOAD functionality needs to be figured out still...
 
@@ -84,7 +99,7 @@ class MyFrame(wx.Frame):
 
     def __set_properties(self):
         self.SetTitle("Intrepid-2a Experiment Runner")
-
+        self.disableChecks()
         # update list of choices for existing participants
         self.refresh()
 
@@ -98,10 +113,13 @@ class MyFrame(wx.Frame):
         # - GitHub & OSF synchronization sections
         # these will be placed into the main grid afterwards
 
-        main_grid        = wx.GridSizer(3, 1, 0, 0)
+        main_grid        = wx.GridSizer(4, 1, 0, 0)
+        # location thing is 1 item, no grid needed...
         participant_grid = wx.GridSizer(2, 3, 0, 0)
         taskrun_grid     = wx.GridSizer(3, 6, 0, 0)
         synch_grid       = wx.GridSizer(2, 4, 0, 0)  # too much?
+
+        main_grid.Add(self.location_radiobox, 0, wx.ALIGN_LEFT, 0)
 
         # add elements to participant grid:
         participant_grid.Add(self.text_participant, 0, wx.ALIGN_LEFT, 0)
@@ -157,14 +175,24 @@ class MyFrame(wx.Frame):
         self.SetSizer(main_grid)
         self.Layout() # frame method from wx
 
+
+    def selectLocation(self):
+        self.location = self.location_radiobox.GetStringSelection()
+
     def refresh(self):
-        # self.pick_existing.choices = findParticipantIDs()
+        self.existingParticipants = findParticipantIDs()
         
         self.pick_existing.Clear()
-        self.pick_existing.AppendItems(findParticipantIDs())
+        self.pick_existing.AppendItems(self.existingParticipants)
 
     def pickExisting(self, event):
         self.participantID.SetValue(self.pick_existing.GetValue())
+
+
+    def generateRandomID(self, event):
+        newID = generateRandomParticipantID(prepend=self.location.lower()[:3]+'_', nbytes=3)
+        self.participantID.SetValue(newID)
+
 
     def disableChecks(self):
         self.folder_check.SetValue(False)

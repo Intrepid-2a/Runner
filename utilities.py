@@ -1,4 +1,4 @@
-import os, subprocess, glob, copy
+import os, subprocess, glob, copy, secrets
 
 def pullGitRepos(repos='all', main=True, clone=False):
     
@@ -176,6 +176,13 @@ def collectParticipantInfo():
     return(participantIDs)
 
 
+def generateRandomParticipantID(prepend='', nbytes=3):
 
+    existingIDs = findParticipantIDs()
 
+    newID = prepend + secrets.token_hex(nbytes)
+    while newID in existingIDs:
+        newID = prepend + secrets.token_hex(nbytes)
+
+    return(newID)
 
