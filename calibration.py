@@ -250,7 +250,7 @@ def doColorCalibration(ID=None, task=None, location=None):
 
 
 
-def doBlindSpotMapping(ID=None,task=None):
+def doBlindSpotMapping(ID=None,task=None,location=None):
     
     askQuestions = False
     expInfo = {}
@@ -299,19 +299,24 @@ def doBlindSpotMapping(ID=None,task=None):
     #            'cont'   : col_cont  } 
 
 
+    if location == None:
+        if os.sys.platform == 'linux':
+            location = 'toronto'
+        else:
+            location = 'glasgow'
 
-    if os.sys.platform == 'linux':
-        location = 'toronto'
-        step = .02
-    else:
-        location = 'glasgow'
+    if location == 'toronto':
+        step = .01
 
+    print(location)
+    print(step)
 
     glasses = 'RG'
     trackEyes = [True, True]
 
 
     setup = localizeSetup(location=location, glasses=glasses, trackEyes=trackEyes, filefolder=None, filename=None, task=task, ID=ID) # data path is for the mapping data, not the eye-tracker data!
+    print(setup['paths'])
 
     colors = setup['colors']
 
@@ -325,21 +330,17 @@ def doBlindSpotMapping(ID=None,task=None):
     cfg = {}
     cfg['hw'] = setup
 
-
-    # print(cfg['hw']['win'].monitor.getGammaGrid())
-    # print(cfg['hw']['win'].color)
-
-
     pyg_keyboard = key.KeyStateHandler()
     cfg['hw']['win'].winHandle.push_handlers(pyg_keyboard)
 
-    if not location == 'toronto':
-        cfg['hw']['tracker'].initialize()
+    if location != 'toronto':
+        # initialization should've already been done for the case of Toronto?
+        print('not toronto?')
+        # cfg['hw']['tracker'].initialize()
     cfg['hw']['tracker'].calibrate()
     cfg['hw']['tracker'].startcollecting()
     # print('tracking...')
 
-    # testX = visual.TextStim(cfg['hw']['win'], 'X', height = 1,wrapWidth=30, color = 'black', pos=[-3,-3])
     fixation_yes = setup['fixation']
     fixation_no  = setup['fixation_x']
     
@@ -386,7 +387,8 @@ def doBlindSpotMapping(ID=None,task=None):
         cfg['hw']['win'].flip()
 
         while 1:
-            k = event.getKeys(['up', 'down', 'left', 'right', 'q', 'w', 'a', 's', 'space', 'escape', '0'])
+            # k = event.getKeys(['up', 'down', 'left', 'right', 'q', 'w', 'a', 's', 'space', 'escape', '0'])
+            k = event.getKeys(['space', 'escape', '0', 'insert'])
 
             if k:
                 if 'escape' in k:
@@ -395,11 +397,13 @@ def doBlindSpotMapping(ID=None,task=None):
 
                 if 'space' in k:
                     break
+                if pyg_keyboard[key.NUM_INSERT]:
+                    break
 
                 if '0' in k:
-                    cfg['hw']['tracker'].stopcollecting() # do we even have to stop/start collecting?
+                    # cfg['hw']['tracker'].stopcollecting() # do we even have to stop/start collecting?
                     cfg['hw']['tracker'].calibrate()
-                    cfg['hw']['tracker'].startcollecting()
+                    # cfg['hw']['tracker'].startcollecting()
 
             if cfg['hw']['tracker'].gazeInFixationWindow():
                 fixation = fixation_yes
@@ -412,6 +416,7 @@ def doBlindSpotMapping(ID=None,task=None):
                     point.pos += [-step, 0]
                 if pyg_keyboard[key.RIGHT]:
                     point.pos += [ step, 0]
+
                 if pyg_keyboard[key.Q]:
                     point.size += [step,0]
                 if pyg_keyboard[key.W]:
@@ -419,6 +424,24 @@ def doBlindSpotMapping(ID=None,task=None):
                 if pyg_keyboard[key.A]:
                     point.size += [0, step]
                 if pyg_keyboard[key.S]:
+                    point.size = [point.size[0], max(step, point.size[1] - step)]
+
+                if pyg_keyboard[key.NUM_UP]:
+                    point.pos += [ 0, step]
+                if pyg_keyboard[key.NUM_DOWN]:
+                    point.pos += [ 0,-step]
+                if pyg_keyboard[key.NUM_LEFT]:
+                    point.pos += [-step, 0]
+                if pyg_keyboard[key.NUM_RIGHT]:
+                    point.pos += [ step, 0]
+
+                if pyg_keyboard[key.NUM_HOME]:
+                    point.size += [step,0]
+                if pyg_keyboard[key.NUM_PAGE_UP]:
+                    point.size = [max(step, point.size[0] - step), point.size[1]]
+                if pyg_keyboard[key.NUM_END]:
+                    point.size += [0, step]
+                if pyg_keyboard[key.NUM_PAGE_DOWN]:
                     point.size = [point.size[0], max(step, point.size[1] - step)]
             else:
                 fixation = fixation_no
