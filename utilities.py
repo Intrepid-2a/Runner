@@ -187,7 +187,6 @@ def getParticipantTaskInfo(ID):
                 file_list = glob.glob(os.path.join('..', 'data', task, subtask, ID + '_*.txt' ) )
 
             if subtask in ['LH', 'RH']:
-                print(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ))
                 file_list = glob.glob(os.path.join('..', 'data', task, ID + '*' + subtask + '*.txt' ) )
 
             if len(file_list):
