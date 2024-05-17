@@ -679,7 +679,10 @@ class EyeTracker:
             else:
                 raise Warning("calibrationPoints must have at least 3 rows")
         else:
-            raise Warning("calibrationPoints must be a numpy.ndarray")
+            if calibrationPoints == None:
+                return
+            else:
+                raise Warning("calibrationPoints must be a numpy.ndarray")
 
 
     def __DM_initialize(self):
@@ -939,16 +942,17 @@ class EyeTracker:
         self.LiveTrack.SetResultsTypeCalibrated()
         # self.LiveTrack.StartTracking()
 
-        cal_files = glob( os.path.join(self.filefolder, 'calibration_*.json' ) )
-        if len(cal_files):
-            idx = np.max([int(os.path.splitext(os.path.basename(x))[0].split('_')[1]) for x in cal_files]) + 1
-        else:
-            idx = 1
-
-        self.__N_calibrations = idx
-        self.comment('calibration %d'%(self.__N_calibrations))
-
         if self.storefiles:
+            
+            cal_files = glob( os.path.join(self.filefolder, 'calibration_*.json' ) )
+            if len(cal_files):
+                idx = np.max([int(os.path.splitext(os.path.basename(x))[0].split('_')[1]) for x in cal_files]) + 1
+            else:
+                idx = 1
+
+            self.__N_calibrations = idx
+            self.comment('calibration %d'%(self.__N_calibrations))
+
             self.savecalibration()
 
     def __DM_calibrate(self):
@@ -1473,9 +1477,9 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                     colors['red']    = [ 0.55, -1.00, -1.00]
                     colors['blue']   = [-1.00,  0.45, -1.00]
                 if location == 'toronto':
-                    colors['back']   = [ 0.55,  0.45, -1.0 ]
-                    colors['red']    = [ 0.55, -1.0,  -1.0 ]
-                    colors['blue']   = [-1.0,   0.45, -1.0 ]
+                    colors['back']   = [ 0.5,  0.5, -1.0 ]
+                    colors['red']    = [ 0.5, -1.0, -1.0 ]
+                    colors['blue']   = [-1.0,  0.5, -1.0 ]
             if glasses == 'RB':
                 # this should no longer be used:
                 print('are you sure about using RED/BLUE glasses?')
@@ -1523,8 +1527,8 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
         resolution = [1920, 1080] # in pixels
         size       = [59.8, 33.6] # in cm
-        distance   = 50 # in cm
-        screen     = 0  # index on the system: 0 = first monitor, 1 = second monitor, and so on
+        distance   = 49.53 # in cm
+        screen     = 1  # index on the system: 0 = first monitor, 1 = second monitor, and so on
 
         tracker = 'livetrack'
 
@@ -1582,6 +1586,10 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     if location == 'toronto':
         if not tracker == 'mouse':
             ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
+        else:
+            ET.initialize()
+    else:
+        ET.initialize()
 
     fcols = [[-1,-1,-1],[1,1,1]]
     if 'both' in colors.keys():
@@ -1607,6 +1615,9 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
         paths['color']        = os.path.join('..', 'data', task, 'color' )
         paths['mapping']      = os.path.join('..', 'data', task, 'mapping' )
         paths['eyetracking']  = os.path.join('..', 'data', task, 'eyetracking', ID )
+        for p in paths.keys():
+            if not os.path.exists(paths[p]):
+                os.makedirs(paths[p], exist_ok = True)
 
     
 
