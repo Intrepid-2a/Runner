@@ -24,12 +24,12 @@ class MyFrame(wx.Frame):
 
 
         if os.sys.platform == 'linux':
-            self.location = 'Toronto'
+            temp_location = 'Toronto'
         else:
-            self.location = 'Glasgow'
+            temp_location = 'Glasgow'
 		  
         self.location_radiobox = wx.RadioBox(self, label = 'location:', pos = (80,10), choices = ['Glasgow', 'Toronto'], majorDimension = 1, style = wx.RA_SPECIFY_ROWS) 
-        self.location_radiobox.SetStringSelection(self.location)
+        self.location_radiobox.SetStringSelection(temp_location)
 
         # participant elements:
         self.text_participant = wx.StaticText(self, -1, "Participant ID:")
@@ -82,12 +82,33 @@ class MyFrame(wx.Frame):
 
         ### --- BIND BUTTONS TO FUNCTIONS --- ###
         
+        # location functionality:
         self.location_radiobox.Bind(wx.EVT_RADIOBOX,self.selectLocation)
 
+        # participant ID functionality:
         self.Bind(wx.EVT_BUTTON, self.refresh, self.refresh_button)
         self.Bind(wx.EVT_COMBOBOX, self.pickExisting, self.pick_existing)
         self.Bind(wx.EVT_BUTTON, self.generateRandomID, self.random_generate)
 
+        # task button functionality:
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_color)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_mapping)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_left)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_right)
+        
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='color',   self.area_color)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='mapping', self.area_mapping)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='left',    self.area_left)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='right',   self.area_right)
+
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='color',    self.curve_color)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='mapping',  self.curve_mapping)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='left',     self.curve_left)
+        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='right',    self.curve_right)
+        
+
+
+        # more advanced stuff ?
         self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
         self.Bind(wx.EVT_BUTTON, self.cloneGitHub, self.clone_button)
         self.Bind(wx.EVT_BUTTON, self.pullGitHub, self.pull_button)
@@ -100,10 +121,11 @@ class MyFrame(wx.Frame):
     def __set_properties(self):
         self.SetTitle("Intrepid-2a Experiment Runner")
         self.disableChecks()
+        self.selectLocation()
         # update list of choices for existing participants
         self.refresh()
 
-        # count participants who already did the experiment
+        # count participants who already did the experiment?
 
     def __do_layout(self):
 
@@ -176,22 +198,25 @@ class MyFrame(wx.Frame):
         self.Layout() # frame method from wx
 
 
-    def selectLocation(self):
-        self.location = self.location_radiobox.GetStringSelection()
+    def selectLocation(self, event=0):
+        self.location = self.location_radiobox.GetStringSelection().lower()
 
-    def refresh(self):
+    def refresh(self, event=0):
         self.existingParticipants = findParticipantIDs()
         
         self.pick_existing.Clear()
         self.pick_existing.AppendItems(self.existingParticipants)
+        self.toggleParticipantTaskButtons(event)
 
     def pickExisting(self, event):
         self.participantID.SetValue(self.pick_existing.GetValue())
+        self.toggleParticipantTaskButtons(event)
 
 
     def generateRandomID(self, event):
-        newID = generateRandomParticipantID(prepend=self.location.lower()[:3]+'_', nbytes=3)
+        newID = generateRandomParticipantID(prepend=self.location.lower()[:3]+'', nbytes=3)
         self.participantID.SetValue(newID)
+        self.toggleParticipantTaskButtons(event)
 
 
     def toggleParticipantTaskButtons(self, event):
@@ -229,6 +254,56 @@ class MyFrame(wx.Frame):
             self.curve_left.Enable()
             self.curve_right.Enable()
 
+
+    def runTask(self, event):
+
+        if self.participantID.GetValue() == '':
+            # no participant ID!
+            return
+
+        task = None
+        subtask = None
+
+        buttonId = event.Id
+        if buttonId in [self.dist_color.Id, self.dist_mapping.Id, self.dist_left.Id, self.dist_right.Id]:
+            task = 'distance'
+        if buttonId in [self.area_color.Id, self.area_mapping.Id, self.area_left.Id, self.area_right.Id]:
+            task = 'area'
+        if buttonId in [self.curve_color.Id, self.curve_mapping.Id, self.curve_left.Id, self.curve_right.Id]:
+            task = 'curvature'
+
+        if buttonId in [self.dist_color.Id,   self.area_color.Id,   self.curve_color.Id]:
+            subtask = 'color'
+        if buttonId in [self.dist_mapping.Id, self.area_mapping.Id, self.curve_mapping.Id]:
+            subtask = 'mapping'
+        if buttonId in [self.dist_left.Id,    self.area_left.Id,    self.curve_left.Id]:
+            subtask = 'left'
+        if buttonId in [self.dist_right.Id,   self.area_right.Id,   self.curve_right.Id]:
+            subtask = 'right'
+
+        if subtask == None:
+            print('no subtask')
+            return
+        if task == None:
+            print('no task')
+            return
+        
+        print([task, subtask])
+
+        if subtask == 'color':
+            # print('do color calibration')
+            doColorCalibration(ID=self.participantID.GetValue(), task=task, location=self.location)
+            return
+
+        if subtask == 'mapping':
+            # print('do blind spot mpapping')
+            doBlindSpotMapping(ID=self.participantID.GetValue(), task=task, location=self.location)
+            return
+
+        if task == 'distance':
+            print('do distance task')
+            doDistanceTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
+            return
 
 
     def disableChecks(self):
