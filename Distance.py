@@ -19,7 +19,10 @@ import numpy as np
 import random, datetime, os
 from glob import glob
 from itertools import compress
-# from fusion_stim import fusionStim
+
+from psychopy.hardware import keyboard
+from pyglet.window import key
+
 
 import sys, os
 sys.path.append(os.path.join('..', 'EyeTracking'))
@@ -133,6 +136,10 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     # unpack all this
     win = setup['win']
 
+
+    pyg_keyboard = key.KeyStateHandler()
+    win.winHandle.push_handlers(pyg_keyboard)
+
     colors = setup['colors']
     col_both = colors['both']
     if hemifield == 'left':
@@ -163,7 +170,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     ## instructions
     visual.TextStim(win,'Troughout the experiment you will fixate at a white cross that will be located at the center of the screen.   \
     It is important that you fixate on this cross at all times.\n\n You will be presented with pairs of dots. You will have to indicate which dots were closer together.\n\n Left arrow = first pair of dots were closer together.\
-    \n\n Right arrow = second pair of dots were closer together.\n\n\n Press the space bar to start the experiment.', height = letter_height,wrapWidth=1200, color = 'black').draw()
+    \n\n Right arrow = second pair of dots were closer together.\n\n\n Press the space bar to start the experiment.', height = letter_height,wrapWidth=15, color = 'black').draw()
     win.flip()
     k = ['wait']
     while k[0] not in ['q','space']:
@@ -458,13 +465,14 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             win.flip()
             
             k = ['wait']
-            while k[0] not in ['q', 'space', 'left', 'right']:
+            while k[0] not in ['q', 'space', 'left', 'right', 'num_left', 'num_right', 'num_insert']:
                 k = event.waitKeys()
+
             if k[0] in ['q']:
                 abort = True
                 tracker.comment('trial aborted')
                 break
-            elif k[0] in ['space']:
+            elif k[0] in ['space', 'num_insert']:
                 position[which_stair] = position[which_stair] + [pos]
                 increment = False
                 resp = 'abort'
@@ -472,7 +480,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 reversal = 'abort'
                 tracker.comment('trial aborted')
             else:
-                resp = 1 if k[0] == 'left' else 2
+                resp = 1 if k[0] in ['left', 'num_left'] else 2
                 tracker.comment('response')
                 
             fixation.ori -= 45
@@ -511,9 +519,10 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 hiFusion.draw()
                 loFusion.draw()
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
+                print('# auto abort')
                 win.flip()
                 k = ['wait']
-                while k[0] not in ['q', 'up', 'r']:
+                while k[0] not in ['q', 'up', 'r', 'num_up']:
                     k = event.waitKeys()
                 if k[0] in ['q']:
                     abort = True
@@ -585,7 +594,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             foil_type[which_stair],
             eye[which_stair],
             gaze_out,
-            which_stair)
+            which_stair,
+            trial)
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write('\t'.join(map(str, [resp,
                                         pos[0],
@@ -604,11 +614,12 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         trial += 1
         break_trial += 1
 
-        if break_trial > 5:
+        if break_trial > 50:
             # do a break...
 
             win.flip()
             visual.TextStim(win, 'take a break!', height = letter_height, color = col_both).draw()
+            print('- break...')
             win.flip()
             
             tracker.comment('break')
