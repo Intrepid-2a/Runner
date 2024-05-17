@@ -883,6 +883,8 @@ class EyeTracker:
 
         viewDist = self.psychopyWindow.monitor.getDistance()
 
+        redoCalibration = False
+
         # %% remove failed fixations from data
 
         if self.trackEyes[0]:
@@ -900,9 +902,13 @@ class EyeTracker:
             tgtLocsXL = np.delete(tgtLocs[:,0], failedFixL).tolist()
             tgtLocsYL = np.delete(tgtLocs[:,1], failedFixL).tolist()
 
-            # %% send fixation data to LiveTrack to calibrate
-            calErrL = self.LiveTrack.CalibrateDevice(0, len(tgtLocsXL), tgtLocsXL, tgtLocsYL, VectXL, VectYL, viewDist, np.median(GlintXL), np.median(GlintYL))
-            print('Left eye calibration accuraccy: ',str(math.sqrt(float(calErrL)/len(tgtLocsXL))), 'errors in dva')
+            if len(tgtLocsXL) < 2:
+                print('left eye calibration fewer than 3 good points: redoing calibration')
+                redoCalibration = True
+            else:
+                # %% send fixation data to LiveTrack to calibrate
+                calErrL = self.LiveTrack.CalibrateDevice(0, len(tgtLocsXL), tgtLocsXL, tgtLocsYL, VectXL, VectYL, viewDist, np.median(GlintXL), np.median(GlintYL))
+                print('Left eye calibration accuraccy: ',str(math.sqrt(float(calErrL)/len(tgtLocsXL))), 'errors in dva')
 
 
         if self.trackEyes[1]:
@@ -920,40 +926,59 @@ class EyeTracker:
             tgtLocsXR = np.delete(tgtLocs[:,0], failedFixR).tolist()
             tgtLocsYR = np.delete(tgtLocs[:,1], failedFixR).tolist()
             
-            calErrR = self.LiveTrack.CalibrateDevice(1, len(tgtLocsXR), tgtLocsXR, tgtLocsYR, VectXR, VectYR, viewDist, np.median(GlintXR), np.median(GlintYR))
-            print('Left eye calibration accuraccy: ',str(math.sqrt(float(calErrR)/len(tgtLocsXR))), 'errors in dva')
-        
-
-        # %% plot the estimated fixation locations for the calibration
-        #if trackLeftEye:
-        #    [gazeXL, gazeYL] = LiveTrack.CalcGaze(0, len(tgtLocsXL), VectXL, VectYL)
-        #
-        #if trackRightEye:
-        #    [gazeXR, gazeYR] = LiveTrack.CalcGaze(1, len(tgtLocsXR), VectXR, VectYR)
-        # errors are added?
-        # gazeXL = [x+10 for x in tgtLocsXL]
-        # gazeYL = [x+10 for x in tgtLocsYL]
-        # gazeXR = [x-10 for x in tgtLocsXR]
-        # gazeYR = [x-10 for x in tgtLocsYR]
-        
-        # if useVideo:
-        #     self.LiveTrackGS.VideoStop()
-
-        self.LiveTrack.SetResultsTypeCalibrated()
-        # self.LiveTrack.StartTracking()
-
-        if self.storefiles:
-            
-            cal_files = glob( os.path.join(self.filefolder, 'calibration_*.json' ) )
-            if len(cal_files):
-                idx = np.max([int(os.path.splitext(os.path.basename(x))[0].split('_')[1]) for x in cal_files]) + 1
+            if len(tgtLocsXR) < 2:
+                print('right eye calibration fewer than 3 good points: redoing calibration')
+                redoCalibration = True
             else:
-                idx = 1
+                calErrR = self.LiveTrack.CalibrateDevice(1, len(tgtLocsXR), tgtLocsXR, tgtLocsYR, VectXR, VectYR, viewDist, np.median(GlintXR), np.median(GlintYR))
+                print('Left eye calibration accuraccy: ',str(math.sqrt(float(calErrR)/len(tgtLocsXR))), 'errors in dva')
+        
 
-            self.__N_calibrations = idx
-            self.comment('calibration %d'%(self.__N_calibrations))
+        if redoCalibration:
 
-            self.savecalibration()
+            redo_text = visual.TextStim(win = self.psychopyWindow,
+                                        'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration')
+            redo_text.draw()
+            self.psychopyWindow.flip()
+
+            k=[]
+            while k[0] not in ['q','space']:
+                k = event.waitKeys()
+
+            self.__LT_calibrate()
+            
+        else:
+
+            # %% plot the estimated fixation locations for the calibration
+            #if trackLeftEye:
+            #    [gazeXL, gazeYL] = LiveTrack.CalcGaze(0, len(tgtLocsXL), VectXL, VectYL)
+            #
+            #if trackRightEye:
+            #    [gazeXR, gazeYR] = LiveTrack.CalcGaze(1, len(tgtLocsXR), VectXR, VectYR)
+            # errors are added?
+            # gazeXL = [x+10 for x in tgtLocsXL]
+            # gazeYL = [x+10 for x in tgtLocsYL]
+            # gazeXR = [x-10 for x in tgtLocsXR]
+            # gazeYR = [x-10 for x in tgtLocsYR]
+            
+            # if useVideo:
+            #     self.LiveTrackGS.VideoStop()
+
+            self.LiveTrack.SetResultsTypeCalibrated()
+            # self.LiveTrack.StartTracking()
+
+            if self.storefiles:
+                
+                cal_files = glob( os.path.join(self.filefolder, 'calibration_*.json' ) )
+                if len(cal_files):
+                    idx = np.max([int(os.path.splitext(os.path.basename(x))[0].split('_')[1]) for x in cal_files]) + 1
+                else:
+                    idx = 1
+
+                self.__N_calibrations = idx
+                self.comment('calibration %d'%(self.__N_calibrations))
+
+                self.savecalibration()
 
     def __DM_calibrate(self):
         self.__N_calibrations += 1
