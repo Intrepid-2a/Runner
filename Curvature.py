@@ -14,15 +14,20 @@ import numpy as np
 from numpy import ndarray
 import random, datetime, os
 import math
-from math import sin, cos, radians, pi
+from math import sin, cos, radians, pi # why not use from numpy?
 from glob import glob
 from itertools import compress
-from psychopy import core, visual, gui, data, event
-from psychopy.tools.coordinatetools import pol2cart, cart2pol
-from fusion_stim import fusionStim
-from curvature import placeCurvatureDots
+
+from psychopy.hardware import keyboard
+from pyglet.window import key
+
+# from fusion_stim import fusionStim
+# from curvature import placeCurvatureDots
 
 
+import sys, os
+sys.path.append(os.path.join('..', 'EyeTracking'))
+from EyeTracking import localizeSetup, EyeTracker
 
 def placeCurvatureDots(B, C, curvature):
 
@@ -143,6 +148,52 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             location = 'glasgow'
 
 
+
+    random.seed(ID+'curvature')
+
+    trackEyes = [True, True]
+
+    # ## path
+    # main_path = 'C:/Users/clementa/Nextcloud/project_blindspot/blindspot_eye_tracker/'
+    # data_path = main_path + 'data/'
+    main_path = '../data/distance/'
+    data_path = main_path
+    eyetracking_path = main_path + 'eyetracking/' + ID + '/'
+    
+    # this _should_ already be handled by the Runner utility: setupDataFolders()
+    os.makedirs(data_path, exist_ok=True)
+    # but not this one:
+    os.makedirs(eyetracking_path, exist_ok=True)
+
+
+
+
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+
+
+
+
+
+    print(setup['paths']) # not using yet, just testing
+
+    # unpack all this
+    win = setup['win']
+
+
+    pyg_keyboard = key.KeyStateHandler()
+    win.winHandle.push_handlers(pyg_keyboard)
+
+
+    colors = setup['colors']
+    col_both = colors['both']
+    if hemifield == 'left':
+        col_ipsi, col_contra = colors['left'], colors['right']
+    if hemifield == 'right':
+        col_contra, col_ipsi = colors['left'], colors['right']
+
+
+    
+
     
     x = 1
     filename = 'motion_' + {'left':'LH', 'right':'RH'}[hemifield] + ID.lower() + '_'
@@ -164,29 +215,29 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     ## colour (eye) parameters
 
-    col_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_col_cal*.txt")[-1],'r')
-    col_param = col_file.read().replace('\t','\n').split('\n')
-    col_file.close()
-    col_left = eval(col_param[3]) # red 
-    col_righ = eval(col_param[5]) # green
-    col_both = [-0.7, -0.7, -0.7] # dark gray that is similar to the rg through glasses
-    col_back = [ 0.55, 0.45, -1.0] #changed by belen to rpevent red bleed
+    # col_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_col_cal*.txt")[-1],'r')
+    # col_param = col_file.read().replace('\t','\n').split('\n')
+    # col_file.close()
+    # col_left = eval(col_param[3]) # red 
+    # col_righ = eval(col_param[5]) # green
+    # col_both = [-0.7, -0.7, -0.7] # dark gray that is similar to the rg through glasses
+    # col_back = [ 0.55, 0.45, -1.0] #changed by belen to rpevent red bleed
 
 
     ## Blind Spot Parameters
-    bs_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_" + hem +  "_blindspot*.txt")[-1],'r')
-    bs_param = bs_file.read().replace('\t','\n').split('\n')
-    bs_file.close()
-    spot_righ_cart = eval(bs_param[1])
-    spot_righ = cart2pol(spot_righ_cart[0], spot_righ_cart[1])
-    spot_righ_size = eval(bs_param[3])
-    print("angles and radians", spot_righ)
+    # bs_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_" + hem +  "_blindspot*.txt")[-1],'r')
+    # bs_param = bs_file.read().replace('\t','\n').split('\n')
+    # bs_file.close()
+    # spot_righ_cart = eval(bs_param[1])
+    # spot_righ = cart2pol(spot_righ_cart[0], spot_righ_cart[1])
+    # spot_righ_size = eval(bs_param[3])
+    # print("angles and radians", spot_righ)
 
     ## Window & elements
-    win = visual.Window([1720,1100],allowGUI=True, monitor='testMonitor', units='deg',  fullscr = False, color=col_back, screen=1)
-    win.mouseVisible = False
-    fixation = visual.ShapeStim(win, vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
-    xfix = visual.ShapeStim(win, vertices = ((-2, -2), (2, 2), (0,0), (-2, 2), (2, -2)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
+    # win = visual.Window([1720,1100],allowGUI=True, monitor='testMonitor', units='deg',  fullscr = False, color=col_back, screen=1)
+    # win.mouseVisible = False
+    # fixation = visual.ShapeStim(win, vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
+    # xfix = visual.ShapeStim(win, vertices = ((-2, -2), (2, 2), (0,0), (-2, 2), (2, -2)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
 
 
     ######
@@ -195,15 +246,33 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     ## Parameters
 
+
+    # In [16]: setup['blindspotmarkers']
+    # Out[16]: 
+    # {'left_prop': {'cart': [-15.84, -1.47],
+    #   'spot': (-174.6979643253833, 15.908063992830806),
+    #   'size': [5.21, 5.76],
+    #   'tar': 9.21,
+    #   'ang_up': 21.231788356874432},
+    #  'left': <psychopy.visual.circle.Circle at 0x7fd3cd1f3100>,
+    #  'right_prop': {'cart': [15.02, -2.37],
+    #   'spot': (-8.966749923798016, 15.205831118357194),
+    #   'size': [5.97, 5.59],
+    #   'tar': 9.969999999999999,
+    #   'ang_up': 23.066717128968264},
+    #  'right': <psychopy.visual.circle.Circle at 0x7fd3d2a1faf0>}
+
+
+
     ## BS stimuli
-    blindspot = visual.Circle(win, radius = .5, pos = [7,0], lineColor = None)
-    blindspot.pos = spot_righ_cart
-    blindspot.size = spot_righ_size
+    # blindspot = visual.Circle(win, radius = .5, pos = [7,0], lineColor = None)
+    # blindspot.pos = spot_righ_cart
+    # blindspot.size = spot_righ_size
 
     ## Fusion Stimuli  -copy distance
 
-    hiFusion = fusionStim(win=win, pos=[0, 0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
-    loFusion = fusionStim(win=win, pos=[0,-0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
+    # hiFusion = fusionStim(win=win, pos=[0, 0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
+    # loFusion = fusionStim(win=win, pos=[0,-0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
 
     ## stimuli
     point1 = visual.Circle(win, radius = .7, pos = pol2cart(00, 3), fillColor = 'white', lineColor = None, units = 'deg')
@@ -213,6 +282,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     #########
 
+    print(setup['blindspotmarkers'])
+
     ## Circle positions and other hemifield dependencies
     # Padding angles =  BSheight/3 + 2 (dotwidth) + 1(padding) --> value obtained from piloting
     angpad = spot_righ_size[1]/3 + 2 + 1
@@ -220,13 +291,13 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     side = (spot_righ_size[1] - spot_righ_size[0])*0.15/0.5
 
     #Positions by hemifield
-    if hem == 'RH':
+    if hemifield == 'right':
         # angle division between BS and outside locations = polar angle of the BS x and y + BS size) - angle of the BS location (dev from 0) / 2 + 2(dot stimulus size) + 2 (padding)
         angup = (cart2pol(spot_righ_cart[0], spot_righ_cart[1] + spot_righ_size[1])[0] - spot_righ[0])/2+ 2 + 2
         #positions
         positions = {
-        "righ-top": [pol2cart(spot_righ[0] + 3*angup, spot_righ[1] -  spot_righ_size[0]-side)],
-        "righ-mid": [pol2cart(spot_righ[0] +angpad,  spot_righ[1] - spot_righ_size[0]-side), 
+        "righ-top": [pol2cart(spot_righ[0] + 3*angup, spot_righ[1] - spot_righ_size[0]-side)],
+        "righ-mid": [pol2cart(spot_righ[0] + angpad,  spot_righ[1] - spot_righ_size[0]-side), 
         pol2cart(spot_righ[0] -angpad, spot_righ[1]- spot_righ_size[0]-side)],
         }
         poss = list(positions.items()) #list of positions used in experiment
@@ -404,7 +475,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             k = ['wait']
             while k[0] not in ['q', 'space', 'left', 'right']:
                 k = event.waitKeys()
-            if hem == 'RH':
+            if hemifield == 'right':
                 if k[0] in ['q']:
                     abort = True
                     break
