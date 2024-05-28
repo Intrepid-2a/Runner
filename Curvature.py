@@ -40,8 +40,9 @@ def placeCurvatureDots(B, C, curvature):
         B, C = C, B
 
     # Then, if the specified curvature is 0, this is a special case
-    # for which the equation doesn't work and the points should lie on 
-    # a straight line:
+    # for which the equation doesn't work...
+    #
+    # ... but the points should lie on a straight line:
 
     if curvature == 0:
         A = [B[0] - (C[0]-B[0]), B[1] - (C[1]-B[1])]
@@ -107,7 +108,7 @@ def placeCurvatureDots(B, C, curvature):
     return(point_coords)
 
 
-def doCurvatureTask(hemifield=None, ID=None):
+def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     ## path
     main_path = "."
@@ -132,6 +133,14 @@ def doCurvatureTask(hemifield=None, ID=None):
         ID = expInfo['ID']
     if hemifield == None:
         hemifield = expInfo['hemifield']
+
+        # need to know which eye-tracker to use:
+    if location == None:
+        # hacky, but true for now:
+        if os.sys.platform == 'linux':
+            location = 'toronto'
+        else:
+            location = 'glasgow'
 
 
     
