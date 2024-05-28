@@ -1771,7 +1771,7 @@ def makeBlindSpotMarkers(win, task, ID, colors):
         blindspotmarkers[hemifield].pos = spot_cart
         blindspotmarkers[hemifield].size = spot_size
 
-    print(len(blindspotmarkers))
+    # print(len(blindspotmarkers))
 
     return(blindspotmarkers)
 
