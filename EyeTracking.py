@@ -936,8 +936,9 @@ class EyeTracker:
 
         if redoCalibration:
 
-            redo_text = visual.TextStim(win = self.psychopyWindow,
-                                        'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration')
+            # redo_text = visual.TextStim(win = self.psychopyWindow,
+            #                             'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration')
+            visual.TextStim(self.psychopyWindow,'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration', height = 1,wrapWidth=30, color = 'black').draw()
             redo_text.draw()
             self.psychopyWindow.flip()
 
