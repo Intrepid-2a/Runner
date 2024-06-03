@@ -279,6 +279,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         # close file
         # shutdown eye-tracker
 
+        #! empty buffer?
+
         win.close()
         core.quit()
 
@@ -468,6 +470,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             win.flip()
             
             k = ['wait']
+            #! empty buffer?
             while k[0] not in ['q', 'space', 'left', 'right', 'num_left', 'num_right', 'num_insert']:
                 k = event.waitKeys()
 
@@ -475,6 +478,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 abort = True
                 tracker.comment('trial aborted')
                 break
+                #! empty buffer?
             elif k[0] in ['space', 'num_insert']:
                 position[which_stair] = position[which_stair] + [pos]
                 increment = False
@@ -482,9 +486,11 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 targ_chosen = 'abort'
                 reversal = 'abort'
                 tracker.comment('trial aborted')
+                #! empty buffer?
             else:
                 resp = 1 if k[0] in ['left', 'num_left'] else 2
                 tracker.comment('response')
+                #! empty buffer?
                 
             fixation.ori -= 45
             
@@ -502,6 +508,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 if k[0] in ['q']:
                     abort = True
                     break
+                    #! empty buffer?
                     
                 #!!# calibrate
                 # tracker.stopcollecting() # do we even have to stop/start collecting?
@@ -516,6 +523,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 if k[0] in ['q']:
                     abort = True
                     break
+                    #! empty buffer?
             
             # changing fixation to signify gaze out, restart with 'up' possibily of break and manual recalibration 'r' 
             else:
@@ -530,6 +538,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 if k[0] in ['q']:
                     abort = True
                     break
+                    #! empty buffer?
         
                 # manual recalibrate
                 if k[0] in ['r']:
@@ -552,6 +561,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                     if k[0] in ['q']:
                         abort = True
                         break
+                        #! empty buffer?
                 
             position[which_stair] = position[which_stair] + [pos]
             increment = False
