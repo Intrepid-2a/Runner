@@ -12,6 +12,10 @@ Authors: Clement Abbatecola, Belén María Montabes de la Cruz
 """
 
 
+# look at how to read out key presses?
+# https://discourse.psychopy.org/t/why-is-my-event-getkeys-memory-buffer-not-clearing/26716/4
+
+
 import psychopy
 from psychopy import core, visual, gui, data, event
 from psychopy.tools.coordinatetools import pol2cart, cart2pol
@@ -259,6 +263,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
         win.close()
         core.quit()
+    
+    event.clearEvents(eventType='keyboard') # just to be sure?
         
     #!!# calibrate
     #tracker.initialize() # this should be done in the central thing... dependent on location: in Toronto we need to override the calibrationTargets
@@ -283,6 +289,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
         win.close()
         core.quit()
+    
+    event.clearEvents(eventType='keyboard') # just to be sure?
 
     #!!# start recording
 
@@ -447,11 +455,13 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 blindspot.draw()
                 win.flip()
                 
-                k = event.getKeys(['q'])
+                k = event.getKeys(['q']) # shouldn't this be space? like after the stimulus? this is confusing...
                 if k and 'q' in k:
                     abort = True
-                    tracker.comment('trial aborted')
+                    tracker.comment('trial aborted') # task aborted?
                     break
+                
+                event.clearEvents(eventType='keyboard') # just to be sure?
 
             if len(stim_comments) == 1:
                 tracker.comment(stim_comments.pop()) # pair 2 off
@@ -459,7 +469,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
         if abort:
             break
         
-        if not gaze_out: # what is this even testing? gaze_out is always False... skip!!!!
+        if not gaze_out: # what is this testing? gaze_out is always False... I think
         
             ## response
             fixation.ori += 45
@@ -476,7 +486,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
             if k[0] in ['q']:
                 abort = True
-                tracker.comment('trial aborted')
+                tracker.comment('trial aborted') # this could be more like: "task aborted"?
                 break
                 #! empty buffer?
             elif k[0] in ['space', 'num_insert']:
@@ -491,6 +501,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 resp = 1 if k[0] in ['left', 'num_left'] else 2
                 tracker.comment('response')
                 #! empty buffer?
+
+            event.clearEvents(eventType='keyboard') # just to be sure?
                 
             fixation.ori -= 45
             
@@ -509,6 +521,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                     abort = True
                     break
                     #! empty buffer?
+                
+                event.clearEvents(eventType='keyboard') # just to be sure?
                     
                 #!!# calibrate
                 # tracker.stopcollecting() # do we even have to stop/start collecting?
@@ -524,6 +538,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                     abort = True
                     break
                     #! empty buffer?
+                
+                event.clearEvents(eventType='keyboard') # just to be sure?
             
             # changing fixation to signify gaze out, restart with 'up' possibily of break and manual recalibration 'r' 
             else:
@@ -532,6 +548,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
                 print('# auto abort')
                 win.flip()
+
                 k = ['wait']
                 while k[0] not in ['q', 'up', 'r', 'num_up']:
                     k = event.waitKeys()
@@ -562,6 +579,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                         abort = True
                         break
                         #! empty buffer?
+
+                event.clearEvents(eventType='keyboard') # just to be sure?
                 
             position[which_stair] = position[which_stair] + [pos]
             increment = False
@@ -637,9 +656,14 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             
             tracker.comment('break')
 
-            k = event.waitKeys()
-            while k[0] not in ['space']:
-                k = event.waitKeys()
+            on_break = True
+            while on_break:
+                keys = event.getKeys(keyList=['space'])
+                if len(keys):
+                    if 'space' in keys:
+                        on_break = False
+            event.clearEvents(eventType='keyboard') # just to be sure?
+
 
             tracker.calibrate()
             break_trial = 1
@@ -670,7 +694,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
     ## last screen
     visual.TextStim(win,'Run ended.', height = letter_height, color = 'black').draw()
     win.flip()
-    k = event.waitKeys()
+    k = event.waitKeys() # this is an appropriate use of 'waitKeys()' the rest might be better done with 'getKeys()'? not sure...
 
     #!!# close eye-tracker (eye-tracker object requires the window object - which should also be closed... but only after this last message)
     win.close()
