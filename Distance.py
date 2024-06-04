@@ -650,18 +650,21 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             # do a break...
 
             win.flip()
-            visual.TextStim(win, 'take a break!', height = letter_height, color = col_both).draw()
+            breaktext = visual.TextStim(win, 'take a break!', height = letter_height, color = col_both)
             print('- break...')
+            breaktext.draw()
             win.flip()
             
             tracker.comment('break')
 
             on_break = True
             while on_break:
-                keys = event.getKeys(keyList=['space']) # simpler solution: use a different key... like 'b'
-                if len(keys):
-                    if 'space' in keys:
-                        on_break = False
+                keys = event.getKeys(keyList=['b']) # simpler solution: use a different key... like 'b'
+                if 'b' in keys:
+                    on_break = False
+                breaktext.draw()
+                win.flip()
+
             event.clearEvents(eventType='keyboard') # just to be sure?
 
 
