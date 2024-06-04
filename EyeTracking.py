@@ -939,13 +939,13 @@ class EyeTracker:
             # redo_text = visual.TextStim(win = self.psychopyWindow,
             #                             'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration')
             visual.TextStim(self.psychopyWindow,'not enough fixations detected\n\nadjust eye-tracker?\n\n    press  [ SPACE ]\nto redo calibration', height = 1,wrapWidth=30, color = 'black').draw()
-            redo_text.draw()
+            # redo_text.draw()
             self.psychopyWindow.flip()
 
             k=[]
             while k[0] not in ['q','space']:
                 k = event.waitKeys()
-
+            event.clearEvents(eventType='keyboard')
             self.__LT_calibrate()
             
         else:
