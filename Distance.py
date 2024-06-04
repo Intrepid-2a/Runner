@@ -658,7 +658,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
             on_break = True
             while on_break:
-                keys = event.getKeys(keyList=['space'])
+                keys = event.getKeys(keyList=['space']) # simpler solution: use a different key... like 'b'
                 if len(keys):
                     if 'space' in keys:
                         on_break = False
@@ -667,6 +667,8 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
             tracker.calibrate()
             break_trial = 1
+
+        event.clearEvents(eventType='keyboard') # just to be more sure?
 
 
     if abort:
