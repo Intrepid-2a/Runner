@@ -75,7 +75,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             location = 'glasgow'
 
 
-    random.seed(ID+'distance')
+    random.seed(ID+'distance'+hemifield)
 
     trackEyes = [True, True]
 

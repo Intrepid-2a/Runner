@@ -149,7 +149,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
 
 
-    random.seed(ID+'curvature')
+    random.seed(ID+'curvature'+hemifield)
 
     trackEyes = [True, True]
 
