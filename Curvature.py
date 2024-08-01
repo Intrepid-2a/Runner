@@ -167,10 +167,14 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # but not this one:
     os.makedirs(eyetracking_path, exist_ok=True)
 
+    # add functionality to name new eye-tracking file (make into generic function so it all works the same?):
+    x = 1
+    et_filename = 'dist' + ('LH' if hemifield == 'left' else 'RH')
+    while len(glob(eyetracking_path + et_filename + str(x) + '.*')):
+        x += 1
 
 
-
-    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID) # data path is for the mapping data, not the eye-tracker data!
 
 
 
