@@ -8,6 +8,7 @@ from utilities import *
 
 from calibration import *
 from Distance import *
+from Curvature import *
 
 
 class MyFrame(wx.Frame):
@@ -306,8 +307,13 @@ class MyFrame(wx.Frame):
             return
 
         if task == 'distance':
-            print('do distance task')
+            # print('do distance task')
             doDistanceTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
+            return
+
+        if task == 'curvature':
+            print('do curvature task')
+            doCurvatureTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
             return
 
 
