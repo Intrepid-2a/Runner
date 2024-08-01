@@ -116,8 +116,10 @@ def placeCurvatureDots(B, C, curvature):
 def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     ## path
-    main_path = "."
-    data_path = main_path + "/data/"
+    # main_path = "."
+    # data_path = main_path + "/data/"
+
+    print('in curvature exp')
 
     expInfo = {}
     askQuestions = False
