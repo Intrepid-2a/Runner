@@ -47,13 +47,14 @@ def placeCurvatureDots(B, C, curvature):
     # Then, if the specified curvature is 0, this is a special case
     # for which the equation doesn't work...
     #
-    # ... but the points should lie on a straight line:
+    # ... but the 4 points should lie on a straight line:
 
     if curvature == 0:
         A = [B[0] - (C[0]-B[0]), B[1] - (C[1]-B[1])]
         D = [C[0] + (C[0]-B[0]), C[1] + (C[1]-B[1])]
         # we return this result:
-        return([A, B, C, D]),
+        # return([A, B, C, D]) # this returned a tuple, while for non-zero curvature, the function returns an array
+        return(np.array([A,B,C,D])[0,:,:])
 
     # If the curvature is not 0, we need to do some more work.
 
@@ -197,9 +198,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     if hemifield == 'right':
         col_contra, col_ipsi = colors['left'], colors['right']
 
-
-    
-
     
     x = 1
     filename = 'motion_' + {'left':'LH', 'right':'RH'}[hemifield] + ID.lower() + '_'
@@ -338,6 +336,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         blindspot.fillColor = col_left
         #Instructions
         instructions = visual.TextStim(win, text="Throughout the experiment you will fixate at a a cross located at the centre of the screen. It is important that you maintain fixation on this cross at all times.\n\n In every trial you will be presented with a dot which will move along a curve. You will have to indicate with a keypress if the dot's motion was curved towards fixation or away from fixation  \n \nLeft arrow = motion curved away from fixation.\n \n Right arrow = motion curved towards fixation.\n\n\nYou will only be able to respond when the fixation cross rotates from a '+' to a 'x' \n\n\n Press the space bar when you're ready to start the experiment.")
+
 
     ## Experiment instructions
     instructions.wrapWidth = 30
