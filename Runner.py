@@ -101,6 +101,11 @@ class MyFrame(wx.Frame):
         # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='left',    self.area_left)
         # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='right',   self.area_right)
 
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_color)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_mapping)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_left)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_right)
+
         # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='color',    self.curve_color)
         # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='mapping',  self.curve_mapping)
         # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='left',     self.curve_left)
