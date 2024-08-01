@@ -156,7 +156,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # ## path
     # main_path = 'C:/Users/clementa/Nextcloud/project_blindspot/blindspot_eye_tracker/'
     # data_path = main_path + 'data/'
-    main_path = '../data/distance/'
+    main_path = '../data/curvature/'
     data_path = main_path
     eyetracking_path = main_path + 'eyetracking/' + ID + '/'
     
