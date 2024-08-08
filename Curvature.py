@@ -350,21 +350,28 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # for me, this is 2.3145021189054944 dva... maybe we don't need to add the dot radius?
 
     # to get an angular offset, lets move things along a circle, by a distance equal to the minimum distance between stimuli:
-    arc_length = (bs_prop['size'][1] * 1.0) + 2  # maybe it should be * 1.5 ?
+    arc_length = (bs_prop['size'][1] * 1.0)  # maybe it should be higher ? no... less is fine, other wise we get close to the fusion stims
 
     # and with a radius that moves away from the blind spot center, toward fixation with enough padding (stim width and 2 dva extra)
     r = np.sqrt( (abs(bs_prop['cart'][0]) - (bs_prop['size'][0]/2) - 2 - stim_width)**2 + bs_prop['cart'][1]**2 )
-    C = 2*np.pi*r
-    ang_up = ((arc_length/C)/np.pi)*180
+    C = 2*np.pi*r                 # total circumference
+    ang_up = (arc_length/C)*360   # is this correct? (propertion of total circumference * 360)
 
     # the direction by which the 'above' blind spot position is rotated, depends on hemifield:
     ang_mod = 1 if hemifield == 'right' else -1
 
+    # at blind spot middle of trajectory:
+    if hemifield == 'right':
+        bsm_x = bs_prop['cart'][0] - (bs_prop['size'][0]/2) - 2 - stim_width
+    else:
+        bsm_x = bs_prop['cart'][0] + (bs_prop['size'][0]/2) + 2 + stim_width
+    bsm = [bsm_x, bs_prop['cart'][1]]
+
     # positions in cartesian coordinates:
-    positions = [ [ [sum(x) for x in zip(pol2cart(cart2pol(bs_prop['cart'][0], bs_prop['cart'][1])[0] + (ang_up*ang_mod), r), [0,dot_distance/2 ])],
-                    [sum(x) for x in zip(pol2cart(cart2pol(bs_prop['cart'][0], bs_prop['cart'][1])[0] + (ang_up*ang_mod), r), [0,dot_distance/-2])] ],
-                  [ [sum(x) for x in zip(pol2cart(cart2pol(bs_prop['cart'][0], bs_prop['cart'][1])[0],                    r), [0,dot_distance/2 ])],
-                    [sum(x) for x in zip(pol2cart(cart2pol(bs_prop['cart'][0], bs_prop['cart'][1])[0],                    r), [0,dot_distance/-2])] ] ]
+    positions = [ [ [sum(x) for x in zip(pol2cart(cart2pol(bsm[0], bsm[1])[0] + (ang_up*ang_mod), r), [0,dot_distance/2 ])],
+                    [sum(x) for x in zip(pol2cart(cart2pol(bsm[0], bsm[1])[0] + (ang_up*ang_mod), r), [0,dot_distance/-2])] ],
+                  [ [bsm[0], bsm[1]+(dot_distance/2)],
+                    [bsm[0], bsm[1]-(dot_distance/2)] ] ]
 
     print(positions)
 
@@ -586,6 +593,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         #drawing the stimuli
         trial_clock.reset()
 
+        print('resetted clock')
+
         # simplify this:
         # while trial_clock.getTime() < .5: 
         #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
@@ -641,6 +650,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         
         tp = trial_clock.getTime()
         while tp < 1.7:
+            tp = trial_clock.getTime()
             blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
             
             if any([0.5 < tp < 0.6, 1.2 < tp < 1.4                ]):
@@ -653,6 +663,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                 point4.draw()
             
             win.flip()
+
+        print('stimulus done')
 
         while trial_clock.getTime()  > 1.7: 
             hiFusion.draw()
