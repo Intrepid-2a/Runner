@@ -26,7 +26,7 @@ from pyglet.window import key
 
 
 import sys, os
-sys.path.append(os.path.join('..', 'EyeTracking'))
+# sys.path.append(os.path.join('..', 'EyeTracking'))
 from EyeTracking import localizeSetup, EyeTracker
 
 def placeCurvatureDots(B, C, curvature):
@@ -134,8 +134,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     ## path
     # main_path = "."
     # data_path = main_path + "/data/"
-
-    print('in curvature exp')
 
     expInfo = {}
     askQuestions = False
