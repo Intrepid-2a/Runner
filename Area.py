@@ -70,9 +70,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             location = 'glasgow'
 
     # not site specific should be:
-    # filenames, blind spot markers, colors
+    # filenames, blind spot markers, colors, fusion stimuli etc etc
     # and these are already handled in localizeSetup
-    # so removing a lot of redundant code here
+    # so removing a lot of redundant code here, and possibilities for making confusing new errors
+    # by not updating one, while updating the other implementation of the exact same things
 
     # keeping what needs to be done for this task only:
 
@@ -86,6 +87,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     
     # this _should_ already be handled by the Runner utility: setupDataFolders()
     os.makedirs(data_path, exist_ok=True)
+
     # but not this one:
     os.makedirs(eyetracking_path, exist_ok=True)
 
@@ -122,137 +124,120 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
 
 
+    ## Creating distributions for the experiment
+    # Range of possible start sizes
+    step = rad/10 # rad (height or width +3)/10
+    adaptorig = [rad-step*5, rad-step*4, rad-step*3, rad-step*2, rad-step, rad+step, rad+step*2, rad+step*3, rad+step*4, rad+step*5]
+    #NOTE : there is no 'no difference' e.g. rad-step, rad, rad+step, can add if preferred
 
-        ## Creating distributions for the experiment
-        # Range of possible start sizes
-        step = rad/10 # rad (height or width +3)/10
-        adaptorig = [rad-step*5, rad-step*4, rad-step*3, rad-step*2, rad-step, rad+step, rad+step*2, rad+step*3, rad+step*4, rad+step*5]
-        #NOTE : there is no 'no difference' e.g. rad-step, rad, rad+step, can add if preferred
+    # Repeating so there's 50 trials per eye and location (5 repeats of an original size for all)
+    # random.seed(1)
+    # random.shuffle(adaptorig) #shuffeling with seed
+    adapt = []
+    i = 1
+    while i < 6: #5 repetitions  
+        # random.seed (i)
+        random.shuffle(adaptorig)
+        adapt += adaptorig
+        i += 1
 
-        # Repeating so there's 50 trials per eye and location (5 repeats of an original size for all)
-        # random.seed(1)
-        # random.shuffle(adaptorig) #shuffeling with seed
-        adapt = []
-        i = 1
-        while i < 6: #5 repetitions  
-            # random.seed (i)
-            random.shuffle(adaptorig)
-            adapt += adaptorig
-            i += 1
+    # print(adapt)
 
-        print(adapt)
-        ## colours
-        # col_file = open(glob(main_path + 'color/' + ID + '_col_cal*.txt')[-1],'r')
-        # col_param = col_file.read().replace('\t','\n').split('\n')
-        # col_file.close()
-        # col_ipsi = eval(col_param[3]) if hem == 'left' else eval(col_param[5]) # left or right
-        # col_cont = eval(col_param[5]) if hem == 'left' else eval(col_param[3]) # right or left
-        # col_back   = [ 0.55, 0.45,  -1.0]   #changed by belen to prevent red bleed
-        # col_both = [eval(col_param[3])[1], eval(col_param[5])[0], -1] 
+
+
+    # # jitter added to the field to reduce local cues
+    # marius: this is jitter added to the "field" property in the fusion stimuli...
+    # not sure why it's not just added to the pos property of the fusion stimulu objects?
+    jitter = (0.005, 0.01, 0.015, 0.02,0.025, 0, -0.005, -0.01, -0.015, -0.02,-0.025)
+
+
+
+    ## BS stimuli
+    # blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=col_ipsi, lineColor = None)
+    # blindspot.pos = spot_cart
+    # blindspot.size = spot_size
+
+    ## eyetracking   
+    # colors = {'both'   : col_both, 
+    #           'back'   : col_back} 
+    # tracker = EyeTracker(tracker           = 'eyelink',
+    #                      trackEyes         = [True, True],
+    #                      fixationWindow    = 2.0,
+    #                      minFixDur         = 0.2,
+    #                      fixTimeout        = 3.0,
+    #                      psychopyWindow    = win,
+    #                      filefolder        = eyetracking_path,
+    #                      filename          = et_filename+str(y),
+    #                      samplemode        = 'average',
+    #                      calibrationpoints = 5,
+    #                      colors            = colors)
+
+    # elif location == 'toronto':
     
-        ## window & elements
-        # win = visual.Window([1500,800],allowGUI=True, monitor='ExpMon',screen=1, units='deg', viewPos = [0,0], fullscr = True, color= col_back)
-        # win.mouseVisible = False
-        # fixation = visual.ShapeStim(win, vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
-        # xfix = visual.ShapeStim(win, vertices = ((-2, -2), (2, 2), (0,0), (-2, 2), (2, -2)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
+    #     # not sure what you want to do here, maybe check if parameters are defined, otherwise throw an error? Or keep the gui in that case?
+        
+        
+    #     expInfo = {}
+    #     askQuestions = False
+    #     if ID == None:
+    #         expInfo['ID'] = ''
+    #         askQuestions = True
+    #     if hem == None:
+    #         expInfo['hemifield'] = ['left','right']
+    #         askQuestions = True
+    #     if askQuestions:
+    #         dlg = gui.DlgFromDict(expInfo, title='Infos', screen=0)
 
-        ## Fusion Stimuli
+    #     if ID == None:
+    #         ID = expInfo['ID'].lower()
+    #     if hem == None:
+    #         hem = expInfo['hemifield']
+        
+    #     ## paths
+    #     main_path = '../data/area/'
+    #     data_path = main_path
+    #     eyetracking_path = main_path + 'eyetracking/' + ID + '/'
+    #     x = 1
+    #     filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
+    #     while (filename + str(x) + '.txt') in os.listdir(data_path):
+    #         x += 1
+    #     y = 1
+    #     et_filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
+    #     while len(glob(eyetracking_path + et_filename + str(y) + '.*')):
+    #         y += 1
+        
+    #     # this _should_ already be handled by the Runner utility: setupDataFolders()
+    #     os.makedirs(data_path, exist_ok=True)
+    #     os.makedirs(eyetracking_path, exist_ok=True)
+        
 
-        # hiFusion = fusionStim(win=win, pos=[0, 0.9], rows=3, columns=5,square=.05, units = 'norm', colors = [col_back, col_both])
-        # loFusion = fusionStim(win=win, pos=[0,-0.9], rows=3, columns=5,square=.05, units = 'norm', colors = [col_back, col_both])
-
-
-        # # jitter added to the field to reduce local cues
-        jitter = (0.005, 0.01, 0.015, 0.02,0.025, 0, -0.005, -0.01, -0.015, -0.02,-0.025)
-
-
-
-        ## BS stimuli
-        # blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=col_ipsi, lineColor = None)
-        # blindspot.pos = spot_cart
-        # blindspot.size = spot_size
-
-        ## eyetracking   
-        # colors = {'both'   : col_both, 
-        #           'back'   : col_back} 
-        # tracker = EyeTracker(tracker           = 'eyelink',
-        #                      trackEyes         = [True, True],
-        #                      fixationWindow    = 2.0,
-        #                      minFixDur         = 0.2,
-        #                      fixTimeout        = 3.0,
-        #                      psychopyWindow    = win,
-        #                      filefolder        = eyetracking_path,
-        #                      filename          = et_filename+str(y),
-        #                      samplemode        = 'average',
-        #                      calibrationpoints = 5,
-        #                      colors            = colors)
-
-    elif location == 'toronto':
+        
+    #     trackEyes = [True, True]
+        
+    #     # get everything shared from central:
+    #     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(y), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
     
-        # not sure what you want to do here, maybe check if parameters are defined, otherwise throw an error? Or keep the gui in that case?
-        
-        
-        expInfo = {}
-        askQuestions = False
-        if ID == None:
-            expInfo['ID'] = ''
-            askQuestions = True
-        if hem == None:
-            expInfo['hemifield'] = ['left','right']
-            askQuestions = True
-        if askQuestions:
-            dlg = gui.DlgFromDict(expInfo, title='Infos', screen=0)
+    #     # unpack all this
+    #     win = setup['win']
+    
+    #     colors = setup['colors']
+    #     col_both = colors['both']
+    #     if hem == 'left':
+    #         col_ipsi, col_contra = colors['left'], colors['right']
+    #     if hem == 'right':
+    #         col_contra, col_ipsi = colors['left'], colors['right']
 
-        if ID == None:
-            ID = expInfo['ID'].lower()
-        if hem == None:
-            hem = expInfo['hemifield']
-        
-        ## paths
-        main_path = '../data/area/'
-        data_path = main_path
-        eyetracking_path = main_path + 'eyetracking/' + ID + '/'
-        x = 1
-        filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
-        while (filename + str(x) + '.txt') in os.listdir(data_path):
-            x += 1
-        y = 1
-        et_filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
-        while len(glob(eyetracking_path + et_filename + str(y) + '.*')):
-            y += 1
-        
-        # this _should_ already be handled by the Runner utility: setupDataFolders()
-        os.makedirs(data_path, exist_ok=True)
-        os.makedirs(eyetracking_path, exist_ok=True)
-        
-
-        
-        trackEyes = [True, True]
-        
-        # get everything shared from central:
-        setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(y), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+    #     hiFusion = setup['fusion']['hi'] #might need to change it due to size
+    #     loFusion = setup['fusion']['lo']
     
-        # unpack all this
-        win = setup['win']
-    
-        colors = setup['colors']
-        col_both = colors['both']
-        if hem == 'left':
-            col_ipsi, col_contra = colors['left'], colors['right']
-        if hem == 'right':
-            col_contra, col_ipsi = colors['left'], colors['right']
-
-        hiFusion = setup['fusion']['hi'] #might need to change it due to size
-        loFusion = setup['fusion']['lo']
-    
-        blindspot = setup['blindspotmarkers'][hem]
+    #     blindspot = setup['blindspotmarkers'][hem]
         
-        fixation = setup['fixation']
+    #     fixation = setup['fixation']
     
-        tracker = setup['tracker']
+    #     tracker = setup['tracker']
  
-    else:
-        raise ValueError("Location should be 'glasgow' or 'toronto', was {}".format(location))
+    # else:
+    #     raise ValueError("Location should be 'glasgow' or 'toronto', was {}".format(location))
 
     # create output files:
     respFile = open(data_path + filename + str(x) + '.txt','w')
@@ -315,7 +300,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     ## Positions, colors and instructions by hemifield
     
-    if hem == 'right':
+    if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
         angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2+ rad
         positions = {
@@ -372,34 +357,37 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     not_ongoing = [[False, False], [False, False]]
     turn=1
     eye = ['left', 'right']
+
+
+
     abort = False
     recalibrate = False
     #mouse element
     mouse= event.Mouse(visible=False) #invisible
     #trials for each position
     adapt1 = adapt.copy()
-    random.seed(6)
+    # random.seed(6)
     random.shuffle(adapt1)
-    print('ad1', adapt, 'ad2', adapt1)
+    # print('ad1', adapt, 'ad2', adapt1)
     adapt2 = adapt.copy()
-    random.seed(7)
+    # random.seed(7)
     random.shuffle(adapt2)
     adapt3 = adapt.copy()
-    random.seed(8)
+    # random.seed(8)
     random.shuffle(adapt3)
     adaptposs = [[adapt, adapt1], [adapt2, adapt3]] # print(adaptposs[0][0],adaptposs[0][1], adaptposs[1][0], adaptposs[1][1]) add 1more [0] to index
     #Circle stimuli jitter
-    posjit = [0 , 0.05, 0.1, 0.15, 0.25, 0.5,- 0.05, -0.1, -0.15, -0.25, -0.5]
+    posjit = [0 , 0.05, 0.1, 0.15, 0.25, 0.5, -0.05, -0.1, -0.15, -0.25, -0.5]
 
     print('hello2')
     #keeping track of time 
     trial_clock = core.Clock()
     
     #repeated draws  
-    def repeat_draw():
-        fixation.draw()
-        hiFusion.draw()
-        loFusion.draw()
+    # def repeat_draw():
+    #     fixation.draw()
+    #     hiFusion.draw()
+    #     loFusion.draw()
     #blindspot.draw()
     #repeat_draw()
     #win.flip()
@@ -411,8 +399,14 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     #    core.quit()
     print('hello3')
     while not ongoing == not_ongoing:
-        repeat_draw()
-        win.flip()
+        # repeat_draw()
+
+        # fixation.draw()
+        # hiFusion.draw()
+        # loFusion.draw()
+        # # blindspot.draw()
+
+        # win.flip()
         '''
         mouse.clickReset()
         while 1:
@@ -432,8 +426,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         else:
             position = np.random.choice([0, 1]) 
             col = np.random.choice(list(compress([0, 1], ongoing[position])))
-            print(list(compress([0, 1], ongoing[position])))
-        print('current position', position, 'current color', col)
+            # print(list(compress([0, 1], ongoing[position])))
+        # print('current position', position, 'current color', col)
         #Point 1 positions & parameters
         if position == 0:
             point1.pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) # Outside BS location
@@ -441,7 +435,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             point1.pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) # BS location
         point1.size = [rad, rad]
         
-        print('hello 5')
+        # print('hello 5')
         
         # Point 2 radius 
         currtrial = trial[position][col]# current trial
@@ -449,10 +443,11 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         point2.size = [curradapt[currtrial], curradapt[currtrial]] 
         point2.pos = [0, 0]  #pol2cart(poss[0][1][0][0], -poss[0][1][0][1]) #[0, 0]
         point2.pos += [random.choice(posjit), random.choice(posjit)]
-        print('hello 6')
+        # print('hello 6')
 
-        #color of dots - which eye to stimulate 
-        if eye[col] == hem: #add col
+        #color of dots - which eye to stimulate
+        # marius: the color mapping decided on each trial?
+        if eye[col] == hemifield: #add col
             point1.lineColor  = col_ipsi
             point2.lineColor = col_ipsi
 
@@ -464,30 +459,42 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
         fixation.vertices = ((0, -f[0]), (0, f[0]), (0,0), (-f[0], 0), (f[0], 0))
 
-        print('hello 7')
+        # print('hello 7')
 
         #adding fusion stimuli
         hiFusion.resetProperties()
         loFusion.resetProperties()
-        hiFusion.fieldPos = (random.sample(jitter, 2))
-        loFusion.fieldPos = (random.sample(jitter, 2))
-        repeat_draw()
-        win.flip()
+        # the fieldPos property does not exist...
+        # hiFusion.fieldPos = (random.sample(jitter, 2))
+        # loFusion.fieldPos = (random.sample(jitter, 2))
+        # repeat_draw()
 
+        # fixation.draw()
+        # hiFusion.draw()
+        # loFusion.draw()
+        # # blindspot.draw()
+
+        # win.flip()
+        tracker.waitForFixation()
         gaze_out = False
 
         ## pre trial fixation 
-        tracker.comment('pre-fixation')
-        if not tracker.waitForFixation(fixationStimuli = [fixation, hiFusion, loFusion]):
-            recalibrate = True
-            gaze_out = True
+        # tracker.comment('pre-fixation')
+        # if not tracker.waitForFixation(fixationStimuli = [fixation, hiFusion, loFusion]):
+        #     recalibrate = True
+        #     gaze_out = True
         
-        print('pre fixation ok \n')
+        # print('pre fixation ok \n')
 
         
 
         ## commencing trial 
-        gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','a')
+
+        # from now on, we could draw things and flip the window... before doesn't do anything...
+
+        # why is there a gazefile? this is handled by the eye-tracker...
+
+        # gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','a')
         if not gaze_out:
             
             stim_comments = ['og difference', 'final difference'] #BM what's this?
@@ -499,20 +506,20 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             jit2 = random.choice(posjit)
             mouse.clickReset()
             
-            #og parameters
+            #og parameters... OG parameters are the original parameters?
             ogdiff = point1.size[0] - point2.size[0]
             ogp2 = point2.size[0]
             cycle = 0
-            if len(stim_comments) == 2:
-                tracker.comment(stim_comments.pop()) 
+            # if len(stim_comments) == 2:
+            #     tracker.comment(stim_comments.pop()) 
 
             while 1 and not abort:
                 t = trial_clock.getTime()
-                gazeFile.write('\t'.join(map(str, [trial[position][col],
-                               position,
-                               col,
-                               round(t,2),
-                               tracker.lastsample()])) + "\n")
+                # gazeFile.write('\t'.join(map(str, [trial[position][col],
+                #                position,
+                #                col,
+                #                round(t,2),
+                #                tracker.lastsample()])) + "\n")
 
                 trial[position][col]
 
@@ -531,21 +538,37 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                     elif 'space' in k:
                          finaldiff = 'Trial aborted'
                          break
+                
+                
+                
+                # taking participant input:
                 wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
-                if turn == 1:
+                
+                if turn == 1: # so only ~7 times per second? (fewer in glasgow)
                     Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
                 else:
                     Check2([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
-                point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)]#uses y mouse location to adjust
+                point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)] # uses y mouse location to adjust
+                
                 point2.draw()
-                repeat_draw()
+
+                # repeat_draw()
+
+                fixation.draw()
+                hiFusion.draw()
+                loFusion.draw()
+                blindspot.draw()
+
                 win.flip()
+
+
                 cycle +=1
-                if cycle == 20:
-                    hiFusion.resetProperties()
-                    loFusion.resetProperties()
-                    hiFusion.fieldPos = (random.sample(jitter, 2))
-                    loFusion.fieldPos = (random.sample(jitter, 2))
+                if cycle == 20: # every 22 frames the fusion stim get shuffled? that's almost 7 times / second?
+                    # hiFusion.resetProperties()
+                    # loFusion.resetProperties()
+                    # the fieldPos property does not exist:
+                    # hiFusion.fieldPos = (random.sample(jitter, 2))
+                    # loFusion.fieldPos = (random.sample(jitter, 2))
                 elif cycle == 21:
                     cycle = 0
                     turn = turn *-1
@@ -559,10 +582,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 tracker.comment(stim_comments.pop()) # pair 2 off
             gazeFile.close()
 
-        if abort:
+        if abort: # trial intentionally aborted? or task/experiment aborted?
             break
         
-        if not gaze_out:
+        if not gaze_out: # trial aborted because of other reasons? ... why the blink parameter?
             blink = 1
             if not finaldiff == 'Trial aborted':
                 trial[position][col] += 1
@@ -573,6 +596,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         else:
             blink = 0
             # auto recalibrate if no initial fixation
+            # why is this not handled before the trial, so we can still do it?
             if recalibrate:
                 recalibrate = False
                 tracker.calibrate()
@@ -606,11 +630,14 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                         abort = True
                         break
 
-        while blink==1:
+        while blink==1: # what is "blink"? what does that mean? do we have accurate blink detection now?
+
             hiFusion.draw()
             loFusion.draw()
             xfix.draw()
+
             win.flip()
+
             m = mouse.getPressed()
             if m[2] == True:
                 print(m)
@@ -618,7 +645,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 break
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [trial[position][col], 
+        respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used?
                                         position,# Stimulus location
                                         col,
                                         round(ogp2, 2), #change
@@ -651,7 +678,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         bye = visual.TextStim(win, text="Run manually ended \n Press space bar to exit")
     elif ongoing == not_ongoing:
         print('run ended properly!')
-        bye = visual.TextStim(win, text="You have now completed the experimental run. Thank you for your participation!! \n Press space bar to exit")
+        bye = visual.TextStim(win, text="You have now completed the experimental run. Thank you for your participation!! \n Press space bar to exit") # it will exit after 4 seconds?
     else:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("something weird happened")
@@ -659,7 +686,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         print('something weird happened')
 
     print(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"))
-    blindspot.autoDraw = False
+    # blindspot.autoDraw = False
 
     ## Farewells
     bye.draw()
