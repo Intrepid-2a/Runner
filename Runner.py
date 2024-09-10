@@ -3,6 +3,9 @@
 # GUI elements, and interaction with OS
 import wx, wx.adv, os
 
+# we need to open webbrowsers to fill in the consent form:
+import webbrowser as wb
+
 # functions for Runner
 from utilities import *
 
@@ -41,6 +44,8 @@ class MyFrame(wx.Frame):
         self.pick_existing = wx.ComboBox(self, id=wx.ID_ANY, choices=self.existingParticipants, style=wx.CB_READONLY)
         self.random_generate = wx.Button(self, wx.ID_ANY, "generate random")
         self.participantID = wx.TextCtrl(self, wx.ID_ANY, "")
+
+        self.hyperlink_demographics = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, label="demographics", url="")
 
 
         # task elements:
@@ -90,6 +95,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.refresh, self.refresh_button)
         self.Bind(wx.EVT_COMBOBOX, self.pickExisting, self.pick_existing)
         self.Bind(wx.EVT_BUTTON, self.generateRandomID, self.random_generate)
+
+        self.Bind(wx.adv.EVT_HYPERLINK, self.onClickDemographics, self.hyperlink_demographics)
 
         # task button functionality:
         self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_color)
@@ -143,7 +150,7 @@ class MyFrame(wx.Frame):
 
         main_grid        = wx.GridSizer(4, 1, 0, 0)
         # location thing is 1 item, no grid needed...
-        participant_grid = wx.GridSizer(2, 3, 0, 0)
+        participant_grid = wx.GridSizer(2, 4, 0, 0)
         taskrun_grid     = wx.GridSizer(3, 6, 0, 0)
         synch_grid       = wx.GridSizer(2, 4, 0, 0)  # too much?
 
@@ -153,6 +160,9 @@ class MyFrame(wx.Frame):
         participant_grid.Add(self.text_participant, 0, wx.ALIGN_LEFT, 0)
         participant_grid.Add(self.text_existing, 0, wx.ALIGN_LEFT, 0)
         participant_grid.Add(self.random_generate, 0, wx.ALIGN_LEFT, 0)
+
+        participant_grid.Add(self.hyperlink_demographics, 1, wx.ALIGN_RIGHT, 0)
+
         participant_grid.Add(self.refresh_button, 0, wx.ALIGN_LEFT, 0)
         participant_grid.Add(self.pick_existing, 0, wx.ALIGN_LEFT, 0)
         participant_grid.Add(self.participantID, 0, wx.ALIGN_LEFT, 0)
@@ -224,8 +234,17 @@ class MyFrame(wx.Frame):
         self.participantID.SetValue(newID)
         self.toggleParticipantTaskButtons(event)
 
+    def onClickDemographics(self, e):
+        wb.open( url = self.hyperlink_demographics.GetURL(),
+                 new = 1,
+                 autoraise = True )
+        
 
     def toggleParticipantTaskButtons(self, event):
+
+        newURL = 'https://docs.google.com/forms/d/e/1FAIpQLScwyXoXaymXpXOO7ZToVsHFpb8hwis1eMvQE5NNGt55ij9HGw/viewform?usp=pp_url&entry.1851916630=%s'%(self.participantID.GetValue())
+        self.hyperlink_demographics.SetURL(newURL)
+
 
         info = getParticipantTaskInfo(self.participantID.GetValue())
 
