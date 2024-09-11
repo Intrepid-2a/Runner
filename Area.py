@@ -103,6 +103,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='area', ID=ID) # data path is for the mapping data, not the eye-tracker data!
     setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
 
+    tracker = setup['tracker']
 
     win = setup['win']
 
@@ -117,6 +118,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     # colors
     colors   = setup['colors']
+
     col_both = colors['both']
     if hemifield == 'left':
         col_ipsi, col_contra = colors['left'], colors['right']
@@ -350,8 +352,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     ######
 
     ## setup and initialize eye-tracker
-    tracker.initialize(calibrationScale=(0.35, 0.35))
-    tracker.calibrate()
+    # tracker.initialize(calibrationScale=(0.35, 0.35))
+    # tracker.calibrate()
+
+
     win.flip()
     fixation.draw()
     win.flip()
@@ -361,7 +365,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         win.close()
         core.quit()
 
-    tracker.startcollecting()
+    # tracker.startcollecting()
 
 
     ######
@@ -451,8 +455,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         else:
             # point1.lineColor = col_cont
             # point2.lineColor = col_cont
-            point1.setLineColor(col_cont)
-            point2.setLineColor(col_cont)
+            point1.setLineColor(col_contra)
+            point2.setLineColor(col_contra)
 
         #adapting fixation size to eliminate local cues during size estimation
         f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
@@ -474,7 +478,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # # blindspot.draw()
 
         # win.flip()
-        tracker.waitForFixation()
+
+        # tracker.waitForFixation()
+        
         gaze_out = False
 
         ## pre trial fixation 
@@ -517,10 +523,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
                 trial[position][col]
 
-                if not tracker.gazeInFixationWindow():
-                    gaze_out = True
-                    finaldiff = 'Trial aborted'
-                    break
+                # if not tracker.gazeInFixationWindow():
+                #     gaze_out = True
+                #     finaldiff = 'Trial aborted'
+                #     break
 
                 #drawing the stimuli
 
@@ -571,8 +577,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                     mouse.clickReset()
                     break
 
-            if len(stim_comments) == 1:
-                tracker.comment(stim_comments.pop()) # pair 2 off
+            # if len(stim_comments) == 1:
+            #     tracker.comment(stim_comments.pop()) # pair 2 off
             gazeFile.close()
 
         if abort: # trial intentionally aborted? or task/experiment aborted?
@@ -591,15 +597,16 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             # auto recalibrate if no initial fixation
             # why is this not handled before the trial, so we can still do it?
             if recalibrate:
-                recalibrate = False
-                tracker.calibrate()
-                win.flip()
-                fixation.draw()
-                win.flip()
-                k = event.waitKeys()
-                if k[0] in ['q']:
-                    abort = True
-                    break
+                pass
+                # recalibrate = False
+                # tracker.calibrate()
+                # win.flip()
+                # fixation.draw()
+                # win.flip()
+                # k = event.waitKeys()
+                # if k[0] in ['q']:
+                #     abort = True
+                #     break
             else:
                 hiFusion.draw()
                 loFusion.draw()
@@ -614,7 +621,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         
                 # manual recalibrate
                 if k[0] in ['r']:
-                    tracker.calibrate()
+                    # tracker.calibrate()
                     win.flip()
                     fixation.draw()
                     win.flip()
@@ -687,7 +694,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     win.flip()
     core.wait(4)
     
-    tracker.shutdown()
+    # tracker.shutdown()
     win.close()
     core.quit()
 
