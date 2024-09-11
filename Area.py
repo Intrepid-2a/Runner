@@ -316,6 +316,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     ## Positions, colors and instructions by hemifield
     
+    spot_cart = bs_prop['cart']
+    spot_size = bs_prop['size']
+    spot      = bs_prop['spot']
+
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
         angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2 + rad
