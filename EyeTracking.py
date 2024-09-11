@@ -1472,7 +1472,7 @@ class EyeTracker:
 
 
 
-def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG', colors=None, task=None, ID=None ):
+def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG', colors=None, task=None, ID=None, noEyeTracker=False ):
     
     # sanity checks on trackEyes, filefolder and filename are done by the eyetracker object
 
@@ -1597,25 +1597,28 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
     print(filefolder)
 
-    ET = EyeTracker(tracker           = tracker,
-                    trackEyes         = trackEyes,
-                    fixationWindow    = 2.0,
-                    minFixDur         = 0.2,
-                    fixTimeout        = 3.0,
-                    psychopyWindow    = win,
-                    filefolder        = filefolder,
-                    filename          = filename,
-                    samplemode        = 'average',
-                    calibrationpoints = 5,
-                    colors            = colors )
+    if noEyeTracker:
+        ET = None
+    else:
+        ET = EyeTracker(tracker           = tracker,
+                        trackEyes         = trackEyes,
+                        fixationWindow    = 2.0,
+                        minFixDur         = 0.2,
+                        fixTimeout        = 3.0,
+                        psychopyWindow    = win,
+                        filefolder        = filefolder,
+                        filename          = filename,
+                        samplemode        = 'average',
+                        calibrationpoints = 5,
+                        colors            = colors )
 
-    if location == 'toronto':
-        if not tracker == 'mouse':
-            ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
+        if location == 'toronto':
+            if not tracker == 'mouse':
+                ET.initialize(calibrationPoints = np.array([[0,0],   [-10.437,0],[0,5.916],[10.437,0],[0,-5.916]                                 ]) )
+            else:
+                ET.initialize()
         else:
             ET.initialize()
-    else:
-        ET.initialize()
 
     fcols = [[-1,-1,-1],[1,1,1]]
     if 'both' in colors.keys():
