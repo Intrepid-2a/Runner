@@ -104,6 +104,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
 
 
+    win = setup['win']
+
     hiFusion = setup['fusion']['hi']
     loFusion = setup['fusion']['lo']
 
@@ -242,6 +244,12 @@ def doAreaTask(ID=None, hemifield=None, location=None):
  
     # else:
     #     raise ValueError("Location should be 'glasgow' or 'toronto', was {}".format(location))
+
+
+    x = 1
+    filename = ID + '_area_' + ('LH' if hemifield == 'left' else 'RH') + '_'
+    while (filename + str(x) + '.txt') in os.listdir(data_path):
+        x += 1
 
     # create output files:
     respFile = open(data_path + filename + str(x) + '.txt','w')
