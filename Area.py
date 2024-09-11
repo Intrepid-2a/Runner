@@ -35,7 +35,9 @@ from EyeTracking import localizeSetup, EyeTracker
 ######
 
 def doAreaTask(ID=None, hemifield=None, location=None):
-    ## parameters  
+
+    ## parameters... these are staircase parameters, but this task does not do any staircases?
+    
     nRevs   = 10   
     nTrials = 30  # at least 10 reversals and 30 trials for each staircase (30*8 staircases = 240 trials minimum)
     letter_height = 1
@@ -98,8 +100,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         x += 1
 
 
-    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='area', ID=ID) # data path is for the mapping data, not the eye-tracker data!
-
+    # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='area', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+    setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
 
 
     hiFusion = setup['fusion']['hi']
@@ -110,7 +112,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     fixation = setup['fixation']
     xfix     = setup['fixation_x']
 
+
     # colors
+    colors   = setup['colors']
     col_both = colors['both']
     if hemifield == 'left':
         col_ipsi, col_contra = colors['left'], colors['right']
@@ -120,7 +124,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     blindspot = setup['blindspotmarkers'][hemifield]
     bs_prop = setup['blindspotmarkers'][hemifield+'_prop']
 
-    rad = max(bs_prop['size']) + 3
+    rad = max(bs_prop['size']) + 3 # 1.5 dva padding? (effectively 0.5... could be OK)
 
 
 
@@ -128,7 +132,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # Range of possible start sizes
     step = rad/10 # rad (height or width +3)/10
     adaptorig = [rad-step*5, rad-step*4, rad-step*3, rad-step*2, rad-step, rad+step, rad+step*2, rad+step*3, rad+step*4, rad+step*5]
-    #NOTE : there is no 'no difference' e.g. rad-step, rad, rad+step, can add if preferred
+    # NOTE : there is no 'no difference' e.g. rad-step, rad, rad+step, can add if preferred
 
     # Repeating so there's 50 trials per eye and location (5 repeats of an original size for all)
     # random.seed(1)
@@ -146,8 +150,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
 
     # # jitter added to the field to reduce local cues
-    # marius: this is jitter added to the "field" property in the fusion stimuli...
-    # not sure why it's not just added to the pos property of the fusion stimulu objects?
+    # marius: this is jitter added to the "field" property in the fusion stimuli... which... doesn't exist?
+    # not sure why it's not just added to the pos property of the fusion stimuli objects? or needed
     jitter = (0.005, 0.01, 0.015, 0.02,0.025, 0, -0.005, -0.01, -0.015, -0.02,-0.025)
 
 
@@ -253,9 +257,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     
     respFile.close()
 
-    gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','w')
-    gazeFile.write("Trial\tPosition\tEye\tTime\tGaze\n")
-    gazeFile.close()
+    # gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','w')
+    # gazeFile.write("Trial\tPosition\tEye\tTime\tGaze\n")
+    # gazeFile.close()
 
     ## instructions
     instructions = visual.TextStim(win, text="Throughout the experiment you will fixate at a a cross located at the centre of the screen. It is important that you maintain fixation on this cross at all times.\n\n In every trial you will be presented with two circles, one surrounding the fixation cross and another in the periphery.The circles will always be slightly different in size. Your task is to make the size of the fixation circle match the one in the periphery by moving your mouse up or down.\n \n Move up = increase size of fixation circle.\n \n Move down = decrease size of fixation circle.\n\n Mouse click = accept final size and continue to next trial \n\n\n Press the space bar when you're ready to start the experiment.", color = col_both)
@@ -274,42 +278,46 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     ######
 
     ## stimuli
-    point1 = visual.Circle(win, pos = pol2cart(00, 3), edges = 200,  lineWidth = 20,fillColor = None, units = 'deg') # fixation  > changes
-    point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
+    # point1 = visual.Circle(win, pos = pol2cart(00, 3), edges = 200,  lineWidth = 20,fillColor = None, units = 'deg') # fixation  > changes
+    # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
-    blindspot.autoDraw = True 
-    # Rotating target stimuli
-    def Check1(Pos, color):
-        for p in range(0,360,30)  :
-            piece1=visual.Pie(win, size=(rad+0.6, rad+.6), start=p, end=p+15, edges=100,pos=Pos, lineWidth=0, lineColor=False,
-                fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
-            inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
-            piece1.draw() 
-            inner_stim.draw()
+    point1 = dashedCircle(win=win, size=10, ndashes=12, lineWidth=10, lineColor=col_both)
+    point2 = dashedCircle(win=win, size=10, ndashes=12, lineWidth=10, lineColor=col_both)
+
+    # blindspot.autoDraw = True 
+    
+    # # Rotating target stimuli
+    # def Check1(Pos, color):
+    #     for p in range(0,360,30)  :
+    #         piece1=visual.Pie(win, size=(rad+0.6, rad+.6), start=p, end=p+15, edges=100,pos=Pos, lineWidth=0, lineColor=False,
+    #             fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
+    #         inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
+    #         piece1.draw() 
+    #         inner_stim.draw()
         
-    def Check2(Pos, color):
-        for p in range(0,360,30)  :
-            piece2=visual.Pie(win, size=(rad+0.6, rad+0.6), start=p+15, end=p+30, edges=100,pos=Pos, lineWidth=0, lineColor=False,
-                fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
-            inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
-            piece2.draw()
-            inner_stim.draw()  
+    # def Check2(Pos, color):
+    #     for p in range(0,360,30)  :
+    #         piece2=visual.Pie(win, size=(rad+0.6, rad+0.6), start=p+15, end=p+30, edges=100,pos=Pos, lineWidth=0, lineColor=False,
+    #             fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
+    #         inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
+    #         piece2.draw()
+    #         inner_stim.draw()  
 
 
-    blindspot.autoDraw = True
+    # blindspot.autoDraw = True
 
     ## Positions, colors and instructions by hemifield
     
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
-        angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2+ rad
+        angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2 + rad
         positions = {
             "righ-top": [(spot[0] + angup, spot[1])], # BS location + angup, same radians 
             "righ-mid": [(spot[0],  spot[1])], 
         }
     else:
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), + angle of the BS location (dev from 0) + 4 (padding) +radious
-        angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) +  2 +2+ rad
+        angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2 + 2 + rad
         positions = {
             "left-top": [(spot[0] - angup, spot[1])], # BS location + angup, same radians 
             "left-mid": [(spot[0],  spot[1])],
@@ -362,60 +370,35 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     abort = False
     recalibrate = False
+
     #mouse element
-    mouse= event.Mouse(visible=False) #invisible
+    mouse = event.Mouse(visible=False) #invisible
+
     #trials for each position
     adapt1 = adapt.copy()
-    # random.seed(6)
-    random.shuffle(adapt1)
-    # print('ad1', adapt, 'ad2', adapt1)
     adapt2 = adapt.copy()
-    # random.seed(7)
-    random.shuffle(adapt2)
     adapt3 = adapt.copy()
-    # random.seed(8)
+
+    random.shuffle(adapt1)
+    random.shuffle(adapt2)
     random.shuffle(adapt3)
+
     adaptposs = [[adapt, adapt1], [adapt2, adapt3]] # print(adaptposs[0][0],adaptposs[0][1], adaptposs[1][0], adaptposs[1][1]) add 1more [0] to index
-    #Circle stimuli jitter
+    #Circle stimuli position jitter
     posjit = [0 , 0.05, 0.1, 0.15, 0.25, 0.5, -0.05, -0.1, -0.15, -0.25, -0.5]
 
-    print('hello2')
     #keeping track of time 
     trial_clock = core.Clock()
     
-    #repeated draws  
-    # def repeat_draw():
-    #     fixation.draw()
-    #     hiFusion.draw()
-    #     loFusion.draw()
-    #blindspot.draw()
-    #repeat_draw()
-    #win.flip()
     #k = ['wait']
     #while k[0] not in ['q','space']:
     #    k = event.waitKeys()
     #if k[0] in ['q']:
     #    win.close()
     #    core.quit()
-    print('hello3')
+
     while not ongoing == not_ongoing:
-        # repeat_draw()
-
-        # fixation.draw()
-        # hiFusion.draw()
-        # loFusion.draw()
-        # # blindspot.draw()
-
-        # win.flip()
-        '''
-        mouse.clickReset()
-        while 1:
-            n = mouse.getPressed()
-            if n[2] == True:
-                print('n', n)
-                mouse.clickReset()
-                break
-        '''
+    
         # Point 1 locations and colors
         if ongoing[0][0] == False and ongoing [0][1] == False :  #any 
             position = 1 #BS location, defined below
@@ -427,13 +410,13 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             position = np.random.choice([0, 1]) 
             col = np.random.choice(list(compress([0, 1], ongoing[position])))
             # print(list(compress([0, 1], ongoing[position])))
-        # print('current position', position, 'current color', col)
-        #Point 1 positions & parameters
+
         if position == 0:
-            point1.pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) # Outside BS location
+            point1.setPos( pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) ) # Outside BS location
         else:
-            point1.pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) # BS location
-        point1.size = [rad, rad]
+            point1.setPos( pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) ) # BS location
+
+        point1.setSize( size = rad )
         
         # print('hello 5')
         
@@ -448,12 +431,16 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         #color of dots - which eye to stimulate
         # marius: the color mapping decided on each trial?
         if eye[col] == hemifield: #add col
-            point1.lineColor  = col_ipsi
-            point2.lineColor = col_ipsi
+            # point1.lineColor = col_ipsi
+            # point2.lineColor = col_ipsi
+            point1.setLineColor(col_ipsi)
+            point2.setLineColor(col_ipsi)
 
         else:
-            point1.lineColor = col_cont
-            point2.lineColor = col_cont
+            # point1.lineColor = col_cont
+            # point2.lineColor = col_cont
+            point1.setLineColor(col_cont)
+            point2.setLineColor(col_cont)
 
         #adapting fixation size to eliminate local cues during size estimation
         f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
@@ -515,11 +502,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
             while 1 and not abort:
                 t = trial_clock.getTime()
-                # gazeFile.write('\t'.join(map(str, [trial[position][col],
-                #                position,
-                #                col,
-                #                round(t,2),
-                #                tracker.lastsample()])) + "\n")
 
                 trial[position][col]
 
@@ -533,24 +515,28 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 k = event.getKeys(['space', 'q'])
                 if k:
                     if 'q' in k:
-                        abort = True
+                        abort = True # abort task
                         break
                     elif 'space' in k:
-                         finaldiff = 'Trial aborted'
+                         finaldiff = 'Trial aborted' # abort trial
                          break
                 
                 
                 
                 # taking participant input:
-                wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
+                # wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
+
+                mousepos = mouse.getPos()
+                point2.size = abs(mousepos[0]) / 3
                 
-                if turn == 1: # so only ~7 times per second? (fewer in glasgow)
-                    Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
-                else:
-                    Check2([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
-                point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)] # uses y mouse location to adjust
+                # if turn == 1: # so only ~7 times per second? (even fewer in glasgow)
+                #     Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
+                # else:
+                #     Check2([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
+                # point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)] # uses y mouse location to adjust
                 
-                point2.draw()
+                # point1.draw()
+                # point2.draw()
 
                 # repeat_draw()
 
@@ -559,25 +545,20 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 loFusion.draw()
                 blindspot.draw()
 
+                point1.draw()
+                point2.draw()
+
+
                 win.flip()
 
-
-                cycle +=1
-                if cycle == 20: # every 22 frames the fusion stim get shuffled? that's almost 7 times / second?
-                    # hiFusion.resetProperties()
-                    # loFusion.resetProperties()
-                    # the fieldPos property does not exist:
-                    # hiFusion.fieldPos = (random.sample(jitter, 2))
-                    # loFusion.fieldPos = (random.sample(jitter, 2))
-                elif cycle == 21:
-                    cycle = 0
-                    turn = turn *-1
+                
                 m = mouse.getPressed()
                 if m[0] == True:
                     print(m)
                     finaldiff = point1.size[0] - point2.size[0]
                     mouse.clickReset()
                     break
+
             if len(stim_comments) == 1:
                 tracker.comment(stim_comments.pop()) # pair 2 off
             gazeFile.close()
@@ -638,11 +619,12 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
             win.flip()
 
-            m = mouse.getPressed()
+            m = mouse.getPressed() # what is the right click for? clickReset and break trial loop? why break trial loop?
             if m[2] == True:
                 print(m)
                 mouse.clickReset()
                 break
+                
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used?
@@ -697,5 +679,83 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     win.close()
     core.quit()
 
+
+
+
+from time import time
+class dashedCircle():
+
+    def __init__(   self,
+                    win,
+                    pos       = [0,0],
+                    size      = 1,         # only circles for now, no ellipses 
+                    ndashes   = 12,
+                    dashprop  = 0.5,
+                    Hz        = 0.1,       # rotations/second (0 = no rotation, sign = direction)
+                    lineWidth = 1,
+                    lineColor = [-1,-1,-1],
+                    ori       = 0):
+
+        self.win       = win
+        self.pos       = pos
+        self.size      = size
+        self.ndashes   = int(ndashes)
+        self.dashprop  = dashprop
+        self.Hz        = Hz
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+        self.ori       = ori
+
+        self.starttime = time()
+        self.createDashes()
+        
+    def createDashes(self):
+        self.dashes = []
+        dashlength = (((360 / self.ndashes) * self.dashprop) / 180) * np.pi
+        dashedges = int( max(2, np.round(720 / self.ndashes)) )
+        for dash in range(self.ndashes):
+            SA = (((360 / self.ndashes) * dash) / 180) * np.pi  # start angle in radians
+            EA = SA + dashlength
+            edge_angles = np.linspace(SA,EA,num=dashedges)
+            vertices = []
+            for v in range(dashedges):
+                vertices.append([np.cos(edge_angles[v])*self.size, np.sin(edge_angles[v])*self.size])
+            vertices = np.array(vertices)
+            self.dashes.append(visual.ShapeStim( win=self.win, 
+                                                 lineWidth=self.lineWidth,
+                                                 lineColor=self.lineColor,
+                                                 vertices=vertices,
+                                                 closeShape=False,
+                                                 ori=self.ori,
+                                                 pos=self.pos))
+            
+    def setPos(self, pos):
+        self.pos = pos
+        for dash_no in range(len(self.dashes)):
+            self.dashes[dash_no].pos = pos
+
+    def setSize(self, size):
+        self.size = size
+        self.createDashes()
+
+    def setLineColor(self, lineColor):
+        self.lineColor = lineColor
+        for dash_no in range(len(self.dashes)):
+            self.dashes[dash_no].lineColor = lineColor
+
+    def draw(self):
+        elapsed = time() - self.starttime
+        add_revolutions = (elapsed * self.Hz) % 1
+        dash_ori = self.ori + (add_revolutions * 360)
+        for dash_no in range(len(self.dashes)):
+            self.dashes[dash_no].ori = dash_ori
+            self.dashes[dash_no].draw()
+
+
+
+
 if __name__ == "__main__": #BM what's this?
-    doAreaTask()
+    doAreaTask()           # if you run the file as a script, the function gets defined
+                           # but doesn't run
+                           # however, if this is the __main__ script, this if will run the task (in Glasgow)
+                           # if it is not the __main__ script the task can be imported (in Toronto)
