@@ -294,9 +294,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
     # foveal reference circle:
-    fov_point = visual.Circle( win = win, pos = [0,0], size=10,  edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None)
+    fov_point = visual.Circle( win = win, pos = [0,0], size=10,  edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None, interpolate = True)
     # peripheral dashed circle:
-    per_point = dashedCircle(  win = win, pos = [0,0], size=rad, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0)
+    per_point = dashedCircle(  win = win, pos = [0,0], size=rad, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0, interpolate = True)
 
     # blindspot.autoDraw = True 
     
@@ -326,7 +326,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     spot_size = bs_prop['size']
     spot      = bs_prop['spot']
 
-    one_dva_angle = 2 * cart2pol(spot_cart[0], 0.5)[0]
+    one_dva_angle = cart2pol(spot_cart[0], 5)[0] / 5
 
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
@@ -753,24 +753,26 @@ class dashedCircle():
 
     def __init__(   self,
                     win,
-                    pos       = [0,0],
-                    size      = 1,         # only circles for now, no ellipses 
-                    ndashes   = 12,
-                    dashprop  = 0.5,
-                    Hz        = 0.1,       # rotations/second (0 = no rotation, sign = direction)
-                    lineWidth = 1,
-                    lineColor = [-1,-1,-1],
-                    ori       = 0):
+                    pos         = [0,0],
+                    size        = 1,         # only circles for now, no ellipses 
+                    ndashes     = 12,
+                    dashprop    = 0.5,
+                    Hz          = 0.1,       # rotations/second (0 = no rotation, sign = direction)
+                    lineWidth   = 1,
+                    lineColor   = [-1,-1,-1],
+                    ori         = 0,
+                    interpolate = True):
 
-        self.win       = win
-        self.pos       = pos
-        self.size      = size
-        self.ndashes   = int(ndashes)
-        self.dashprop  = dashprop
-        self.Hz        = Hz
-        self.lineWidth = lineWidth
-        self.lineColor = lineColor
-        self.ori       = ori
+        self.win         = win
+        self.pos         = pos
+        self.size        = size
+        self.ndashes     = int(ndashes)
+        self.dashprop    = dashprop
+        self.Hz          = Hz
+        self.lineWidth   = lineWidth
+        self.lineColor   = lineColor
+        self.ori         = ori
+        self.interpolate = interpolate
 
         self.starttime = time()
         self.createDashes()
@@ -792,14 +794,15 @@ class dashedCircle():
             for v in range(dashedges+1):
                 vertices.append([np.cos(edge_angles[v]), np.sin(edge_angles[v])])
             vertices = np.array(vertices)
-            self.dashes.append(visual.ShapeStim( win        = self.win, 
-                                                 size       = self.size,
-                                                 lineWidth  = self.lineWidth,
-                                                 lineColor  = self.lineColor,
-                                                 vertices   = vertices,
-                                                 closeShape = False,
-                                                 ori        = self.ori,
-                                                 pos        = self.pos))
+            self.dashes.append(visual.ShapeStim( win         = self.win, 
+                                                 size        = self.size,
+                                                 lineWidth   = self.lineWidth,
+                                                 lineColor   = self.lineColor,
+                                                 vertices    = vertices,
+                                                 closeShape  = False,
+                                                 ori         = self.ori,
+                                                 pos         = self.pos,
+                                                 interpolate = self.interpolate))
             
 
     def draw(self):
@@ -812,11 +815,12 @@ class dashedCircle():
 
         # make sure all other settings are properly used as well:
         for dash_no in range(len(self.dashes)):
-            self.dashes[dash_no].ori       = self.ori
-            self.dashes[dash_no].lineColro = self.lineColor
-            self.dashes[dash_no].lineWidth = self.lineWidth
-            self.dashes[dash_no].size      = self.size
-            self.dashes[dash_no].pos       = self.pos
+            self.dashes[dash_no].ori         = self.ori
+            self.dashes[dash_no].lineColor   = self.lineColor
+            self.dashes[dash_no].lineWidth   = self.lineWidth
+            self.dashes[dash_no].size        = self.size
+            self.dashes[dash_no].pos         = self.pos
+            self.dashes[dash_no].interpolate = self.interpolate
 
         # update orientation depending on elapsed time:
         elapsed = time() - self.starttime
