@@ -291,8 +291,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # point1 = visual.Circle(win, pos = pol2cart(00, 3), edges = 200,  lineWidth = 20,fillColor = None, units = 'deg') # fixation  > changes
     # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
-    point1 = dashedCircle(win=win, size=10, ndashes=12, lineWidth=10, lineColor=col_both)
-    point2 = dashedCircle(win=win, size=10, ndashes=12, lineWidth=10, lineColor=col_both)
+    circle = dashedCircle(win=win, size=10, ndashes=12, dashprop=0.5, lineWidth=6, lineColor=col_both, Hz=0)
 
     # blindspot.autoDraw = True 
     
@@ -729,40 +728,72 @@ class dashedCircle():
         self.createDashes()
         
     def createDashes(self):
+
+        # to detect changes:
+        self.currentProperties = {'ndashes'  = self.ndashes,
+                                  'dashprop' = self.dashprop}
+
         self.dashes = []
         dashlength = (((360 / self.ndashes) * self.dashprop) / 180) * np.pi
         dashedges = int( max(2, np.round(720 / self.ndashes)) )
         for dash in range(self.ndashes):
             SA = (((360 / self.ndashes) * dash) / 180) * np.pi  # start angle in radians
             EA = SA + dashlength
-            edge_angles = np.linspace(SA,EA,num=dashedges)
+            edge_angles = np.linspace(SA,EA,num=dashedges+1)
             vertices = []
-            for v in range(dashedges):
-                vertices.append([np.cos(edge_angles[v])*self.size, np.sin(edge_angles[v])*self.size])
+            for v in range(dashedges+1):
+                vertices.append([np.cos(edge_angles[v]), np.sin(edge_angles[v])])
             vertices = np.array(vertices)
-            self.dashes.append(visual.ShapeStim( win=self.win, 
-                                                 lineWidth=self.lineWidth,
-                                                 lineColor=self.lineColor,
-                                                 vertices=vertices,
-                                                 closeShape=False,
-                                                 ori=self.ori,
-                                                 pos=self.pos))
+            self.dashes.append(visual.ShapeStim( win        = self.win, 
+                                                 size       = self.size,
+                                                 lineWidth  = self.lineWidth,
+                                                 lineColor  = self.lineColor,
+                                                 vertices   = vertices,
+                                                 closeShape = False,
+                                                 ori        = self.ori,
+                                                 pos        = self.pos))
             
-    def setPos(self, pos):
-        self.pos = pos
-        for dash_no in range(len(self.dashes)):
-            self.dashes[dash_no].pos = pos
+    # properties are now read out when the object is drawn,
+    # so we don't need update- / set- functions anymore
 
-    def setSize(self, size):
-        self.size = size
-        self.createDashes()
+    # def setPos(self, pos):
+    #     self.pos = pos
+    #     for dash_no in range(len(self.dashes)):
+    #         self.dashes[dash_no].pos = pos
 
-    def setLineColor(self, lineColor):
-        self.lineColor = lineColor
-        for dash_no in range(len(self.dashes)):
-            self.dashes[dash_no].lineColor = lineColor
+    # def setSize(self, size):
+    #     self.size = size
+    #     for dash_no in range(len(self.dashes)):
+    #         self.dashes[dash_no].size = size
+
+    # def setLineColor(self, lineColor):
+    #     self.lineColor = lineColor
+    #     for dash_no in range(len(self.dashes)):
+    #         self.dashes[dash_no].lineColor = lineColor
+    
+    # def setOri(self, ori):
+    #     self.ori = ori
+    #     for dash_no in range(len(self.dashes)):
+    #         self.dashes[dash_no].ori = ori
+
 
     def draw(self):
+
+        # if the ndashes or dashprop properties got changed, we need to recreate the shapestim objects:
+        recreateDashes = False
+        if self.ndashes  != self.currentProperties['ndashes']:  recreateDashes = True; self.currentProperties['ndashes']  = self.ndashes
+        if self.dashprop != self.currentProperties['dashprop']: recreateDashes = True; self.currentProperties['dahsprop'] = self.dashprop
+        if recreateDashes: self.createDashes()
+
+        # make sure all other settings are properly used as well:
+        for dash_no in range(len(self.dashes)):
+            self.dashes[dash_no].ori       = self.ori
+            self.dashes[dash_no].lineColro = self.lineColor
+            self.dashes[dash_no].lineWidth = self.lineWidth
+            self.dashes[dash_no].size      = self.size
+            self.dashes[dash_no].pos       = self.pos
+
+        # update orientation depending on elapsed time:
         elapsed = time() - self.starttime
         add_revolutions = (elapsed * self.Hz) % 1
         dash_ori = self.ori + (add_revolutions * 360)
