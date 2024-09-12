@@ -1626,12 +1626,25 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     if 'back' in colors.keys():
         fcols[1] = colors['back']
 
-    fusion = {'hi': fusionStim(win    = win,
-                               pos    = [0,7],
-                               colors = fcols),
-              'lo': fusionStim(win    = win,
-                               pos    = [0,-7],
-                               colors = fcols)}
+    if task == 'area':
+        fusion = {'hi': fusionStim(win    = win,
+                                   rows    = 3,
+                                   columns = 15,
+                                   pos    = [0,9],
+                                   colors = fcols),
+                  'lo': fusionStim(win    = win,
+                                   rows    = 3,
+                                   columns = 15,
+                                   pos    = [0,-9],
+                                   colors = fcols)}
+
+    if task == 'distance':
+        fusion = {'hi': fusionStim(win    = win,
+                                   pos    = [0,7],
+                                   colors = fcols),
+                  'lo': fusionStim(win    = win,
+                                   pos    = [0,-7],
+                                   colors = fcols)}
 
     # color calibration doesn't use any of this (except the window object?)
     # for either calibration task, the task should not be set
