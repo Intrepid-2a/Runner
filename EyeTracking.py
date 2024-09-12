@@ -1783,7 +1783,7 @@ def makeBlindSpotMarkers(win, task, ID, colors):
         print(spot_size)
 
 
-        blindspotmarkers[hemifield] = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=colors[hemifield], lineColor = None)
+        blindspotmarkers[hemifield] = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=colors[hemifield], lineColor = None, interpolate = True)
         blindspotmarkers[hemifield].pos = spot_cart
         blindspotmarkers[hemifield].size = spot_size
 
