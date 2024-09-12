@@ -128,6 +128,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     blindspot = setup['blindspotmarkers'][hemifield]
     bs_prop = setup['blindspotmarkers'][hemifield+'_prop']
 
+    # called rad... but it's diameter, not radius
     rad = max(bs_prop['size']) + 3 # 1.5 dva padding? (effectively 0.5... could be OK)
 
 
@@ -291,7 +292,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # point1 = visual.Circle(win, pos = pol2cart(00, 3), edges = 200,  lineWidth = 20,fillColor = None, units = 'deg') # fixation  > changes
     # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
-    circle = dashedCircle(win=win, size=10, ndashes=12, dashprop=0.5, lineWidth=6, lineColor=col_both, Hz=0)
+    # foveal reference circle:
+    fov_point = visual.Circle( win = win, pos = [0,0], size=10, edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None)
+    # peripheral dashed circle:
+    per_point = dashedCircle(  win = win, pos = [0,0], size=10, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0)
 
     # blindspot.autoDraw = True 
     
@@ -321,16 +325,20 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     spot_size = bs_prop['size']
     spot      = bs_prop['spot']
 
+    one_dva_angle = 2 * cart2pol(spot_cart[0], 0.5)[0]
+
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
-        angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2 + rad
+        # angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2 + rad
+        angup = one_dva_angle * ( (spot_size[1]/2) + (rad/2) + 2)
         positions = {
             "righ-top": [(spot[0] + angup, spot[1])], # BS location + angup, same radians 
             "righ-mid": [(spot[0],  spot[1])], 
         }
     else:
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), + angle of the BS location (dev from 0) + 4 (padding) +radious
-        angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2 + 2 + rad
+        # angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2 + 2 + rad
+        angup = one_dva_angle * ( (spot_size[1]/2) + (rad/2) + 2)
         positions = {
             "left-top": [(spot[0] - angup, spot[1])], # BS location + angup, same radians 
             "left-mid": [(spot[0],  spot[1])],
@@ -417,7 +425,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # Point 1 locations and colors
         if ongoing[0][0] == False and ongoing [0][1] == False :  #any 
             position = 1 #BS location, defined below
-            col = np.random.choice(list(compress([0, 1], ongoing[position])))
+            col = np.random.choice(list(compress([0, 1], ongoing[position]))) # col is 'color' in R... what does it mean here? condition?
         elif ongoing[1][0] == False and ongoing [1][1] == False:
             position = 0 #Outside BS location, defined below
             col = np.random.choice(list(compress([0, 1], ongoing[position])))
@@ -426,40 +434,50 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             col = np.random.choice(list(compress([0, 1], ongoing[position])))
             # print(list(compress([0, 1], ongoing[position])))
 
-        if position == 0:
-            point1.setPos( pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) ) # Outside BS location
-        else:
-            point1.setPos( pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) ) # BS location
+        # if position == 0:
+        #     point1.setPos( pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) ) # Outside BS location
+        # else:
+        #     point1.setPos( pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) ) # BS location
 
-        point1.setSize( size = rad )
+        per_point.pos = pol2cart(poss[position][1][0][0], poss[position][1][0][1])
+
+        # point1.setSize( size = rad )
+        per_point.size = rad
         
         # print('hello 5')
         
         # Point 2 radius 
+        # foveal point radius:
         currtrial = trial[position][col]# current trial
         curradapt = adaptposs[position][col] # current staircase (i.e. adapt, adapt1, adapt2, adapt3)
-        point2.size = [curradapt[currtrial], curradapt[currtrial]] 
-        point2.pos = [0, 0]  #pol2cart(poss[0][1][0][0], -poss[0][1][0][1]) #[0, 0]
-        point2.pos += [random.choice(posjit), random.choice(posjit)]
+        # point2.size = [curradapt[currtrial], curradapt[currtrial]] 
+        # point2.pos = [0, 0]  #pol2cart(poss[0][1][0][0], -poss[0][1][0][1]) #[0, 0]
+        # point2.pos += [random.choice(posjit), random.choice(posjit)]
         # print('hello 6')
 
+        fov_point.size = curradapt[currtrial]
+        fov_point.pos  = [random.choice(posjit), random.choice(posjit)]
+
+        mouse_offset = random.choice(posjit) * 10
+
         #color of dots - which eye to stimulate
-        # marius: the color mapping decided on each trial?
         if eye[col] == hemifield: #add col
-            # point1.lineColor = col_ipsi
-            # point2.lineColor = col_ipsi
-            point1.setLineColor(col_ipsi)
-            point2.setLineColor(col_ipsi)
+            # point1.setLineColor(col_ipsi)
+            # point2.setLineColor(col_ipsi)
+            per_point.lineColor = col_ipsi
+            fov_point.lineColor = col_ipsi
 
         else:
-            # point1.lineColor = col_cont
-            # point2.lineColor = col_cont
-            point1.setLineColor(col_contra)
-            point2.setLineColor(col_contra)
+            # point1.setLineColor(col_contra)
+            # point2.setLineColor(col_contra)
+            per_point.lineColor = col_contra
+            fov_point.lineColor = col_contra
 
         #adapting fixation size to eliminate local cues during size estimation
-        f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
-        fixation.vertices = ((0, -f[0]), (0, f[0]), (0,0), (-f[0], 0), (f[0], 0))
+        # f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
+        # fixation.vertices = ((0, -f[0]), (0, f[0]), (0,0), (-f[0], 0), (f[0], 0))
+
+        fixation.size = [random.choice(np.arange(0.5, 2.25, 0.25))] * 2
 
         # print('hello 7')
 
@@ -506,13 +524,13 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             trial_clock.reset()
 
             # setting adaptive method
-            jit1 = random.choice(posjit)
-            jit2 = random.choice(posjit)
+            # jit1 = random.choice(posjit) # not used?
+            # jit2 = random.choice(posjit)
             mouse.clickReset()
             
             #og parameters... OG parameters are the original parameters?
-            ogdiff = point1.size[0] - point2.size[0]
-            ogp2 = point2.size[0]
+            ogdiff = fov_point.size - per_point.size
+            ogp2 = fov_point.size
             cycle = 0
             # if len(stim_comments) == 2:
             #     tracker.comment(stim_comments.pop()) 
@@ -544,7 +562,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 # wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
 
                 mousepos = mouse.getPos()
-                point2.size = abs(mousepos[0]) / 3
+                fov_point.size = abs(mousepos[0] + mouse_offset) / 1.5
                 
                 # if turn == 1: # so only ~7 times per second? (even fewer in glasgow)
                 #     Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
@@ -553,7 +571,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 # point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)] # uses y mouse location to adjust
                 
                 # point1.draw()
-                # point2.draw()
+                # point2.draw() # this is the foveal circle... need to get lineWidth from that one: 15 pts
 
                 # repeat_draw()
 
@@ -562,8 +580,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 loFusion.draw()
                 blindspot.draw()
 
-                point1.draw()
-                point2.draw()
+                fov_point.draw()
+                per_point.draw()
 
 
                 win.flip()
@@ -572,13 +590,13 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 m = mouse.getPressed()
                 if m[0] == True:
                     print(m)
-                    finaldiff = point1.size[0] - point2.size[0]
+                    finaldiff = fov_point.size - per_point.size
                     mouse.clickReset()
                     break
 
             # if len(stim_comments) == 1:
             #     tracker.comment(stim_comments.pop()) # pair 2 off
-            gazeFile.close()
+            # gazeFile.close()
 
         if abort: # trial intentionally aborted? or task/experiment aborted?
             break
@@ -609,6 +627,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             else:
                 hiFusion.draw()
                 loFusion.draw()
+
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
                 win.flip()
                 k = ['wait']
@@ -648,9 +667,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used?
                                         position,# Stimulus location
                                         col,
-                                        round(ogp2, 2), #change
-                                        round(point1.size[0], 2),
-                                        round(ogdiff,2),
+                                        round(ogp2, 3), #change
+                                        round(fov_point.size, 3),
+                                        round(ogdiff,3),
                                         finaldiff, 
                                         gaze_out])) + "\n") #block
         respFile.close()
@@ -699,8 +718,13 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
 
 
+# object that implements a rotating circle with dashed outline
+# (mostly compatible with psychopy style visual stimulus objects)
 
+
+# we need to keep time, in order to rotate the dashes:
 from time import time
+
 class dashedCircle():
 
     def __init__(   self,
@@ -753,29 +777,6 @@ class dashedCircle():
                                                  ori        = self.ori,
                                                  pos        = self.pos))
             
-    # properties are now read out when the object is drawn,
-    # so we don't need update- / set- functions anymore
-
-    # def setPos(self, pos):
-    #     self.pos = pos
-    #     for dash_no in range(len(self.dashes)):
-    #         self.dashes[dash_no].pos = pos
-
-    # def setSize(self, size):
-    #     self.size = size
-    #     for dash_no in range(len(self.dashes)):
-    #         self.dashes[dash_no].size = size
-
-    # def setLineColor(self, lineColor):
-    #     self.lineColor = lineColor
-    #     for dash_no in range(len(self.dashes)):
-    #         self.dashes[dash_no].lineColor = lineColor
-    
-    # def setOri(self, ori):
-    #     self.ori = ori
-    #     for dash_no in range(len(self.dashes)):
-    #         self.dashes[dash_no].ori = ori
-
 
     def draw(self):
 
