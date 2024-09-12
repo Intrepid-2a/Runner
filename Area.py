@@ -730,8 +730,8 @@ class dashedCircle():
     def createDashes(self):
 
         # to detect changes:
-        self.currentProperties = {'ndashes'  = self.ndashes,
-                                  'dashprop' = self.dashprop}
+        self.currentProperties = {'ndashes'  : self.ndashes,
+                                  'dashprop' : self.dashprop}
 
         self.dashes = []
         dashlength = (((360 / self.ndashes) * self.dashprop) / 180) * np.pi
