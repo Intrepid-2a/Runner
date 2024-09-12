@@ -130,7 +130,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     # called rad... but it's diameter, not radius
     rad = max(bs_prop['size']) + 3 # 1.5 dva padding? (effectively 0.5... could be OK)
-
+    
+    print('RAD = %0.4f'%(rad))
 
 
     ## Creating distributions for the experiment
@@ -293,9 +294,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
     # foveal reference circle:
-    fov_point = visual.Circle( win = win, pos = [0,0], size=10, edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None)
+    fov_point = visual.Circle( win = win, pos = [0,0], size=10,  edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None)
     # peripheral dashed circle:
-    per_point = dashedCircle(  win = win, pos = [0,0], size=10, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0)
+    per_point = dashedCircle(  win = win, pos = [0,0], size=rad, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0)
 
     # blindspot.autoDraw = True 
     
@@ -395,7 +396,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     recalibrate = False
 
     #mouse element
-    mouse = event.Mouse(visible=False) #invisible
+    mouse = event.Mouse(visible=False, win=win) #invisible
 
     #trials for each position
     adapt1 = adapt.copy()
@@ -439,10 +440,12 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # else:
         #     point1.setPos( pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) ) # BS location
 
-        per_point.pos = pol2cart(poss[position][1][0][0], poss[position][1][0][1])
+        per_pos = pol2cart(poss[position][1][0][0], poss[position][1][0][1])
+        per_pos = [x + random.choice(posjit) for x in per_pos]
+        per_point.pos = per_pos
 
         # point1.setSize( size = rad )
-        per_point.size = rad
+        per_point.size = rad/2
         
         # print('hello 5')
         
@@ -455,10 +458,16 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # point2.pos += [random.choice(posjit), random.choice(posjit)]
         # print('hello 6')
 
+        fov_size = curradapt[currtrial]
         fov_point.size = curradapt[currtrial]
         fov_point.pos  = [random.choice(posjit), random.choice(posjit)]
 
-        mouse_offset = random.choice(posjit) * 10
+        # mouse_offset = random.choice(posjit) * 10
+
+
+        mouse_offset = fov_size * 2
+        mouse.setPos([0,0])
+
 
         #color of dots - which eye to stimulate
         if eye[col] == hemifield: #add col
@@ -508,7 +517,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         
         # print('pre fixation ok \n')
 
-        
+        print([mouse_offset, mouse.getPos()[0]])
+
 
         ## commencing trial 
 
@@ -562,7 +572,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 # wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
 
                 mousepos = mouse.getPos()
-                fov_point.size = abs(mousepos[0] + mouse_offset) / 1.5
+                fov_point.size = abs(mousepos[0] + mouse_offset) / 2
                 
                 # if turn == 1: # so only ~7 times per second? (even fewer in glasgow)
                 #     Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
@@ -648,28 +658,31 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                         abort = True
                         break
 
-        while blink==1: # what is "blink"? what does that mean? do we have accurate blink detection now?
+        # while blink==1: # what is "blink"? what does that mean? do we have accurate blink detection now?
 
-            hiFusion.draw()
-            loFusion.draw()
-            xfix.draw()
+        #     hiFusion.draw()
+        #     loFusion.draw()
+        #     xfix.draw()
 
-            win.flip()
+        #     win.flip()
 
-            m = mouse.getPressed() # what is the right click for? clickReset and break trial loop? why break trial loop?
-            if m[2] == True:
-                print(m)
-                mouse.clickReset()
-                break
+        #     m = mouse.getPressed() # what is the right click for? clickReset and break trial loop? why break trial loop?
+        #     if m[2] == True:
+        #         print(m)
+        #         mouse.clickReset()
+        #         break
                 
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used?
                                         position,# Stimulus location
                                         col,
-                                        round(ogp2, 3), #change
-                                        round(fov_point.size, 3),
-                                        round(ogdiff,3),
+                                        #round(ogp2, 3), #change
+                                        '%0.3f'%(ogp2),
+                                        # round(fov_point.size, 3),
+                                        '%0.3f'%(fov_point.size),
+                                        # round(ogdiff,3),
+                                        '%0.3f'%(ogdiff),
                                         finaldiff, 
                                         gaze_out])) + "\n") #block
         respFile.close()
@@ -678,6 +691,14 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         #    trial[position][col]  = trial[position][col]  +1
         #else:
         #    pass
+
+        # short break to get rid of mouse clicks in buffer
+        starttime = trial_clock.getTime()
+        while(trial_clock.getTime() < (starttime + 0.150)):
+            win.flip()
+        mouse.clickReset()
+        event.clearEvents(eventType='mouse')
+
         # Break midway through
         ntrial +=1
         if ntrial == brk:
@@ -689,6 +710,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         print('running trial N=',  trial[position][col], 'of', len(adaptposs[position][col])-1, 'in position =', position, 'and color =', col)
         ongoing[position][col] =  trial[position][col] <= len(adaptposs[position][col]) -1
         
+
+
+
     ## Closing prints
     if abort:
         respFile = open(data_path + filename + str(x) + '.txt','a')
