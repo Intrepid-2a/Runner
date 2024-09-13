@@ -585,6 +585,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
                 # repeat_draw()
 
+                per_point.ori = 15 * np.floor((t * (1/.366)) % 2)
+
+
                 fixation.draw()
                 hiFusion.draw()
                 loFusion.draw()
