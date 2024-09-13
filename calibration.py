@@ -84,7 +84,7 @@ def doColorCalibration(ID=None, task=None, location=None):
 
     # filefoder needs to be specified? maybe not for color calibration? no eye-tracking files will be written...
     # not sending colors to localize setup, since we're still determining them here: use defaults for now!
-    setup = localizeSetup(location=location, glasses=glasses, trackEyes=trackEyes, filefolder=None, filename=None) # data path is for the mapping data, not the eye-tracker data!
+    setup = localizeSetup(location=location, glasses=glasses, trackEyes=trackEyes, filefolder=None, filename=None, task=task, ID=ID) # data path is for the mapping data, not the eye-tracker data!
 
     cfg = {}
     cfg['hw'] = setup
