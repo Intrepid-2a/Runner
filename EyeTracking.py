@@ -780,7 +780,7 @@ class EyeTracker:
 
         visual.TextStim(self.psychopyWindow,'calibration', height = 1,wrapWidth=30, color = 'black').draw()
         self.psychopyWindow.flip()
-        time.sleep(0.3333) # is this necessary?
+        time.sleep(0.3333) # is this necessary? well, we just show this briefly, so the participant knows what's going to happen
 
         for target_idx in range(ntargets):
             # plot a circle at the fixation position.
@@ -1618,7 +1618,10 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
             else:
                 ET.initialize()
         else:
-            ET.initialize()
+            if location == 'glasgow':
+                ET.initialize(calibrationScale=(0.35, 0.35))
+            else:
+                ET.initialize()
 
     fcols = [[-1,-1,-1],[1,1,1]]
     if 'both' in colors.keys():
