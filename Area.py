@@ -102,6 +102,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='area', ID=ID) # data path is for the mapping data, not the eye-tracker data!
     setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='area', ID=ID) 
 
     tracker = setup['tracker']
 
@@ -267,13 +268,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                         'FixFinalSize',
                                         'FinalDiff', 
                                         'GazeOut'])) + '\n')
-    # respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
     
     respFile.close()
 
-    # gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','w')
-    # gazeFile.write("Trial\tPosition\tEye\tTime\tGaze\n")
-    # gazeFile.close()
 
     ## instructions
     instructions = visual.TextStim(win, text="Throughout the experiment you will fixate at a a cross located at the centre of the screen. It is important that you maintain fixation on this cross at all times.\n\n In every trial you will be presented with two circles, one surrounding the fixation cross and another in the periphery.The circles will always be slightly different in size. Your task is to make the size of the fixation circle match the one in the periphery by moving your mouse up or down.\n \n Move up = increase size of fixation circle.\n \n Move down = decrease size of fixation circle.\n\n Mouse click = accept final size and continue to next trial \n\n\n Press the space bar when you're ready to start the experiment.", color = col_both)
@@ -292,35 +289,12 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     ######
 
     ## stimuli
-    # point1 = visual.Circle(win, pos = pol2cart(00, 3), edges = 200,  lineWidth = 20,fillColor = None, units = 'deg') # fixation  > changes
-    # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
     # foveal reference circle:
     fov_point = visual.Circle( win = win, pos = [0,0], radius=0.5, edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None, interpolate = True)
     # peripheral dashed circle:
     per_point = dashedCircle(  win = win, pos = [0,0], size=1,     ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0, interpolate = True)
 
-    # blindspot.autoDraw = True 
-    
-    # # Rotating target stimuli
-    # def Check1(Pos, color):
-    #     for p in range(0,360,30)  :
-    #         piece1=visual.Pie(win, size=(rad+0.6, rad+.6), start=p, end=p+15, edges=100,pos=Pos, lineWidth=0, lineColor=False,
-    #             fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
-    #         inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
-    #         piece1.draw() 
-    #         inner_stim.draw()
-        
-    # def Check2(Pos, color):
-    #     for p in range(0,360,30)  :
-    #         piece2=visual.Pie(win, size=(rad+0.6, rad+0.6), start=p+15, end=p+30, edges=100,pos=Pos, lineWidth=0, lineColor=False,
-    #             fillColor=color, interpolate=False, colorSpace='rgb', units='deg')
-    #         inner_stim = visual.Circle(win, size=(rad, rad),  pos=Pos, units='deg',colorSpace='rgb', fillColor=col_back)
-    #         piece2.draw()
-    #         inner_stim.draw()  
-
-
-    # blindspot.autoDraw = True
 
     ## Positions, colors and instructions by hemifield
     
@@ -332,7 +306,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
-        # angup = (cart2pol(spot_cart[0], spot_cart[1] + spot_size[1])[0] - spot[0]) + 2 + 2 + rad
         angup = one_dva_angle * ( (spot_size[1]/2) + (rad/2) + 2)
         positions = {
             "righ-top": [(spot[0] + angup, spot[1])], # BS location + angup, same radians 
@@ -341,7 +314,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         hiFusion.pos = [-10,0]
     else:
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), + angle of the BS location (dev from 0) + 4 (padding) +radious
-        # angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2 + 2 + rad
         angup = one_dva_angle * ( (spot_size[1]/2) + (rad/2) + 2)
         positions = {
             "left-top": [(spot[0] - angup, spot[1])], # BS location + angup, same radians 
@@ -354,15 +326,22 @@ def doAreaTask(ID=None, hemifield=None, location=None):
   
     
     ## Break
-    breakk = visual.TextStim(win, text="You are now midway through the experiment.\n You can take a little break. Press space bar when you're ready to continue.", pos = [0, 5], color = col_both)
-    breakk.wrapWidth = 40
-    ntrial = 0 # trial counter to be used for the break
-    brk = len(adapt)*2
+    # breakk = visual.TextStim(win, text="You are now midway through the experiment.\n You can take a little break. Press space bar when you're ready to continue.", pos = [0, 5], color = col_both)
+    # breakk.wrapWidth = 40
+    # ntrial = 0 # trial counter to be used for the break
+    # brk = len(adapt)*2
 
+    ntrial = 1
+    break_trial = 1
 
     ######
     #### Prepare eye tracking
     ######
+
+
+    tracker.openfile()
+    tracker.startcollecting()
+    tracker.calibrate()
 
     ## setup and initialize eye-tracker
     # tracker.initialize(calibrationScale=(0.35, 0.35))
@@ -426,8 +405,17 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     #    win.close()
     #    core.quit()
 
+    tracker.comment('%s hemifield'%(hemifield))
+
     while not ongoing == not_ongoing:
-    
+        
+        # position: at blind spot / away from blind spot
+        #  - 0:
+        #  - 1:
+        # col: which eye are the stimulus presented to? (in which color are they displayed)
+        #  - 0:
+        #  - 1:
+        
         # Point 1 locations and colors
         if ongoing[0][0] == False and ongoing [0][1] == False :  #any 
             position = 1 #BS location, defined below
@@ -510,8 +498,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
         # win.flip()
 
-        # tracker.waitForFixation()
-        
+        tracker.waitForFixation()
         gaze_out = False
 
         ## pre trial fixation 
@@ -522,8 +509,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         
         # print('pre fixation ok \n')
 
-        print([mouse_offset, mouse.getPos()[0]])
-
+        tracker.comment('start trial %d'%(ntrial))
 
         ## commencing trial 
 
@@ -534,7 +520,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','a')
         if not gaze_out:
             
-            stim_comments = ['og difference', 'final difference'] #BM what's this?
+            # stim_comments = ['og difference', 'final difference'] #BM what's this?
             #tracker.comment('start trial %d'%(trial))
             trial_clock.reset()
 
@@ -543,10 +529,13 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             # jit2 = random.choice(posjit)
             mouse.clickReset()
             
+            tracker.comment('peripheral size %0.4f'%per_point.size)
+            tracker.comment('location %d eye %d'%(position, col))
+            tracker.comment('starting size %0.4f'%fov_point.size)
             #og parameters... OG parameters are the original parameters?
             ogdiff = fov_point.size - per_point.size
             ogp2 = fov_point.size
-            cycle = 0
+            # cycle = 0
             # if len(stim_comments) == 2:
             #     tracker.comment(stim_comments.pop()) 
 
@@ -555,10 +544,11 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
                 trial[position][col]
 
-                # if not tracker.gazeInFixationWindow():
-                #     gaze_out = True
-                #     finaldiff = 'Trial aborted'
-                #     break
+                if not tracker.gazeInFixationWindow():
+                    gaze_out = True
+                    finaldiff = 'Trial aborted'
+                    tracker.comment('trial auto aborted')
+                    break
 
                 #drawing the stimuli
 
@@ -566,9 +556,11 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 if k:
                     if 'q' in k:
                         abort = True # abort task
+                        tracker.comment('task aborted')
                         break
                     elif 'space' in k:
                         finaldiff = 'Trial aborted' # abort trial
+                        tracker.comment('trial aborted')
                         break
                 
                 
@@ -600,7 +592,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 fov_point.draw()
                 per_point.draw()
 
-
                 win.flip()
 
                 
@@ -608,6 +599,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 if m[0] == True:
                     print(m)
                     finaldiff = fov_point.size - per_point.size
+                    tracker.comment('final size %0.4f'%fov_point.size)
                     mouse.clickReset()
                     break
 
@@ -615,25 +607,29 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             #     tracker.comment(stim_comments.pop()) # pair 2 off
             # gazeFile.close()
 
-        if abort: # trial intentionally aborted? or task/experiment aborted?
+        if abort: # M: trial intentionally aborted? or task/experiment aborted?
+            # M: I think it's the task loop that gets interrupted here... but it's completely unclear what is going on
             break
         
         if not gaze_out: # trial aborted because of other reasons? ... why the blink parameter?
             blink = 1
             if not finaldiff == 'Trial aborted':
                 trial[position][col] += 1
-                print('this trial is ', trial[position][col])
+                # print('this trial is ', trial[position][col])
             else:
-                print('this trial was aborted')
+                # print('this trial was aborted')
                 pass
         else:
             blink = 0
             # auto recalibrate if no initial fixation
-            # why is this not handled before the trial, so we can still do it?
+            # why is this not handled before the trial, so we can still do the trial?
+
+            # this is never set to true?
             if recalibrate:
                 pass
                 # recalibrate = False
                 # tracker.calibrate()
+
                 # win.flip()
                 # fixation.draw()
                 # win.flip()
@@ -646,6 +642,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 loFusion.draw()
 
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
+                print('# auto abort')
                 win.flip()
                 k = ['wait']
                 while k[0] not in ['q', 'up', 'r']:
@@ -656,15 +653,20 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         
                 # manual recalibrate
                 if k[0] in ['r']:
-                    # tracker.calibrate()
+
+                    tracker.calibrate()
+                    
                     win.flip()
                     fixation.draw()
                     win.flip()
                     k = event.waitKeys()
+
                     if k[0] in ['q']:
                         abort = True
                         break
 
+        # no... it's some time for blinking...
+        # but... let's do this after storing the data in the respFile
         # while blink==1: # what is "blink"? what does that mean? do we have accurate blink detection now?
 
         #     hiFusion.draw()
@@ -697,66 +699,91 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                         finaldiff if isinstance(finaldiff, str) else '%0.4f'%(finaldiff),                    # final difference? 
                                         gaze_out])) + "\n") #block              # gaze out?
         respFile.close()
-        #final updates
-        #if not finaldiff == 'Trial aborted':
-        #    trial[position][col]  = trial[position][col]  +1
-        #else:
-        #    pass
+
+        
 
 
         # wait until mouse button is no longer pressed:
-        m = mouse.getPressed()
-        while m[0]:
+        waiting_for_blink = True if blink else 0
+        right_button_clicked = False
+
+        while waiting_for_blink:
+
             m = mouse.getPressed()
+            xfix.draw()
             win.flip()
-        # making absolutely sure?
-        starttime = trial_clock.getTime()
-        while(trial_clock.getTime() < (starttime + 0.020)):
-            win.flip()
+
+            if m[2]:
+                right_button_clicked = True
+
+            if all([right_button_clicked, not m[2], not m[0]]):
+                waiting_for_blink = False
+
 
         mouse.clickReset()
         event.clearEvents(eventType='mouse')
 
-        # Break midway through
-        ntrial +=1
-        if ntrial == brk:
-            fixation.draw()
-            breakk.draw()
+
+        # break every X trials (50?)
+        ntrial += 1
+        break_trial += 1
+
+        if break_trial > 50:
+            # do a break...
+
             win.flip()
-            event.waitKeys(keyList = ['space'])
-        ##Check if experiment can continue  
-        print('running trial N=',  trial[position][col], 'of', len(adaptposs[position][col])-1, 'in position =', position, 'and color =', col)
-        ongoing[position][col] =  trial[position][col] <= len(adaptposs[position][col]) -1
-        
+            breaktext = visual.TextStim(win, 'take a break!', height = letter_height, color = col_both)
+            print('- break...')
+            breaktext.draw()
+            win.flip()
+            
+            tracker.comment('break')
 
+            on_break = True
+            while on_break:
+                keys = event.getKeys(keyList=['b']) # simpler solution: use a different key... like 'b'
+                if 'b' in keys:
+                    on_break = False
+                breaktext.draw()
+                win.flip()
 
+            event.clearEvents(eventType='keyboard') # just to be sure?
+
+            tracker.comment('continue')
+
+            tracker.calibrate()
+            break_trial = 1
+
+        event.clearEvents(eventType='keyboard') # just to be more sure?
 
     ## Closing prints
     if abort:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("Run manually ended at " + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M") + "!")
         respFile.close()
+        tracker.comment('run aborted')
         bye = visual.TextStim(win, text="Run manually ended \n Press space bar to exit")
     elif ongoing == not_ongoing:
+        tracker.comment('run finished')
         print('run ended properly!')
         bye = visual.TextStim(win, text="You have now completed the experimental run. Thank you for your participation!! \n Press space bar to exit") # it will exit after 4 seconds?
     else:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("something weird happened")
         respFile.close()
+        tracker.comments('unknown abort')
         print('something weird happened')
 
     print(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"))
-    # blindspot.autoDraw = False
 
     ## Farewells
     bye.draw()
     win.flip()
     core.wait(4)
     
-    # tracker.shutdown()
+    tracker.shutdown()
     win.close()
-    core.quit()
+    # core.quit()
 
 
 
