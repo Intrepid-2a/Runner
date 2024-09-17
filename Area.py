@@ -257,15 +257,17 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     # create output files:
     respFile = open(data_path + filename + str(x) + '.txt','w')
-    respFile.write('\t'.join(map(str, ['Trial',
-                                    'StimulusPosition',
-                                    'EyeStim',
-                                    'FixOrigSize',
-                                    'PeriOrigSize',
-                                    'OriginalDiff',
-                                    'FinalDiff', 
-                                    'GazeOut'])) + '\n')
-    respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
+    respFile.write(''.join(map(str, [ 'Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
+    respFile.write('\t'.join(map(str, [ 'Trial',
+                                        'StimulusPosition',
+                                        'EyeStim',
+                                        'FixOrigSize',
+                                        'PeriOrigSize',
+                                        'OriginalDiff',
+                                        'FixFinalSize',
+                                        'FinalDiff', 
+                                        'GazeOut'])) + '\n')
+    # respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
     
     respFile.close()
 
@@ -294,9 +296,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # point2 = visual.Circle(win, pos = pol2cart(00, 6), edges = 200, lineColor = col_both, lineWidth = 15, fillColor = None, units = 'deg') # BS vs outside BS > fixed
     
     # foveal reference circle:
-    fov_point = visual.Circle( win = win, pos = [0,0], size=10,  edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None, interpolate = True)
+    fov_point = visual.Circle( win = win, pos = [0,0], radius=0.5, edges = 360,                lineColor = col_both, lineWidth = 15, fillColor = None, interpolate = True)
     # peripheral dashed circle:
-    per_point = dashedCircle(  win = win, pos = [0,0], size=rad, ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0, interpolate = True)
+    per_point = dashedCircle(  win = win, pos = [0,0], size=1,     ndashes = 12, dashprop=0.5, lineColor = col_both, lineWidth = 15, Hz=0, interpolate = True)
 
     # blindspot.autoDraw = True 
     
@@ -326,7 +328,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     spot_size = bs_prop['size']
     spot      = bs_prop['spot']
 
-    one_dva_angle = cart2pol(spot_cart[0], 5)[0] / 5
+    one_dva_angle = cart2pol(abs(spot_cart[0]), 5)[0] / 5
 
     if hemifield == 'right':
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), - angle of the BS location (dev from 0) + 4 (padding) + radious
@@ -336,6 +338,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             "righ-top": [(spot[0] + angup, spot[1])], # BS location + angup, same radians 
             "righ-mid": [(spot[0],  spot[1])], 
         }
+        hiFusion.pos = [-10,0]
     else:
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), + angle of the BS location (dev from 0) + 4 (padding) +radious
         # angup = (cart2pol(spot_cart[0], spot_cart[1] - spot_size[1])[0] - spot[0]) + 2 + 2 + rad
@@ -344,6 +347,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             "left-top": [(spot[0] - angup, spot[1])], # BS location + angup, same radians 
             "left-mid": [(spot[0],  spot[1])],
         }
+        hiFusion.pos = [10,0]
+
     # positions
     poss = list(positions.items())
   
@@ -445,7 +450,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         per_point.pos = per_pos
 
         # point1.setSize( size = rad )
-        per_point.size = rad/2
+        per_point.size = rad
         
         # print('hello 5')
         
@@ -563,9 +568,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                         abort = True # abort task
                         break
                     elif 'space' in k:
-                         finaldiff = 'Trial aborted' # abort trial
-                         break
-                
+                        finaldiff = 'Trial aborted' # abort trial
+                        break
                 
                 
                 # taking participant input:
@@ -585,7 +589,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
                 # repeat_draw()
 
-                per_point.ori = 15 * np.floor((t * (1/.366)) % 2)
+                per_point.ori = 15 * np.floor((t * (2/.366)) % 2)
 
 
                 fixation.draw()
@@ -674,20 +678,24 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         #         print(m)
         #         mouse.clickReset()
         #         break
-                
+        
+
+
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used?
-                                        position,# Stimulus location
-                                        col,
+        respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used? SHOULD be trial number?
+                                        position,                               # Stimulus location [0|1]
+                                        col,                                    # condition?
                                         #round(ogp2, 3), #change
-                                        '%0.3f'%(ogp2),
+                                        '%0.4f'%(ogp2),                         # FixOrigSize (one of 10 values)
                                         # round(fov_point.size, 3),
-                                        '%0.3f'%(fov_point.size),
+                                        # '%0.3f'%(fov_point.size),             # PeriOrigSize (SHOULD be a constant)
+                                        '%0.4f'%(rad),                          # PeriOrigSize (SHOULD be a constant)
                                         # round(ogdiff,3),
-                                        '%0.3f'%(ogdiff),
-                                        finaldiff, 
-                                        gaze_out])) + "\n") #block
+                                        '%0.4f'%(ogdiff),                       # original difference ?
+                                        '%0.4f'%(fov_point.size),               # fix final size
+                                        finaldiff if isinstance(finaldiff, str) else '%0.4f'%(finaldiff),                    # final difference? 
+                                        gaze_out])) + "\n") #block              # gaze out?
         respFile.close()
         #final updates
         #if not finaldiff == 'Trial aborted':
@@ -695,10 +703,17 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         #else:
         #    pass
 
-        # short break to get rid of mouse clicks in buffer
-        starttime = trial_clock.getTime()
-        while(trial_clock.getTime() < (starttime + 0.150)):
+
+        # wait until mouse button is no longer pressed:
+        m = mouse.getPressed()
+        while m[0]:
+            m = mouse.getPressed()
             win.flip()
+        # making absolutely sure?
+        starttime = trial_clock.getTime()
+        while(trial_clock.getTime() < (starttime + 0.020)):
+            win.flip()
+
         mouse.clickReset()
         event.clearEvents(eventType='mouse')
 
@@ -798,7 +813,7 @@ class dashedCircle():
                 vertices.append([np.cos(edge_angles[v]), np.sin(edge_angles[v])])
             vertices = np.array(vertices)
             self.dashes.append(visual.ShapeStim( win         = self.win, 
-                                                 size        = self.size,
+                                                 size        = self.size/2,
                                                  lineWidth   = self.lineWidth,
                                                  lineColor   = self.lineColor,
                                                  vertices    = vertices,
@@ -806,7 +821,7 @@ class dashedCircle():
                                                  ori         = self.ori,
                                                  pos         = self.pos,
                                                  interpolate = self.interpolate))
-            
+    
 
     def draw(self):
 
@@ -821,7 +836,7 @@ class dashedCircle():
             self.dashes[dash_no].ori         = self.ori
             self.dashes[dash_no].lineColor   = self.lineColor
             self.dashes[dash_no].lineWidth   = self.lineWidth
-            self.dashes[dash_no].size        = self.size
+            self.dashes[dash_no].size        = self.size/2
             self.dashes[dash_no].pos         = self.pos
             self.dashes[dash_no].interpolate = self.interpolate
 
