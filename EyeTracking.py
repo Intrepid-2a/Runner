@@ -1628,14 +1628,14 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
     if task == 'area':
         fusion = {'hi': fusionStim(win    = win,
-                                   rows    = 3,
-                                   columns = 15,
-                                   pos    = [0,9],
+                                   rows    = 15,
+                                   columns = 3,
+                                   pos    = [0,10],
                                    colors = fcols),
                   'lo': fusionStim(win    = win,
                                    rows    = 3,
                                    columns = 15,
-                                   pos    = [0,-9],
+                                   pos    = [0,-10],
                                    colors = fcols)}
 
     if task == 'distance':
@@ -1799,7 +1799,7 @@ class fusionStim:
                  win, 
                  pos     = [0,0],
                  colors  = [[-1,-1,-1],[1,1,1]],
-                 rows    = 15,
+                 rows    = 7,
                  columns = 3,
                  square  = 0.5,
                  units   = 'deg'):
@@ -1815,19 +1815,19 @@ class fusionStim:
         self.resetProperties()
 
     def resetProperties(self):
-        self.nElements = (self.columns*2 + 1) * self.rows
+        self.nElements = (self.columns*2 + 1) * (self.rows*2 + 1)
 
         self.setColorArray()
         self.setPositions()
         self.createElementArray()
 
     def setColorArray(self):
-        self.colorArray = (self.colors * int(np.ceil(((self.columns*2 + 1) * self.rows)/len(self.colors))))
+        self.colorArray = (self.colors * int(np.ceil(((self.columns*2 + 1) * (self.rows*2 + 1))/len(self.colors))))
         random.shuffle(self.colorArray)
         self.colorArray = self.colorArray[:self.nElements]
 
     def setPositions(self):
-        self.xys = [[(i * self.square)+self.pos[0], ((j-((self.rows-1)/2))*self.square)+self.pos[1]] for i in range(-self.columns, self.columns + 1) for j in range(self.rows)]
+        self.xys = [[(i*self.square)+self.pos[0], (j*self.square)+self.pos[1]] for i in range(-self.columns, self.columns+1) for j in range(-self.rows, self.rows+1)]
 
     def createElementArray(self):
         self.elementArray = visual.ElementArrayStim( win         = self.win, 
