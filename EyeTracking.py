@@ -1649,6 +1649,15 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                                    pos    = [0,-7],
                                    colors = fcols)}
 
+
+    if task == 'curvature':
+        fusion = {'hi': fusionStim(win    = win,
+                                   pos    = [0,7],
+                                   colors = fcols),
+                  'lo': fusionStim(win    = win,
+                                   pos    = [0,-7],
+                                   colors = fcols)}
+
     # color calibration doesn't use any of this (except the window object?)
     # for either calibration task, the task should not be set
     # which returns an empty dictionary
