@@ -31,7 +31,7 @@ from EyeTracking import localizeSetup, EyeTracker
 
 def placeCurvatureDots(B, C, curvature):
 
-    print([B, C, curvature])
+    # print([B, C, curvature])
 
     # B: coordinates of point B
     # C: coordinates of point C
@@ -188,7 +188,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         x += 1
 
 
-    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID) # data path is for the mapping data, not the eye-tracker data!
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID, noEyeTracker=True) # data path is for the mapping data, not the eye-tracker data!
 
 
 
@@ -308,7 +308,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     #########
 
-    print(setup['blindspotmarkers'])
+    # print(setup['blindspotmarkers'])
 
     ## Circle positions and other hemifield dependencies
 
@@ -371,7 +371,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                   [ [bsm[0], bsm[1]+(dot_distance/2)],
                     [bsm[0], bsm[1]-(dot_distance/2)] ] ]
 
-    print(positions)
+    # print(positions)
 
     # end MARIUS interpretation
 
@@ -577,7 +577,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         currentcurv = direction[position][eye][staircase] * curvature[tstep]
         print('currently we are at', currentcurv, 'current step =', tstep)
         coords = placeCurvatureDots(point2.pos, point3.pos, currentcurv)
-        print(coords)
+        # print(coords)
         point1.pos = coords[3]
         point4.pos = coords[0]
         #color of dots - which eye to stimulate
@@ -591,7 +591,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         #drawing the stimuli
         trial_clock.reset()
 
-        print('resetted clock')
+        # print('resetted clock')
 
         # simplify this:
         # while trial_clock.getTime() < .5: 
@@ -662,7 +662,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             
             win.flip()
 
-        print('stimulus done')
+        # print('stimulus done')
 
         while trial_clock.getTime()  > 1.7: 
             hiFusion.draw()
@@ -684,11 +684,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                     else:
                         if step[position][eye][staircase] <= len(curvature)-2:
                             step[position][eye][staircase] += 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice = 'left'
                         if step[position][eye][staircase] ==len(curvature)-1:
                             step[position][eye][staircase] -= 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice= 'NA'
                     trial_clock.reset()
                 elif k[0] in ['right']:
@@ -698,10 +698,10 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                         if step[position][eye][staircase] <= len(curvature)-2:
                             step[position][eye][staircase] -= 1
                             choice = 'right'
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                         if step[position][eye][staircase] ==len(curvature)-1:
                             step[position][eye][staircase] += 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice= 'NA'
                     trial_clock.reset()
                 elif k[0] in ['space']:
@@ -718,10 +718,10 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                         if step[position][eye][staircase] <= len(curvature)-2:
                             step[position][eye][staircase] += 1
                             choice = 'right'
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                         if step[position][eye][staircase] ==len(curvature)-1:
                             step[position][eye][staircase] -= 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice= 'NA'
                     trial_clock.reset()
                 elif k[0] in ['left']:
@@ -730,11 +730,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                     else:
                         if step[position][eye][staircase] <= len(curvature)-2:
                             step[position][eye][staircase] -= 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice = 'left'
                         if step[position][eye][staircase] ==len(curvature)-1:
                             step[position][eye][staircase] += 1
-                            print(step[position][eye][staircase])
+                            # print(step[position][eye][staircase])
                             choice= 'NA'
                     trial_clock.reset()
                 elif k[0] in ['space']:
