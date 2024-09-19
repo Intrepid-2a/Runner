@@ -292,6 +292,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     #keeping track of time 
     trial_clock = core.Clock()
+
+    # how finegrained / sensitive is the mouse position?
+    # you need to move the mouse by X dva to get a 1 dva size change in the foveal circle
+    mouse_scale = 3
     
     #k = ['wait']
     #while k[0] not in ['q','space']:
@@ -338,7 +342,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         fov_point.size = curradapt[currtrial]
         fov_point.pos  = [random.choice(posjit), random.choice(posjit)]
 
-        mouse_offset = fov_size * 2
+        mouse_offset = fov_size * mouse_scale
         mouse.setPos([0,0])
 
         #color of dots - which eye to stimulate
@@ -407,7 +411,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 
                 # taking participant input:
                 mousepos = mouse.getPos()
-                fov_point.size = abs(mousepos[0] + mouse_offset) / 2
+                fov_point.size = abs(mousepos[0] + mouse_offset) / mouse_scale
                 
                 per_point.ori = 15 * np.floor((t * (2/.366)) % 2)
 
