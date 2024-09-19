@@ -158,7 +158,8 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # create output files:
     respFile = open(data_path + filename + str(x) + '.txt','w')
     respFile.write(''.join(map(str, [ 'Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
-    respFile.write('\t'.join(map(str, [ 'Trial',
+    respFile.write('\t'.join(map(str, [ 'TotalTrial',
+                                        'Trial',
                                         'StimulusPosition',
                                         'EyeStim',
                                         'FixOrigSize',
@@ -479,23 +480,41 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [trial[position][col],                # which eye was used? SHOULD be trial number?
-                                        position,                               # Stimulus location [0|1]
-                                        col,                                    # condition?
-                                        #round(ogp2, 3), #change
-                                        '%0.4f'%(ogp2),                         # FixOrigSize (one of 10 values)
-                                        # round(fov_point.size, 3),
-                                        # '%0.3f'%(fov_point.size),             # PeriOrigSize (SHOULD be a constant)
-                                        '%0.4f'%(rad),                          # PeriOrigSize (SHOULD be a constant)
-                                        # round(ogdiff,3),
-                                        '%0.4f'%(ogdiff),                       # original difference ?
-                                        '%0.4f'%(fov_point.size),               # fix final size
-                                        finaldiff if isinstance(finaldiff, str) else '%0.4f'%(finaldiff),                    # final difference? 
-                                        gaze_out])) + "\n") #block              # gaze out?
+        respFile.write('\t'.join(map(str, [ntrial,                                 # total trials
+                                           trial[position][col],                   # which eye was used? SHOULD be trial number?
+                                                                                   # its the number of completed trials in this condition
+                                           position,                               # Stimulus location [0|1]
+                                           col,                                    # condition?
+                                           #round(ogp2, 3), #change
+                                           '%0.4f'%(ogp2),                         # FixOrigSize (one of 10 values)
+                                           # round(fov_point.size, 3),
+                                           # '%0.3f'%(fov_point.size),             # PeriOrigSize (SHOULD be a constant)
+                                           '%0.4f'%(rad),                          # PeriOrigSize (SHOULD be a constant)
+                                           # round(ogdiff,3),
+                                           '%0.4f'%(ogdiff),                       # original difference ?
+                                           '%0.4f'%(fov_point.size),               # fix final size
+                                           finaldiff if isinstance(finaldiff, str) else '%0.4f'%(finaldiff),                    # final difference? 
+                                           gaze_out])) + "\n") #block              # gaze out?
         respFile.close()
 
+        # check if we finished this condition:
+        ongoing[position][col] =  trial[position][col] <= len(adaptposs[position][col]) -1
 
-
+        print('\t'.join(map(str, [         ntrial,                                 # total trials
+                                           trial[position][col],                   # which eye was used? SHOULD be trial number?
+                                                                                   # its the number of completed trials in this condition
+                                           position,                               # Stimulus location [0|1]
+                                           col,                                    # condition?
+                                           #round(ogp2, 3), #change
+                                           '%0.4f'%(ogp2),                         # FixOrigSize (one of 10 values)
+                                           # round(fov_point.size, 3),
+                                           # '%0.3f'%(fov_point.size),             # PeriOrigSize (SHOULD be a constant)
+                                           '%0.4f'%(rad),                          # PeriOrigSize (SHOULD be a constant)
+                                           # round(ogdiff,3),
+                                           '%0.4f'%(ogdiff),                       # original difference ?
+                                           '%0.4f'%(fov_point.size),               # fix final size
+                                           finaldiff if isinstance(finaldiff, str) else '%0.4f'%(finaldiff),                    # final difference? 
+                                           gaze_out])))
 
         # wait until mouse button is no longer pressed:
         waiting_for_blink = True if blink else 0
