@@ -14,15 +14,12 @@ import numpy as np
 from numpy import ndarray
 import random, datetime, os
 import math
-from math import sin, cos, radians, pi # why not use from numpy?
+from math import sin, cos, radians, pi 
 from glob import glob
 from itertools import compress
 
 from psychopy.hardware import keyboard
 from pyglet.window import key
-
-# from fusion_stim import fusionStim
-# from curvature import placeCurvatureDots
 
 
 import sys, os
@@ -132,7 +129,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # called rad... but it's diameter, not radius
     rad = max(bs_prop['size']) + 3 # 1.5 dva padding? (effectively 0.5... could be OK)
     
-    print('RAD = %0.4f'%(rad))
+    # print('RAD = %0.4f'%(rad))
 
 
     ## Creating distributions for the experiment
@@ -142,113 +139,15 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     # NOTE : there is no 'no difference' e.g. rad-step, rad, rad+step, can add if preferred
 
     # Repeating so there's 50 trials per eye and location (5 repeats of an original size for all)
-    # random.seed(1)
-    # random.shuffle(adaptorig) #shuffeling with seed
     adapt = []
     i = 1
     while i < 6: #5 repetitions  
-        # random.seed (i)
         random.shuffle(adaptorig)
         adapt += adaptorig
         i += 1
 
-    # print(adapt)
-
-
-
     # # jitter added to the field to reduce local cues
-    # marius: this is jitter added to the "field" property in the fusion stimuli... which... doesn't exist?
-    # not sure why it's not just added to the pos property of the fusion stimuli objects? or needed
     jitter = (0.005, 0.01, 0.015, 0.02,0.025, 0, -0.005, -0.01, -0.015, -0.02,-0.025)
-
-
-
-    ## BS stimuli
-    # blindspot = visual.Circle(win, radius = .5, pos = [7,0], units = 'deg', fillColor=col_ipsi, lineColor = None)
-    # blindspot.pos = spot_cart
-    # blindspot.size = spot_size
-
-    ## eyetracking   
-    # colors = {'both'   : col_both, 
-    #           'back'   : col_back} 
-    # tracker = EyeTracker(tracker           = 'eyelink',
-    #                      trackEyes         = [True, True],
-    #                      fixationWindow    = 2.0,
-    #                      minFixDur         = 0.2,
-    #                      fixTimeout        = 3.0,
-    #                      psychopyWindow    = win,
-    #                      filefolder        = eyetracking_path,
-    #                      filename          = et_filename+str(y),
-    #                      samplemode        = 'average',
-    #                      calibrationpoints = 5,
-    #                      colors            = colors)
-
-    # elif location == 'toronto':
-    
-    #     # not sure what you want to do here, maybe check if parameters are defined, otherwise throw an error? Or keep the gui in that case?
-        
-        
-    #     expInfo = {}
-    #     askQuestions = False
-    #     if ID == None:
-    #         expInfo['ID'] = ''
-    #         askQuestions = True
-    #     if hem == None:
-    #         expInfo['hemifield'] = ['left','right']
-    #         askQuestions = True
-    #     if askQuestions:
-    #         dlg = gui.DlgFromDict(expInfo, title='Infos', screen=0)
-
-    #     if ID == None:
-    #         ID = expInfo['ID'].lower()
-    #     if hem == None:
-    #         hem = expInfo['hemifield']
-        
-    #     ## paths
-    #     main_path = '../data/area/'
-    #     data_path = main_path
-    #     eyetracking_path = main_path + 'eyetracking/' + ID + '/'
-    #     x = 1
-    #     filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
-    #     while (filename + str(x) + '.txt') in os.listdir(data_path):
-    #         x += 1
-    #     y = 1
-    #     et_filename = ID + '_dist_' + ('LH' if hem == 'left' else 'RH') + '_'
-    #     while len(glob(eyetracking_path + et_filename + str(y) + '.*')):
-    #         y += 1
-        
-    #     # this _should_ already be handled by the Runner utility: setupDataFolders()
-    #     os.makedirs(data_path, exist_ok=True)
-    #     os.makedirs(eyetracking_path, exist_ok=True)
-        
-
-        
-    #     trackEyes = [True, True]
-        
-    #     # get everything shared from central:
-    #     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(y), task='distance', ID=ID) # data path is for the mapping data, not the eye-tracker data!
-    
-    #     # unpack all this
-    #     win = setup['win']
-    
-    #     colors = setup['colors']
-    #     col_both = colors['both']
-    #     if hem == 'left':
-    #         col_ipsi, col_contra = colors['left'], colors['right']
-    #     if hem == 'right':
-    #         col_contra, col_ipsi = colors['left'], colors['right']
-
-    #     hiFusion = setup['fusion']['hi'] #might need to change it due to size
-    #     loFusion = setup['fusion']['lo']
-    
-    #     blindspot = setup['blindspotmarkers'][hem]
-        
-    #     fixation = setup['fixation']
-    
-    #     tracker = setup['tracker']
- 
-    # else:
-    #     raise ValueError("Location should be 'glasgow' or 'toronto', was {}".format(location))
 
 
     x = 1
@@ -326,11 +225,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
   
     
     ## Break
-    # breakk = visual.TextStim(win, text="You are now midway through the experiment.\n You can take a little break. Press space bar when you're ready to continue.", pos = [0, 5], color = col_both)
-    # breakk.wrapWidth = 40
-    # ntrial = 0 # trial counter to be used for the break
-    # brk = len(adapt)*2
-
     ntrial = 1
     break_trial = 1
 
@@ -338,14 +232,11 @@ def doAreaTask(ID=None, hemifield=None, location=None):
     #### Prepare eye tracking
     ######
 
+    ## setup and initialize eye-tracker
 
     tracker.openfile()
     tracker.startcollecting()
     tracker.calibrate()
-
-    ## setup and initialize eye-tracker
-    # tracker.initialize(calibrationScale=(0.35, 0.35))
-    # tracker.calibrate()
 
 
     win.flip()
@@ -426,118 +317,64 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         else:
             position = np.random.choice([0, 1]) 
             col = np.random.choice(list(compress([0, 1], ongoing[position])))
-            # print(list(compress([0, 1], ongoing[position])))
 
-        # if position == 0:
-        #     point1.setPos( pos = pol2cart(poss[0][1][0][0], poss[0][1][0][1]) ) # Outside BS location
-        # else:
-        #     point1.setPos( pos = pol2cart(poss[1][1][0][0], poss[1][1][0][1]) ) # BS location
 
         per_pos = pol2cart(poss[position][1][0][0], poss[position][1][0][1])
         per_pos = [x + random.choice(posjit) for x in per_pos]
         per_point.pos = per_pos
 
-        # point1.setSize( size = rad )
         per_point.size = rad
-        
-        # print('hello 5')
         
         # Point 2 radius 
         # foveal point radius:
         currtrial = trial[position][col]# current trial
         curradapt = adaptposs[position][col] # current staircase (i.e. adapt, adapt1, adapt2, adapt3)
-        # point2.size = [curradapt[currtrial], curradapt[currtrial]] 
-        # point2.pos = [0, 0]  #pol2cart(poss[0][1][0][0], -poss[0][1][0][1]) #[0, 0]
-        # point2.pos += [random.choice(posjit), random.choice(posjit)]
-        # print('hello 6')
 
         fov_size = curradapt[currtrial]
         fov_point.size = curradapt[currtrial]
         fov_point.pos  = [random.choice(posjit), random.choice(posjit)]
 
-        # mouse_offset = random.choice(posjit) * 10
-
-
         mouse_offset = fov_size * 2
         mouse.setPos([0,0])
 
-
         #color of dots - which eye to stimulate
         if eye[col] == hemifield: #add col
-            # point1.setLineColor(col_ipsi)
-            # point2.setLineColor(col_ipsi)
             per_point.lineColor = col_ipsi
             fov_point.lineColor = col_ipsi
 
         else:
-            # point1.setLineColor(col_contra)
-            # point2.setLineColor(col_contra)
             per_point.lineColor = col_contra
             fov_point.lineColor = col_contra
 
-        #adapting fixation size to eliminate local cues during size estimation
-        # f = random.sample(ndarray.tolist(np.arange(0.5, 2.25, 0.25)), 1)
-        # fixation.vertices = ((0, -f[0]), (0, f[0]), (0,0), (-f[0], 0), (f[0], 0))
-
+        # adapting fixation size to eliminate local cues during size estimation
         fixation.size = [random.choice(np.arange(0.5, 2.25, 0.25))] * 2
 
-        # print('hello 7')
 
         #adding fusion stimuli
         hiFusion.resetProperties()
         loFusion.resetProperties()
-        # the fieldPos property does not exist...
-        # hiFusion.fieldPos = (random.sample(jitter, 2))
-        # loFusion.fieldPos = (random.sample(jitter, 2))
-        # repeat_draw()
-
-        # fixation.draw()
-        # hiFusion.draw()
-        # loFusion.draw()
-        # # blindspot.draw()
-
-        # win.flip()
 
         tracker.waitForFixation()
         gaze_out = False
 
-        ## pre trial fixation 
-        # tracker.comment('pre-fixation')
-        # if not tracker.waitForFixation(fixationStimuli = [fixation, hiFusion, loFusion]):
-        #     recalibrate = True
-        #     gaze_out = True
-        
-        # print('pre fixation ok \n')
 
         tracker.comment('start trial %d'%(ntrial))
 
         ## commencing trial 
 
-        # from now on, we could draw things and flip the window... before doesn't do anything...
-
-        # why is there a gazefile? this is handled by the eye-tracker...
-
-        # gazeFile = open(eyetracking_path + filename + str(x) + '_gaze.txt','a')
         if not gaze_out:
             
-            # stim_comments = ['og difference', 'final difference'] #BM what's this?
-            #tracker.comment('start trial %d'%(trial))
             trial_clock.reset()
 
             # setting adaptive method
-            # jit1 = random.choice(posjit) # not used?
-            # jit2 = random.choice(posjit)
             mouse.clickReset()
             
             tracker.comment('peripheral size %0.4f'%per_point.size)
             tracker.comment('location %d eye %d'%(position, col))
             tracker.comment('starting size %0.4f'%fov_point.size)
-            #og parameters... OG parameters are the original parameters?
+
             ogdiff = fov_point.size - per_point.size
             ogp2 = fov_point.size
-            # cycle = 0
-            # if len(stim_comments) == 2:
-            #     tracker.comment(stim_comments.pop()) 
 
             while 1 and not abort:
                 t = trial_clock.getTime()
@@ -565,22 +402,9 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 
                 
                 # taking participant input:
-                # wheel_dX, wheel_dY = mouse.getWheelRel() #gets x/ylocation of mouse
-
                 mousepos = mouse.getPos()
                 fov_point.size = abs(mousepos[0] + mouse_offset) / 2
                 
-                # if turn == 1: # so only ~7 times per second? (even fewer in glasgow)
-                #     Check1([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
-                # else:
-                #     Check2([point1.pos[0] + jit1, point1.pos[1] + jit2], point1.lineColor)
-                # point2.size +=  [wheel_dY*(step/2), wheel_dY*(step/2)] # uses y mouse location to adjust
-                
-                # point1.draw()
-                # point2.draw() # this is the foveal circle... need to get lineWidth from that one: 15 pts
-
-                # repeat_draw()
-
                 per_point.ori = 15 * np.floor((t * (2/.366)) % 2)
 
 
@@ -597,15 +421,11 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 
                 m = mouse.getPressed()
                 if m[0] == True:
-                    print(m)
                     finaldiff = fov_point.size - per_point.size
                     tracker.comment('final size %0.4f'%fov_point.size)
                     mouse.clickReset()
                     break
 
-            # if len(stim_comments) == 1:
-            #     tracker.comment(stim_comments.pop()) # pair 2 off
-            # gazeFile.close()
 
         if abort: # M: trial intentionally aborted? or task/experiment aborted?
             # M: I think it's the task loop that gets interrupted here... but it's completely unclear what is going on
@@ -615,9 +435,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             blink = 1
             if not finaldiff == 'Trial aborted':
                 trial[position][col] += 1
-                # print('this trial is ', trial[position][col])
             else:
-                # print('this trial was aborted')
                 pass
         else:
             blink = 0
@@ -630,13 +448,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 # recalibrate = False
                 # tracker.calibrate()
 
-                # win.flip()
-                # fixation.draw()
-                # win.flip()
-                # k = event.waitKeys()
-                # if k[0] in ['q']:
-                #     abort = True
-                #     break
             else:
                 hiFusion.draw()
                 loFusion.draw()
@@ -665,23 +476,6 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                         abort = True
                         break
 
-        # no... it's some time for blinking...
-        # but... let's do this after storing the data in the respFile
-        # while blink==1: # what is "blink"? what does that mean? do we have accurate blink detection now?
-
-        #     hiFusion.draw()
-        #     loFusion.draw()
-        #     xfix.draw()
-
-        #     win.flip()
-
-        #     m = mouse.getPressed() # what is the right click for? clickReset and break trial loop? why break trial loop?
-        #     if m[2] == True:
-        #         print(m)
-        #         mouse.clickReset()
-        #         break
-        
-
 
         #writing reponse file 
         respFile = open(data_path + filename + str(x) + '.txt','a')
@@ -700,7 +494,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                         gaze_out])) + "\n") #block              # gaze out?
         respFile.close()
 
-        
+
 
 
         # wait until mouse button is no longer pressed:
@@ -787,9 +581,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
 
 
-# object that implements a rotating circle with dashed outline
-# (mostly compatible with psychopy style visual stimulus objects)
 
+
+# object that implements a rotating circle with dashed outline
+# (limited ompatibility with psychopy visual stimulus objects)
 
 # we need to keep time, in order to rotate the dashes:
 from time import time
