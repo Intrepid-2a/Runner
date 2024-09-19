@@ -104,10 +104,10 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_left)
         self.Bind(wx.EVT_BUTTON, self.runTask, self.dist_right)
         
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='color',   self.area_color)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='mapping', self.area_mapping)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='left',    self.area_left)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='area', subtask='right',   self.area_right)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.area_color)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.area_mapping)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.area_left)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.area_right)
 
         self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_color)
         self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_mapping)
@@ -316,13 +316,18 @@ class MyFrame(wx.Frame):
         print([task, subtask])
 
         if subtask == 'color':
-            # print('do color calibration')
+            print('do color calibration')
             doColorCalibration(ID=self.participantID.GetValue(), task=task, location=self.location)
             return
 
         if subtask == 'mapping':
             # print('do blind spot mpapping')
             doBlindSpotMapping(ID=self.participantID.GetValue(), task=task, location=self.location)
+            return
+
+        if task == 'area':
+            # print('do distance task')
+            doAreaTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
             return
 
         if task == 'distance':
