@@ -98,7 +98,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
 
     # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='area', ID=ID) # data path is for the mapping data, not the eye-tracker data!
-    setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
+    # setup = localizeSetup(location=location, trackEyes=[False, False], filefolder=None, filename=None, task='area', ID=ID, noEyeTracker=True) 
     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='area', ID=ID) 
 
     tracker = setup['tracker']
