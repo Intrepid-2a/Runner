@@ -492,7 +492,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                                                                    # its the number of completed trials in this condition
                                            position,                               # Stimulus location [0|1]
                                            col,                                    # condition?
-                                           '%0.2f'%(fixation.size),                # size of fixation plus
+                                           '%0.2f'%(fixation.size[0]),                # size of fixation plus
                                            '%0.2f'%(fov_point.pos[0]),             # X offset of foveal circle
                                            '%0.2f'%(fov_point.pos[1]),             # Y offset of foveal circle
                                            #round(ogp2, 3), #change
