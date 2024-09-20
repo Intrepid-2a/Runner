@@ -12,6 +12,7 @@ from utilities import *
 from calibration import *
 from Distance import *
 from Curvature import *
+from Area import *
 
 
 class MyFrame(wx.Frame):
