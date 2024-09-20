@@ -56,7 +56,7 @@ def placeCurvatureDots(B, C, curvature):
         D = [C[0] + (C[0]-B[0]), C[1] + (C[1]-B[1])]
         # we return this result:
         # return([A, B, C, D]) # this returned a tuple, while for non-zero curvature, the function returns an array
-        return(np.array([A,B,C,D])[0,:,:])
+        return(np.array([A,B,C,D]))
 
     # If the curvature is not 0, we need to do some more work.
 
@@ -96,7 +96,6 @@ def placeCurvatureDots(B, C, curvature):
     # First we correct for our positive and negative curvature.
     # This does not really exist, we just define negative curvature
     # to mean 'away from fixation'.
-
     point_coords = point_coords - [R,0]
     if curvature < 0:
         point_coords[:,0] *= -1
@@ -337,7 +336,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # MARIUS interpretation:
 
     # distance between dots in the trajectory should be related to the height of the blind spot:
-    dot_distance = bs_prop['size'][1] / 3
+    # dot_distance = bs_prop['size'][1] / 3
+    # no, we'll keep a standard stimulus size for all participants:
+    dot_distance = 2
 
     # stimulus width should be related to dot offset at maximum curvature:
     max_curvature_points = placeCurvatureDots(  B = [0,dot_distance/2],
