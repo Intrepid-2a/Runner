@@ -201,7 +201,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     xfix     = setup['fixation_x']
 
 
-    print(setup['paths']) # not using yet, just testing
+    # print(setup['paths']) # not using yet (perhaps never?), just testing
 
     # unpack all this
     win = setup['win']
@@ -221,21 +221,23 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = 'motion_' + {'left':'LH', 'right':'RH'}[hemifield] + ID.lower() + '_'
-    while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
-    respFile = open(data_path + filename + str(x) + '.txt','w')
+    filename = ID + '_curvature_' + ('LH' if hemifield == 'left' else 'RH') + '_'
+    while (filename + str(x) + '.txt') in os.listdir(data_path):
+        x += 1
 
     respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
-    respFile.write('\t'.join(map(str, ['TrialN',
-                                        'Curvature',
-                                        'Stimulus_position', 
-                                        'GreenStim', 
-                                        'Staircase', 
-                                        'ResponseCode', 
-                                        'Response', 
-                                        'Reversal', 
-                                        'AllTrials', 
-                                        'StairsOngoing'])) + '\n')
+    respFile.write('\t'.join(map(str, ['TrialN',                         # completed trials within the current staircase ???
+                                        'Curvature',                     # curvature value: -0.4 : 0.4
+                                        'Stimulus_position',             # at blind spot / away from blind spot
+                                        'GreenStim',                     # which eye was the stimulus presented to?
+                                        'Staircase',                     # stair case number?
+                                                                         # should be 0 - 7
+                                                                         # but it's just the starting point of the staircase
+                                        'ResponseCode',                  # 1 / 2 (no idea what this is mapped onto?)
+                                        'Response',                      # left/right...
+                                        'Reversal',                      # number of reversals in the current staircase
+                                        'AllTrials',                     # these last two variables are really not necessary at all
+                                        'StairsOngoing'])) + '\n')       # instead, we could record some more useful things?
     respFile.close()
 
     ## colour (eye) parameters
