@@ -416,7 +416,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             win.flip()
 
 
-        while trial_clock.getTime()  > 1.7: 
+        waiting_for_response = True
+        while waiting_for_response:
             hiFusion.draw()
             loFusion.draw()
             xfix.draw()
@@ -427,38 +428,40 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             while k[0] not in ['q', 'space', 'left', 'right']:
                 k = event.waitKeys()
 
-            # deal with q/quit:
-            if k[0] in ['q']:
-                abort = True
-                break
-            # deal with space/abort
-            if k[0] in ['space']:
-                choice = 'Trial aborted'
-                move = 0
-                trial_clock.reset()
-            
-            # get a move on the staircase:
-            if k[0] in ['left']:
-                choice = 'left'
-                move = +1
-            if k[0] in ['right']:
-                choice = 'right'
-                move = -1
-            
-            # adjust move by hemifield:
-            if hemifield == 'right':
-                move = move * -1
+            waiting_for_response = False
 
-            # make the move:
-            step[position][eye][staircase] += move
+        # deal with q/quit:
+        if k[0] in ['q']:
+            abort = True
+            break
+        # deal with space/abort
+        if k[0] in ['space']:
+            choice = 'Trial aborted'
+            move = 0
+            trial_clock.reset()
+        
+        # get a move on the staircase:
+        if k[0] in ['left']:
+            choice = 'left'
+            move = +1
+        if k[0] in ['right']:
+            choice = 'right'
+            move = -1
+        
+        # adjust move by hemifield:
+        if hemifield == 'right':
+            move = move * -1
 
-            # adjust for out of bounds moves:
-            if step[position][eye][staircase] < 0:
-                step[position][eye][staircase] == 0
-                choice = 'NA'
-            if step[position][eye][staircase] >= len(curvature):
-                step[position][eye][staircase] = len(curvature)
-                choice = 'NA'
+        # make the move:
+        step[position][eye][staircase] += move
+
+        # adjust for out of bounds moves:
+        if step[position][eye][staircase] < 0:
+            step[position][eye][staircase] == 0
+            choice = 'NA'
+        if step[position][eye][staircase] >= len(curvature):
+            step[position][eye][staircase] = len(curvature)
+            choice = 'NA'
 
 
             # # simplified this (see above):
@@ -522,11 +525,14 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
                 
             ##Adapting the staircase
-            resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
+        resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
         #sets the bounds for the staircase
         ## Reversals
-            if resps[position][eye][staircase][-2:] == ['left', 'right'] or resps[position][eye][staircase][-2:] == ['right', 'left']: 
-                revs[position][eye][staircase]  = revs[position][eye][staircase]  + 1
+        if resps[position][eye][staircase][-2:] == ['left', 'right'] or resps[position][eye][staircase][-2:] == ['right', 'left']: 
+            revs[position][eye][staircase]  = revs[position][eye][staircase]  + 1
+
+        
+
         if abort:
                 break # in this case: quit the task, not abort the trial
         #writing reponse file
@@ -565,4 +571,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     bye.draw()
     win.flip()
     event.waitKeys()
+
+    win.close()
 
