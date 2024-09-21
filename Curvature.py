@@ -201,7 +201,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     xfix     = setup['fixation_x']
 
 
-    # print(setup['paths']) # not using yet (perhaps never?), just testing
+    print(setup['paths']) # not using yet, just testing
 
     # unpack all this
     win = setup['win']
@@ -221,50 +221,23 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = ID + '_curvature_' + ('LH' if hemifield == 'left' else 'RH') + '_'
-    while (filename + str(x) + '.txt') in os.listdir(data_path):
-        x += 1
+    filename = 'motion_' + {'left':'LH', 'right':'RH'}[hemifield] + ID.lower() + '_'
+    while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
+    respFile = open(data_path + filename + str(x) + '.txt','w')
 
     respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
-    respFile.write('\t'.join(map(str, ['TrialN',                         # completed trials within the current staircase ???
-                                        'Curvature',                     # curvature value: -0.4 : 0.4
-                                        'Stimulus_position',             # at blind spot / away from blind spot
-                                        'GreenStim',                     # which eye was the stimulus presented to?
-                                        'Staircase',                     # stair case number?
-                                                                         # should be 0 - 7
-                                                                         # but it's just the starting point of the staircase
-                                        'ResponseCode',                  # 1 / 2 (no idea what this is mapped onto?)
-                                        'Response',                      # left/right...
-                                        'Reversal',                      # number of reversals in the current staircase
-                                        'AllTrials',                     # these last two variables are really not necessary at all
-                                        'StairsOngoing'])) + '\n')       # instead, we could record some more useful things?
+    respFile.write('\t'.join(map(str, ['TrialN',
+                                        'Curvature',
+                                        'Stimulus_position', 
+                                        'GreenStim', 
+                                        'Staircase', 
+                                        'ResponseCode', 
+                                        'Response', 
+                                        'Reversal', 
+                                        'AllTrials', 
+                                        'StairsOngoing'])) + '\n')
     respFile.close()
 
-    ## colour (eye) parameters
-
-    # col_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_col_cal*.txt")[-1],'r')
-    # col_param = col_file.read().replace('\t','\n').split('\n')
-    # col_file.close()
-    # col_left = eval(col_param[3]) # red 
-    # col_righ = eval(col_param[5]) # green
-    # col_both = [-0.7, -0.7, -0.7] # dark gray that is similar to the rg through glasses
-    # col_back = [ 0.55, 0.45, -1.0] #changed by belen to rpevent red bleed
-
-
-    ## Blind Spot Parameters
-    # bs_file = open(glob(main_path + "/mapping_data/" + expInfo['ID'] + "_" + hem +  "_blindspot*.txt")[-1],'r')
-    # bs_param = bs_file.read().replace('\t','\n').split('\n')
-    # bs_file.close()
-    # spot_righ_cart = eval(bs_param[1])
-    # spot_righ = cart2pol(spot_righ_cart[0], spot_righ_cart[1])
-    # spot_righ_size = eval(bs_param[3])
-    # print("angles and radians", spot_righ)
-
-    ## Window & elements
-    # win = visual.Window([1720,1100],allowGUI=True, monitor='testMonitor', units='deg',  fullscr = False, color=col_back, screen=1)
-    # win.mouseVisible = False
-    # fixation = visual.ShapeStim(win, vertices = ((0, -2), (0, 2), (0,0), (-2, 0), (2, 0)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
-    # xfix = visual.ShapeStim(win, vertices = ((-2, -2), (2, 2), (0,0), (-2, 2), (2, -2)), lineWidth = 4, units = 'pix', size = (10, 10), closeShape = False, lineColor = col_both)
 
 
     ######
@@ -272,34 +245,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     ######
 
     ## Parameters
-
-
-    # In [16]: setup['blindspotmarkers']
-    # Out[16]: 
-    # {'left_prop': {'cart': [-15.84, -1.47],
-    #   'spot': (-174.6979643253833, 15.908063992830806),
-    #   'size': [5.21, 5.76],
-    #   'tar': 9.21,
-    #   'ang_up': 21.231788356874432},
-    #  'left': <psychopy.visual.circle.Circle at 0x7fd3cd1f3100>,
-    #  'right_prop': {'cart': [15.02, -2.37],
-    #   'spot': (-8.966749923798016, 15.205831118357194),
-    #   'size': [5.97, 5.59],
-    #   'tar': 9.969999999999999,
-    #   'ang_up': 23.066717128968264},
-    #  'right': <psychopy.visual.circle.Circle at 0x7fd3d2a1faf0>}
-
-
-
-    ## BS stimuli
-    # blindspot = visual.Circle(win, radius = .5, pos = [7,0], lineColor = None)
-    # blindspot.pos = spot_righ_cart
-    # blindspot.size = spot_righ_size
-
-    ## Fusion Stimuli  -copy distance
-
-    # hiFusion = fusionStim(win=win, pos=[0, 0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
-    # loFusion = fusionStim(win=win, pos=[0,-0.8], colors = [col_back, col_both], columns=1, rows=5, square=0.07, units='norm', fieldShape = 'square')
 
     ## stimuli
     point1 = visual.Circle(win, radius = .7, pos = pol2cart(00, 6), fillColor = 'white', lineColor = None, units = 'deg')
@@ -309,21 +254,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     #########
 
-    # print(setup['blindspotmarkers'])
-
     ## Circle positions and other hemifield dependencies
 
     # shouldn't this be different for left and right hemifield runs?
 
     bs_prop = setup['blindspotmarkers'][hemifield+'_prop']
 
-            # blindspotmarkers[hemifield+'_prop'] = { 'cart'   : spot_cart,
-            #                                     'spot'   : spot,
-            #                                     'size'   : spot_size,
-            #                                     'tar'    : tar,
-            #                                     'ang_up' : ang_up       }
-
-   
 
     # Padding angles =  BSheight/3 + 2 (dotwidth) + 1(padding) --> value obtained from piloting
     # angpad = spot_righ_size[1]/3 + 2 + 1
@@ -388,111 +324,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
 
 
-
-
-
-    # Protocol paper says:
-
-    # - points are above/below this point:
-    #     - point on line between fixation and centre of blind spot marker
-    #     - distance to fixation is same distance to blind spot centre - (blind spot width/2) - 4 dva (padding)
-
-
-    # - above/below blind spot locations the angle is increased/decreased by half the blind spot height (in angular difference relative to fixation)
-
-
-    # cart2pol return: (theta, radius)  # i.e.: angle and distance, in that order
-
-    # #Positions by hemifield
-    # if hemifield == 'right':
-    #     # angle division between BS and outside locations = polar angle of the BS x and y + BS size) - angle of the BS location (dev from 0) / 2 + 2(dot stimulus size) + 2 (padding)
-    #     # angup = (cart2pol(spot_righ_cart[0], spot_righ_cart[1] + spot_righ_size[1])[0] - spot_righ[0])/2 + 2 + 2
-
-    #     angup = (cart2pol(bs_prop['cart'][0], bs_prop['cart'][1] + bs_prop['size'][1])[0] - bs_prop['spot'][0])/2 + 4
-
-    #     # spot_righ[0] is the angle (degrees) of the centre of the blind spot relative to fixation
-    #     # the cart2pol(...)[0] part returns the angle of a point (relative to fixation) that is:
-    #     # -  straight above the centre of the blind spot marker
-    #     # -  but offset by the height of the blind spot marker
-    #     # so the difference between those, divided by 2
-    #     # gives something that is usually close to half the height of the blind spot marker in degrees angle, relative to fixation
-    #     # adding 4 degrees angle (not dva!)
-
-    #     #positions
-    #     # positions = {
-    #     # "righ-top": [pol2cart(spot_righ[0] + 3*angup, spot_righ[1] - spot_righ_size[0]-side)],
-    #     # "righ-mid": [pol2cart(spot_righ[0] + angpad,  spot_righ[1] - spot_righ_size[0]-side), 
-    #     #              pol2cart(spot_righ[0] -angpad, spot_righ[1]- spot_righ_size[0]-side)],
-    #     # }
-
-
-    #     # why are we pretending that the blind spot marker is a circle, when we calibrate it as an ellipse?
-    #     # https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
-
-    #     positions = {
-    #     "righ-top": [pol2cart(bs_prop['spot'][0] + 3*angup, bs_prop['spot'][1] - bs_prop['size'][0]-side)],
-    #     "righ-mid": [pol2cart(bs_prop['spot'][0] + angpad,  bs_prop['spot'][1] - bs_prop['size'][0]-side), 
-    #                  pol2cart(bs_prop['spot'][0] - angpad,  bs_prop['spot'][1] - bs_prop['size'][0]-side)],
-    #     }
-
-    #     # angpad is not an angle, but a distance... should not be used here?
-
-
-    #     poss = list(positions.items()) #list of positions used in experiment
-
-    #     # these are the positions:
-    #     print(poss)
-
-    #     #to make top stimuli parallel to BS # why are there 4 levels? the input dictionary has 3...
-    #     ydif = (poss[1][1][0][1]-poss[1][1][1][1])/2
-    #     if poss[1][1][0][0] > poss[1][1][1][0]:
-    #         xdif = (poss[1][1][0][0]-poss[1][1][1][0])/2
-    #     else:
-    #         xdif = (poss[1][1][1][0]-poss[1][1][0][0])/2
-
-    #     print(xdif) # xdif should be 0? why does this have any value at all?
-
-    #                 # ydif should be scaled with the height of the blind spot... it kind of is
-
-    #     # #BS color
-    #     # blindspot.fillColor = col_righ
-    #     # Instructions
-    #     instructions = visual.TextStim(win, text="Throughout the experiment you will fixate a cross located at the centre of the screen. It is important that you maintain fixation on this cross at all times.\n\n In every trial you will be presented with a dot which will move along a curve. You will have to indicate with a keypress if the dot's motion was curved towards fixation or away from fixation  \n \nLeft arrow = motion curved towards fixation.\n \n Right arrow = motion curved away from fixation.\n\n\n You will only be able to respond when the fixation cross rotates from a '+' to a 'x' \n\n\n Press the space bar when you're ready to start the experiment.", color=col_both)
-
-    # else:
-
-
-    #     # THIS USES THE RIGHT BLIND SPOT MARKER, NOT THE LEFT!
-
-    #     # angle division between BS and outside locations = polar angle of the BS x and y - BS size) - angle of the BS location (dev from 0) / 2 + 2(dot stimulus size) + 2 (padding)
-    #     angup = (cart2pol(spot_righ_cart[0], spot_righ_cart[1] - spot_righ_size[1])[0] + spot_righ[0])/2 + 2 + 2
-
-    #     # positions
-    #     positions = {
-    #     "left-top": [pol2cart(spot_righ[0] + 3*angup, spot_righ[1] -  spot_righ_size[0]-side)], # this has 1 set of coordinates
-    #     "left-mid": [pol2cart(spot_righ[0] -angpad,  spot_righ[1] - spot_righ_size[0]-side),    # this has 2 ? are those the above & below positions?
-    #     pol2cart(spot_righ[0] -angpad, spot_righ[1]- spot_righ_size[0]-side)],
-    #     }
-    #     poss = list(positions.items()) #list of positions used in experiment
-
-    #     # the block below is the same as for the right hemifield... 
-    #     # move out of the if-else thing and only do once?
-
-    #     # to make top stimuli parallel to BS
-    #     ydif = (poss[1][1][0][1]-poss[1][1][1][1])/2
-    #     if poss[1][1][0][0] < poss[1][1][1][0]:
-    #         xdif = (poss[1][1][0][0]-poss[1][1][1][0])/2
-    #     else:
-    #         xdif = (poss[1][1][1][0]-poss[1][1][0][0])/2
-    #     # #BS color
-    #     # blindspot.fillColor = col_left
-
-    #     # Instructions
-    #     instructions = visual.TextStim(win, text="Throughout the experiment you will fixate at a a cross located at the centre of the screen. It is important that you maintain fixation on this cross at all times.\n\n In every trial you will be presented with a dot which will move along a curve. You will have to indicate with a keypress if the dot's motion was curved towards fixation or away from fixation  \n \nLeft arrow = motion curved away from fixation.\n \n Right arrow = motion curved towards fixation.\n\n\nYou will only be able to respond when the fixation cross rotates from a '+' to a 'x' \n\n\n Press the space bar when you're ready to start the experiment.")
-
-
-
-
     ## Experiment instructions
     instructions.wrapWidth = 30
     instructions.draw()
@@ -503,11 +334,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     ## Experimental parameters
 
     ## Curvatures, note that 0.000001 instead of 0 to avoid crushing
-    # curvature = [0.4, 0.375, 0.35, 0.325, 0.3, 0.275, 0.25,  0.225, 0.2, 0.175, 0.15, 0.125, 0.1, 0.075, 0.05, 0.025, -0.025, 0.000001,-0.000001, -0.05, -0.075, -0.1, -0.125, -0.15, -0.175, -0.2, -0.225, -0.25, -0.275, -0.3, -0.325, -0.35, -0.375, -0.4]
-    # curvature = [0.4, 0.375, 0.35, 0.325, 0.3, 0.275, 0.25,  0.225, 0.2, 0.175, 0.15, 0.125, 0.1, 0.075, 0.05, 0.025, 0.000, -0.05, -0.075, -0.1, -0.125, -0.15, -0.175, -0.2, -0.225, -0.25, -0.275, -0.3, -0.325, -0.35, -0.375, -0.4]
-
     # this is 33 values, instead of the 15 we use in the distance task... this should affect the staircases: more trials and reversals needed?
-    # curvature = [round((x / 40)-0.4, ndigits=3) for x in list(range(0,33))]
 
     curvature = [round((x / 20)-0.4, ndigits=3) for x in list(range(0,17))]   # NEW 17 points only
 
@@ -515,8 +342,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     step = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]] #[['left', 'right'], ['left', 'right']]
     direction = [[[1, -1], [1, -1]], [[1, -1], [1, -1]]] # 2 directions per eye and position converging to straight
     eye = [0, 1] #0 = col_left = red, 1 = col_righ = green
-    # eye: 0 = ipsi, 1 = contra
-    # eyecol = [col_left, col_righ] # these colors are not defined
     eyecol = [col_ipsi, col_contra] # use contra and ipsi colors?
 
     revs = [[0, 0], [0, 0]], [[0, 0], [0, 0]] #counter for the number of reversals
@@ -531,17 +356,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     #keeping track of time
     trial_clock = core.Clock()
 
-    # blindspot.autoDraw = True # hmmm... turn off when people can look away!
-    # #repeated draws 
-    # def repeat_draw():
-    #     fixation.draw()
-    #     hiFusion.draw()
-    #     loFusion.draw()
-
 
     while not stairs_ongoing == not_ongoing:
 
-        # these are not random?
 
         #1. Select the position to draw on
         if  stairs_ongoing[0] == [[False, False], [False, False]]: # doing all(stairs_ongoing[1]) leads to error = 'list indices must be integers or slices, not list'
@@ -563,13 +380,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         # 3. Select the staircase to draw (i.e. curvature towards or curvature away)
         staircase = np.random.choice(list(compress([0, 1], stairs_ongoing[position][eye])))
         fixation.color = col_both 
-        ##position of central dots (fixed, either above or around BS)
-        # if position == 0: #above blind spot
-        #     point2.pos = (poss[0][1][0][0]+xdif,poss[0][1][0][1]+ydif)
-        #     point3.pos = (poss[0][1][0][0]-xdif,poss[0][1][0][1]-ydif)
-        # elif position == 1: #blind spot
-        #     point2.pos = poss[1][1][0]
-        #     point3.pos = poss[1][1][1]
+
         point2.pos = positions[position][0]
         point3.pos = positions[position][1]
         
@@ -580,74 +391,20 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         currentcurv = direction[position][eye][staircase] * curvature[tstep]
         print('currently we are at', currentcurv, 'current step =', tstep)
         coords = placeCurvatureDots(point2.pos, point3.pos, currentcurv)
-        # print(coords)
+
         point1.pos = coords[3]
         point4.pos = coords[0]
-        #color of dots - which eye to stimulate
+
         point1.fillColor =  eyecol[eye]
         point2.fillColor =  eyecol[eye]
         point3.fillColor =  eyecol[eye]
         point4.fillColor =  eyecol[eye]
-        #resetting fusion stimuli
+
         hiFusion.resetProperties()
         loFusion.resetProperties()
-        #drawing the stimuli
+        
         trial_clock.reset()
 
-        # print('resetted clock')
-
-        # simplify this:
-        # while trial_clock.getTime() < .5: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < .6: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point1.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < .7: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point2.draw()
-        #     win.flip()
-        # while  trial_clock.getTime() < .8: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point3.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < .9: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point4.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.0: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point4.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.1: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point3.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.2: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point2.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.3: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point1.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.4: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point1.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.5: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point2.draw()
-        #     win.flip()
-        # while  trial_clock.getTime() < 1.6: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point3.draw()
-        #     win.flip()
-        # while trial_clock.getTime() < 1.7: 
-        #     blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
-        #     point4.draw()
-        #     win.flip()
         
         tp = trial_clock.getTime()
         while tp < 1.7:
@@ -665,7 +422,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             
             win.flip()
 
-        # print('stimulus done')
 
         while trial_clock.getTime()  > 1.7: 
             hiFusion.draw()
@@ -677,71 +433,101 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             k = ['wait']
             while k[0] not in ['q', 'space', 'left', 'right']:
                 k = event.waitKeys()
+
+            # deal with q/quit:
+            if k[0] in ['q']:
+                abort = True
+                break
+            # deal with space/abort
+            if k[0] in ['space']:
+                choice = 'Trial aborted'
+                move = 0
+                trial_clock.reset()
+            
+            # get a move on the staircase:
+            if k[0] in ['left']:
+                choice = 'left'
+                move = +1
+            if k[0] in ['right']:
+                choice = 'right'
+                move = -1
+            
+            # adjust move by hemifield:
             if hemifield == 'right':
-                if k[0] in ['q']:
-                    abort = True
-                    break
-                elif k[0] in ['left']:
-                    if currentcurv == .4:
-                        pass
-                    else:
-                        if step[position][eye][staircase] <= len(curvature)-2:
-                            step[position][eye][staircase] += 1
-                            # print(step[position][eye][staircase])
-                            choice = 'left'
-                        if step[position][eye][staircase] ==len(curvature)-1:
-                            step[position][eye][staircase] -= 1
-                            # print(step[position][eye][staircase])
-                            choice= 'NA'
-                    trial_clock.reset()
-                elif k[0] in ['right']:
-                    if currentcurv == -.4:
-                        pass
-                    else:
-                        if step[position][eye][staircase] <= len(curvature)-2:
-                            step[position][eye][staircase] -= 1
-                            choice = 'right'
-                            # print(step[position][eye][staircase])
-                        if step[position][eye][staircase] ==len(curvature)-1:
-                            step[position][eye][staircase] += 1
-                            # print(step[position][eye][staircase])
-                            choice= 'NA'
-                    trial_clock.reset()
-                elif k[0] in ['space']:
-                    choice = 'Trial aborted'
-                    trial_clock.reset()
-            else: ## add -4 +4
-                if k[0] in ['q']:
-                    abort = True
-                    break
-                elif k[0] in ['right']:
-                    if currentcurv == .4:
-                        pass
-                    else:
-                        if step[position][eye][staircase] <= len(curvature)-2:
-                            step[position][eye][staircase] += 1
-                            choice = 'right'
-                            # print(step[position][eye][staircase])
-                        if step[position][eye][staircase] ==len(curvature)-1:
-                            step[position][eye][staircase] -= 1
-                            # print(step[position][eye][staircase])
-                            choice= 'NA'
-                    trial_clock.reset()
-                elif k[0] in ['left']:
-                    if currentcurv == -.4:
-                        pass
-                    else:
-                        if step[position][eye][staircase] <= len(curvature)-2:
-                            step[position][eye][staircase] -= 1
-                            # print(step[position][eye][staircase])
-                            choice = 'left'
-                        if step[position][eye][staircase] ==len(curvature)-1:
-                            step[position][eye][staircase] += 1
-                            # print(step[position][eye][staircase])
-                            choice= 'NA'
-                    trial_clock.reset()
-                elif k[0] in ['space']:
-                    choice = 'Trial aborted'
+                move = move * -1
+
+            # make the move:
+            step[position][eye][staircase] += move
+
+            # adjust for out of bounds moves:
+            if step[position][eye][staircase] < 0:
+                step[position][eye][staircase] == 0
+                choice = 'NA'
+            if step[position][eye][staircase] >= len(curvature):
+                step[position][eye][staircase] = len(curvature)
+                choice = 'NA'
+
+
+            # # simplified this (see above):
+            # if hemifield == 'right':
+            #     if k[0] in ['q']:
+            #         abort = True
+            #         break
+            #     elif k[0] in ['left']:
+            #         if currentcurv == .4:
+            #             pass
+            #         else:
+            #             if step[position][eye][staircase] <= len(curvature)-2:
+            #                 step[position][eye][staircase] += 1
+            #                 choice = 'left'
+            #             if step[position][eye][staircase] ==len(curvature)-1:
+            #                 step[position][eye][staircase] -= 1
+            #                 choice= 'NA'
+            #         trial_clock.reset()
+            #     elif k[0] in ['right']:
+            #         if currentcurv == -.4:
+            #             pass
+            #         else:
+            #             if step[position][eye][staircase] <= len(curvature)-2:
+            #                 step[position][eye][staircase] -= 1
+            #                 choice = 'right'
+            #             if step[position][eye][staircase] ==len(curvature)-1:
+            #                 step[position][eye][staircase] += 1
+            #                 choice= 'NA'
+            #         trial_clock.reset()
+            #     elif k[0] in ['space']:
+            #         choice = 'Trial aborted'
+            #         trial_clock.reset()
+            # else: ## add -4 +4
+            #     if k[0] in ['q']:
+            #         abort = True
+            #         break
+            #     elif k[0] in ['right']:
+            #         if currentcurv == .4:
+            #             pass
+            #         else:
+            #             if step[position][eye][staircase] <= len(curvature)-2:
+            #                 step[position][eye][staircase] += 1
+            #                 choice = 'right'
+            #             if step[position][eye][staircase] ==len(curvature)-1:
+            #                 step[position][eye][staircase] -= 1
+            #                 choice= 'NA'
+            #         trial_clock.reset()
+            #     elif k[0] in ['left']:
+            #         if currentcurv == -.4:
+            #             pass
+            #         else:
+            #             if step[position][eye][staircase] <= len(curvature)-2:
+            #                 step[position][eye][staircase] -= 1
+            #                 choice = 'left'
+            #             if step[position][eye][staircase] ==len(curvature)-1:
+            #                 step[position][eye][staircase] += 1
+            #                 choice= 'NA'
+            #         trial_clock.reset()
+            #     elif k[0] in ['space']:
+            #         choice = 'Trial aborted'
+
+                
             ##Adapting the staircase
             resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
         #sets the bounds for the staircase
@@ -749,7 +535,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             if resps[position][eye][staircase][-2:] == ['left', 'right'] or resps[position][eye][staircase][-2:] == ['right', 'left']: 
                 revs[position][eye][staircase]  = revs[position][eye][staircase]  + 1
         if abort:
-                break
+                break # in this case: quit the task, not abort the trial
         #writing reponse file
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write('\t'.join(map(str, [trial[position][eye][staircase], 
