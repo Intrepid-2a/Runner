@@ -416,19 +416,16 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             win.flip()
 
 
-        waiting_for_response = True
-        while waiting_for_response:
-            hiFusion.draw()
-            loFusion.draw()
-            xfix.draw()
-            win.flip()
+        hiFusion.draw()
+        loFusion.draw()
+        xfix.draw()
+        win.flip()
 
         #Wait for responses
-            k = ['wait']
-            while k[0] not in ['q', 'space', 'left', 'right']:
-                k = event.waitKeys()
+        k = ['wait']
+        while k[0] not in ['q', 'space', 'left', 'right']:
+            k = event.waitKeys()
 
-            waiting_for_response = False
 
         # deal with q/quit:
         if k[0] in ['q']:
