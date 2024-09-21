@@ -13,17 +13,11 @@ from psychopy.tools.mathtools import distance
 import numpy as np
 from numpy import ndarray
 import random, datetime, os
-import math
-from math import sin, cos, radians, pi # why not use from numpy?
 from glob import glob
 from itertools import compress
 
 from psychopy.hardware import keyboard
 from pyglet.window import key
-
-# from fusion_stim import fusionStim
-# from curvature import placeCurvatureDots
-
 
 import sys, os
 # sys.path.append(os.path.join('..', 'EyeTracking'))
