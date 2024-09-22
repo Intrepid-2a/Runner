@@ -332,9 +332,14 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     curvature = [round((x / 20)-0.4, ndigits=3) for x in list(range(0,17))]   # NEW 17 points only
 
     ## staircase
+    # step has the current index into the list of curvatures for each staircase
     step = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]] #[['left', 'right'], ['left', 'right']]
+
+    # direction flips the index into the curvature list, although we could have also just started at the max of step in half the staircases
     direction = [[[1, -1], [1, -1]], [[1, -1], [1, -1]]] # 2 directions per eye and position converging to straight
+    # which eye sees the stimuli? (i.e. which color are the stimuli displayed in?)
     eye = [0, 1] #0 = col_left = red, 1 = col_righ = green
+
     eyecol = [col_ipsi, col_contra] # use contra and ipsi colors?
 
     revs = [[0, 0], [0, 0]], [[0, 0], [0, 0]] #counter for the number of reversals
@@ -426,102 +431,39 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         while k[0] not in ['q', 'space', 'left', 'right']:
             k = event.waitKeys()
 
-
-        # # deal with q/quit:
-        # if k[0] in ['q']:
-        #     abort = True
-        #     break
-        # # deal with space/abort
-        # if k[0] in ['space']:
-        #     choice = 'Trial aborted'
-        #     move = 0
-        #     trial_clock.reset()
+        # deal with q/quit:
+        if k[0] in ['q']:
+            abort = True
+            break
+        # deal with space/abort
+        if k[0] in ['space']:
+            choice = 'Trial aborted'
+            move = 0
+            # trial_clock.reset()
         
-        # # get a move on the staircase:
-        # if k[0] in ['left']:
-        #     choice = 'left'
-        #     move = +1
-        # if k[0] in ['right']:
-        #     choice = 'right'
-        #     move = -1
-        
-        # # adjust move by hemifield:
-        # if hemifield == 'right':
-        #     move = move * -1
+        # get a move on the staircase:
+        if k[0] in ['left', 'right']:
+            # register button pressed:
+            choice = k[0]
+            # pick movement direction on staircase, depending on response: 
+            move = {'right':-1, 'left':+1}[k[0]]
+            # invert for inverted dircetions:
+            move = move * direction[position][eye][staircase]
+            # invert for left hemifield:
+            move = move * {'right':1, 'left':-1}[hemifield]
+            # make the move:
+            step[position][eye][staircase] += move
 
-        # # make the move:
-        # step[position][eye][staircase] += move
-
-        # # adjust for out of bounds moves:
-        # if step[position][eye][staircase] < 0:
-        #     step[position][eye][staircase] == 0
-        #     choice = 'NA'
-        # if step[position][eye][staircase] >= len(curvature):
-        #     step[position][eye][staircase] = len(curvature)
-        #     choice = 'NA'
-
-
-        # simplified this (see above):
-        if hemifield == 'right':
-            if k[0] in ['q']:
-                abort = True
-                break
-            elif k[0] in ['left']:
-                if currentcurv == .4:
-                    pass
-                else:
-                    if step[position][eye][staircase] <= len(curvature)-2:
-                        step[position][eye][staircase] += 1
-                        choice = 'left'
-                    if step[position][eye][staircase] ==len(curvature)-1:
-                        step[position][eye][staircase] -= 1
-                        choice= 'NA'
-                trial_clock.reset()
-            elif k[0] in ['right']:
-                if currentcurv == -.4:
-                    pass
-                else:
-                    if step[position][eye][staircase] <= len(curvature)-2:
-                        step[position][eye][staircase] -= 1
-                        choice = 'right'
-                    if step[position][eye][staircase] ==len(curvature)-1:
-                        step[position][eye][staircase] += 1
-                        choice= 'NA'
-                trial_clock.reset()
-            elif k[0] in ['space']:
-                choice = 'Trial aborted'
-                trial_clock.reset()
-        else: ## add -4 +4
-            if k[0] in ['q']:
-                abort = True
-                break
-            elif k[0] in ['right']:
-                if currentcurv == .4:
-                    pass
-                else:
-                    if step[position][eye][staircase] <= len(curvature)-2:
-                        step[position][eye][staircase] += 1
-                        choice = 'right'
-                    if step[position][eye][staircase] ==len(curvature)-1:
-                        step[position][eye][staircase] -= 1
-                        choice= 'NA'
-                trial_clock.reset()
-            elif k[0] in ['left']:
-                if currentcurv == -.4:
-                    pass
-                else:
-                    if step[position][eye][staircase] <= len(curvature)-2:
-                        step[position][eye][staircase] -= 1
-                        choice = 'left'
-                    if step[position][eye][staircase] ==len(curvature)-1:
-                        step[position][eye][staircase] += 1
-                        choice= 'NA'
-                trial_clock.reset()
-            elif k[0] in ['space']:
-                choice = 'Trial aborted'
+        # now correct out of bounds moves:
+        if step[position][eye][staircase] < 0:
+            step[position][eye][staircase] == 0
+            choice = 'NA'
+        if step[position][eye][staircase] >= len(curvature):
+            step[position][eye][staircase] = len(curvature) - 1
+            choice = 'NA'
 
                 
-            ##Adapting the staircase
+        ##Adapting the staircase
         resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
         #sets the bounds for the staircase
         ## Reversals
@@ -554,6 +496,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         stairs_ongoing[position][eye][staircase]  = revs[position][eye][staircase]  <= Nrevs or trial[position][eye][staircase]  < Ntrials
 
     ## Closing prints
+    bye = visual.TextStim(win, text="Run ended.\nPress space bar to exit")
     if abort:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("Run manually ended at " + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M") + "!")
@@ -561,11 +504,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         bye = visual.TextStim(win, text="Run manually ended \n Press space bar to exit")
     elif not any(stairs_ongoing):
         print('run ended properly!')
-        bye = visual.TextStim(win, text="You have now completed the experimental run. Thank you for your participation!! \n Press space bar to exit")
+        bye = visual.TextStim(win, text="You have now completed the experimental run.\nThank you for your participation!!\n\nPress space bar to exit")
 
     blindspot.autoDraw = False
     ## Farewells
-    bye.draw()
+    bye.draw() # there was no bye stim defined on my runs... creating default stim above
     win.flip()
     event.waitKeys()
 
