@@ -392,6 +392,14 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         point1.pos = coords[3]
         point4.pos = coords[0]
 
+        # randomly flip the coords?
+        if random.choice([0, 1]):
+            startdirection = 'up'
+            point2.pos, point3.pos = point3.pos, point2.pos
+            point1.pos, point4.pos = point4.pos, point1.pos
+        else:
+            startdirection = 'down'
+
         point1.fillColor =  eyecol[eye]
         point2.fillColor =  eyecol[eye]
         point3.fillColor =  eyecol[eye]
@@ -404,17 +412,17 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         
         tp = trial_clock.getTime()
-        while tp < 1.7:
+        while tp < 1.3:
             tp = trial_clock.getTime()
             blindspot.draw(); fixation.draw(); hiFusion.draw(); loFusion.draw()
             
-            if any([0.5 < tp < 0.6, 1.2 < tp < 1.4                ]):
+            if any([0.1 < tp < 0.2, 0.8 < tp < 1.0                ]):
                 point1.draw()
-            if any([0.6 < tp < 0.7, 1.1 < tp < 1.2, 1.4 < tp < 1.5]):
+            if any([0.2 < tp < 0.3, 0.7 < tp < 0.8, 1.0 < tp < 1.1]):
                 point2.draw()
-            if any([0.7 < tp < 0.8, 1.0 < tp < 1.1, 1.5 < tp < 1.6]):
+            if any([0.3 < tp < 0.4, 0.6 < tp < 0.7, 1.1 < tp < 1.2]):
                 point3.draw()
-            if any([0.8 < tp < 1.0,                 1.6 < tp < 1.7]):
+            if any([0.4 < tp < 0.6,                 1.2 < tp < 1.3]):
                 point4.draw()
             
             win.flip()
