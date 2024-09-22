@@ -214,7 +214,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = 'curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield] + ID.lower() + '_'
+    filename = ID.lower() + '_curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield] + '_'
     while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
     respFile = open(data_path + filename + str(x) + '.txt','w')
 
@@ -386,7 +386,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         # why would it be negative?
 
         currentcurv = direction[position][eye][staircase] * curvature[tstep]
-        print('currently we are at', currentcurv, 'current step =', tstep)
+        # print('currently we are at', currentcurv, 'current step =', tstep)
+
         coords = placeCurvatureDots(point2.pos, point3.pos, currentcurv)
 
         point1.pos = coords[3]
@@ -473,33 +474,34 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         ##Adapting the staircase
         resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
         #sets the bounds for the staircase
+        
         ## Reversals
         if resps[position][eye][staircase][-2:] == ['left', 'right'] or resps[position][eye][staircase][-2:] == ['right', 'left']: 
-            revs[position][eye][staircase]  = revs[position][eye][staircase]  + 1
+            revs[position][eye][staircase] = revs[position][eye][staircase] + 1
 
-        
 
         if abort:
                 break # in this case: quit the task, not abort the trial
         #writing reponse file
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [trial[position][eye][staircase], 
-                                        currentcurv,# Stimulus location
-                                        position,
-                                        eye, 
-                                        staircase,
-                                        [1 if k[0] == 'left' else 2][0],
-                                        choice, 
-                                        revs[position][eye][staircase],
-                                        trial,
-                                        stairs_ongoing])) + "\n") #block
+        respFile.write('\t'.join(map(str, [trial[position][eye][staircase],   # number of trials completed for the current staircase
+                                           currentcurv,                       # curvature used in the current trial
+                                           position,                          # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
+                                           eye,                               # eye to which stimuli fo rthe current staircase are presented (0 or 1)
+                                           staircase,                         # starting point of the staircase of the current trial (0 or 1)
+                                           [1 if k[0] == 'left' else 2][0],   # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
+                                           choice,                            # which button was pressed ('left' or 'right' arrow key)
+                                           revs[position][eye][staircase],    # number of reversals done for this particular condition
+                                           trial,                             # a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
+                                           stairs_ongoing])) + "\n")          # a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
         respFile.close()
         #final updates
         if not choice == 'Trial aborted':
             trial[position][eye][staircase]  = trial[position][eye][staircase]  +1
         else:
             pass
-        ##Check if experiment can continue
+        
+        # Check if the current staircase is completed or not (minimum of Ntrials trials and Nrevs reversals have to be completed in the current staircase)
         stairs_ongoing[position][eye][staircase]  = revs[position][eye][staircase]  <= Nrevs or trial[position][eye][staircase]  < Ntrials
 
     ## Closing prints
