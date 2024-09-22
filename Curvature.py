@@ -214,7 +214,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = 'motion_' + {'left':'LH', 'right':'RH'}[hemifield] + ID.lower() + '_'
+    filename = 'curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield] + ID.lower() + '_'
     while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
     respFile = open(data_path + filename + str(x) + '.txt','w')
 
@@ -260,7 +260,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # Padding on circle side
 
     # this could be negative padding?
-    # side = (spot_righ_size[1] - spot_righ_size[0])*0.15/0.5
     side = (bs_prop['size'][1] - bs_prop['size'][0]) * 0.15/0.5
 
     # ============================
@@ -283,7 +282,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     arc_length = (bs_prop['size'][1] * 1.0)  # maybe it should be higher ? no... less is fine, other wise we get close to the fusion stims
 
     # and with a radius that moves away from the blind spot center, toward fixation with enough padding (stim width and 2 dva extra)
-    r = np.sqrt( (abs(bs_prop['cart'][0]) - (bs_prop['size'][0]/2) - 2 - stim_width)**2 + bs_prop['cart'][1]**2 )
+    r = np.sqrt( (abs(bs_prop['cart'][0]) - (bs_prop['size'][0]/2) - 0.5 - stim_width)**2 + bs_prop['cart'][1]**2 )
     C = 2*np.pi*r                 # total circumference
     ang_up = (arc_length/C)*360   # is this correct? (propertion of total circumference * 360)
 
