@@ -427,98 +427,98 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             k = event.waitKeys()
 
 
-        # deal with q/quit:
-        if k[0] in ['q']:
-            abort = True
-            break
-        # deal with space/abort
-        if k[0] in ['space']:
-            choice = 'Trial aborted'
-            move = 0
-            trial_clock.reset()
+        # # deal with q/quit:
+        # if k[0] in ['q']:
+        #     abort = True
+        #     break
+        # # deal with space/abort
+        # if k[0] in ['space']:
+        #     choice = 'Trial aborted'
+        #     move = 0
+        #     trial_clock.reset()
         
-        # get a move on the staircase:
-        if k[0] in ['left']:
-            choice = 'left'
-            move = +1
-        if k[0] in ['right']:
-            choice = 'right'
-            move = -1
+        # # get a move on the staircase:
+        # if k[0] in ['left']:
+        #     choice = 'left'
+        #     move = +1
+        # if k[0] in ['right']:
+        #     choice = 'right'
+        #     move = -1
         
-        # adjust move by hemifield:
+        # # adjust move by hemifield:
+        # if hemifield == 'right':
+        #     move = move * -1
+
+        # # make the move:
+        # step[position][eye][staircase] += move
+
+        # # adjust for out of bounds moves:
+        # if step[position][eye][staircase] < 0:
+        #     step[position][eye][staircase] == 0
+        #     choice = 'NA'
+        # if step[position][eye][staircase] >= len(curvature):
+        #     step[position][eye][staircase] = len(curvature)
+        #     choice = 'NA'
+
+
+        # simplified this (see above):
         if hemifield == 'right':
-            move = move * -1
-
-        # make the move:
-        step[position][eye][staircase] += move
-
-        # adjust for out of bounds moves:
-        if step[position][eye][staircase] < 0:
-            step[position][eye][staircase] == 0
-            choice = 'NA'
-        if step[position][eye][staircase] >= len(curvature):
-            step[position][eye][staircase] = len(curvature)
-            choice = 'NA'
-
-
-            # # simplified this (see above):
-            # if hemifield == 'right':
-            #     if k[0] in ['q']:
-            #         abort = True
-            #         break
-            #     elif k[0] in ['left']:
-            #         if currentcurv == .4:
-            #             pass
-            #         else:
-            #             if step[position][eye][staircase] <= len(curvature)-2:
-            #                 step[position][eye][staircase] += 1
-            #                 choice = 'left'
-            #             if step[position][eye][staircase] ==len(curvature)-1:
-            #                 step[position][eye][staircase] -= 1
-            #                 choice= 'NA'
-            #         trial_clock.reset()
-            #     elif k[0] in ['right']:
-            #         if currentcurv == -.4:
-            #             pass
-            #         else:
-            #             if step[position][eye][staircase] <= len(curvature)-2:
-            #                 step[position][eye][staircase] -= 1
-            #                 choice = 'right'
-            #             if step[position][eye][staircase] ==len(curvature)-1:
-            #                 step[position][eye][staircase] += 1
-            #                 choice= 'NA'
-            #         trial_clock.reset()
-            #     elif k[0] in ['space']:
-            #         choice = 'Trial aborted'
-            #         trial_clock.reset()
-            # else: ## add -4 +4
-            #     if k[0] in ['q']:
-            #         abort = True
-            #         break
-            #     elif k[0] in ['right']:
-            #         if currentcurv == .4:
-            #             pass
-            #         else:
-            #             if step[position][eye][staircase] <= len(curvature)-2:
-            #                 step[position][eye][staircase] += 1
-            #                 choice = 'right'
-            #             if step[position][eye][staircase] ==len(curvature)-1:
-            #                 step[position][eye][staircase] -= 1
-            #                 choice= 'NA'
-            #         trial_clock.reset()
-            #     elif k[0] in ['left']:
-            #         if currentcurv == -.4:
-            #             pass
-            #         else:
-            #             if step[position][eye][staircase] <= len(curvature)-2:
-            #                 step[position][eye][staircase] -= 1
-            #                 choice = 'left'
-            #             if step[position][eye][staircase] ==len(curvature)-1:
-            #                 step[position][eye][staircase] += 1
-            #                 choice= 'NA'
-            #         trial_clock.reset()
-            #     elif k[0] in ['space']:
-            #         choice = 'Trial aborted'
+            if k[0] in ['q']:
+                abort = True
+                break
+            elif k[0] in ['left']:
+                if currentcurv == .4:
+                    pass
+                else:
+                    if step[position][eye][staircase] <= len(curvature)-2:
+                        step[position][eye][staircase] += 1
+                        choice = 'left'
+                    if step[position][eye][staircase] ==len(curvature)-1:
+                        step[position][eye][staircase] -= 1
+                        choice= 'NA'
+                trial_clock.reset()
+            elif k[0] in ['right']:
+                if currentcurv == -.4:
+                    pass
+                else:
+                    if step[position][eye][staircase] <= len(curvature)-2:
+                        step[position][eye][staircase] -= 1
+                        choice = 'right'
+                    if step[position][eye][staircase] ==len(curvature)-1:
+                        step[position][eye][staircase] += 1
+                        choice= 'NA'
+                trial_clock.reset()
+            elif k[0] in ['space']:
+                choice = 'Trial aborted'
+                trial_clock.reset()
+        else: ## add -4 +4
+            if k[0] in ['q']:
+                abort = True
+                break
+            elif k[0] in ['right']:
+                if currentcurv == .4:
+                    pass
+                else:
+                    if step[position][eye][staircase] <= len(curvature)-2:
+                        step[position][eye][staircase] += 1
+                        choice = 'right'
+                    if step[position][eye][staircase] ==len(curvature)-1:
+                        step[position][eye][staircase] -= 1
+                        choice= 'NA'
+                trial_clock.reset()
+            elif k[0] in ['left']:
+                if currentcurv == -.4:
+                    pass
+                else:
+                    if step[position][eye][staircase] <= len(curvature)-2:
+                        step[position][eye][staircase] -= 1
+                        choice = 'left'
+                    if step[position][eye][staircase] ==len(curvature)-1:
+                        step[position][eye][staircase] += 1
+                        choice= 'NA'
+                trial_clock.reset()
+            elif k[0] in ['space']:
+                choice = 'Trial aborted'
 
                 
             ##Adapting the staircase
