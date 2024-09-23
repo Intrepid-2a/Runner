@@ -219,10 +219,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     respFile = open(data_path + filename + str(x) + '.txt','w')
 
     respFile.write(''.join(map(str, ['Start: \t' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + '\n'])))
-    respFile.write('\t'.join(map(str, ['TrialN',
+    respFile.write('\t'.join(map(str, [ 'TotalTrial',
+                                        'TrialN',
                                         'Curvature',
                                         'Stimulus_position', 
-                                        'GreenStim', 
+                                        'GreenStim',
+                                        'CorrectedCurvature', 
                                         'Staircase', 
                                         'ResponseCode', 
                                         'Response', 
@@ -357,6 +359,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     #keeping track of time
     trial_clock = core.Clock()
 
+    total_trials = 1
+    break_trials = 1
 
     while not stairs_ongoing == not_ongoing:
 
@@ -438,6 +442,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         xfix.draw()
         win.flip()
 
+        # tracker.comment('wait for response')
+
         #Wait for responses
         k = ['wait']
         while k[0] not in ['q', 'space', 'left', 'right']:
@@ -446,15 +452,18 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         # deal with q/quit:
         if k[0] in ['q']:
             abort = True
+            # tracker.comment('quit task')
             break
         # deal with space/abort
         if k[0] in ['space']:
             choice = 'Trial aborted'
             move = 0
+            # tracker.comment('trial aborted')
             # trial_clock.reset()
         
         # get a move on the staircase:
         if k[0] in ['left', 'right']:
+            # tracker.comment('response '%(k[0]))
             # register button pressed:
             choice = k[0]
             # pick movement direction on staircase, depending on response: 
@@ -476,7 +485,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
                 
         ##Adapting the staircase
-        resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
+        if choice in ['left', 'right']:
+            resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
         #sets the bounds for the staircase
         
         ## Reversals
@@ -485,19 +495,21 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
 
         if abort:
-                break # in this case: quit the task, not abort the trial
+            break # in this case: quit the task, not abort the trial
         #writing reponse file
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [trial[position][eye][staircase],   # number of trials completed for the current staircase
-                                           currentcurv,                       # curvature used in the current trial
-                                           position,                          # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
-                                           eye,                               # eye to which stimuli fo rthe current staircase are presented (0 or 1)
-                                           staircase,                         # starting point of the staircase of the current trial (0 or 1)
-                                           [1 if k[0] == 'left' else 2][0],   # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
-                                           choice,                            # which button was pressed ('left' or 'right' arrow key)
-                                           revs[position][eye][staircase],    # number of reversals done for this particular condition
-                                           trial,                             # a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
-                                           stairs_ongoing])) + "\n")          # a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
+        respFile.write('\t'.join(map(str, [total_trials,                                       # total number of trials done (including aborted ones)
+                                           trial[position][eye][staircase],                    # number of trials completed for the current staircase
+                                           currentcurv,                                        # curvature used in the current trial (uncorrected for hemifield)
+                                           position,                                           # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
+                                           eye,                                                # eye to which stimuli fo rthe current staircase are presented (0 or 1)
+                                           currentcurv * {'left':-1, 'right':1}[hemifield],    # corrected curvature: negative is curved to the left, positive is curved to the right
+                                           staircase,                                          # starting point of the staircase of the current trial (0 or 1)
+                                           [1 if k[0] == 'left' else 2][0],                    # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
+                                           choice,                                             # which button was pressed ('left' or 'right' arrow key)
+                                           revs[position][eye][staircase],                     # number of reversals done for this particular condition
+                                           trial,                                              # a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
+                                           stairs_ongoing])) + "\n")                           # a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
         respFile.close()
         #final updates
         if not choice == 'Trial aborted':
@@ -507,6 +519,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         
         # Check if the current staircase is completed or not (minimum of Ntrials trials and Nrevs reversals have to be completed in the current staircase)
         stairs_ongoing[position][eye][staircase]  = revs[position][eye][staircase]  <= Nrevs or trial[position][eye][staircase]  < Ntrials
+
+
+        # do break here?
+
+        total_trials += 1
+        break_trials += 1
 
     ## Closing prints
     bye = visual.TextStim(win, text="Run ended.\nPress space bar to exit")
