@@ -534,13 +534,13 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            currentcurv,                                        # curvature used in the current trial (uncorrected for hemifield)
                                            position,                                           # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
                                            eye,                                                # eye to which stimuli fo rthe current staircase are presented (0 or 1)
-                                           currentcurv * {'left':-1, 'right':1}[hemifield],    # corrected curvature: negative is curved to the left, positive is curved to the right
+                                           currentcurv * {'left':-1, 'right':1}[hemifield],    # hemifield corrected curvature: negative is curved to the left, positive is curved to the right
                                            staircase,                                          # starting point of the staircase of the current trial (0 or 1)
                                            [1 if k[0] == 'left' else 2][0],                    # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
                                            choice,                                             # which button was pressed ('left' or 'right' arrow key)
-                                           revs[position][eye][staircase],                     # number of reversals done for this particular condition
-                                           trial,                                              # a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
-                                           stairs_ongoing])) + "\n")                           # a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
+                                           revs,                                               # print of a nested list of lists of lists with number of reversals detected for each condition
+                                           trial,                                              # print of a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
+                                           stairs_ongoing])) + "\n")                           # print of a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
         respFile.close()
         #final updates
         if not choice == 'Trial aborted':
