@@ -448,10 +448,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
             
             win.flip()
 
-            if tp > msg_time[0]:
-                # tracker.comment(msg_text[0])
-                msg_time.pop(0)
-                msg_text.pop(0)
+            if len(msg_time):
+                if tp > msg_time[0]:
+                    # tracker.comment(msg_text[0])
+                    msg_time.pop(0)
+                    msg_text.pop(0)
 
 
         hiFusion.draw()
