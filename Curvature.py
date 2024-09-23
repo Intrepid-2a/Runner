@@ -419,6 +419,18 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         
         trial_clock.reset()
 
+        msg_time = [0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.1, 1.2]
+        msg_text = ['point 1', 
+                    'point 2', 
+                    'point 3', 
+                    'point 4', 
+                    'point 3', 
+                    'point 2', 
+                    'point 1', 
+                    'point 2', 
+                    'point 3', 
+                    'point 4']
+
         
         tp = trial_clock.getTime()
         while tp < 1.3:
@@ -435,6 +447,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                 point4.draw()
             
             win.flip()
+
+            if tp > msg_time[0]:
+                # tracker.comment(msg_text[0])
+                msg_time.pop(0)
+                msg_text.pop(0)
 
 
         hiFusion.draw()
