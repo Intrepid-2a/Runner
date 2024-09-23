@@ -328,6 +328,10 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     win.flip()
     event.waitKeys(keyList='space')
 
+    ## Start eye-tracker stuff
+    tracker.openfile()
+    tracker.startcollecting()
+    tracker.calibrate()
 
     ## Experimental parameters
 
@@ -358,6 +362,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     choice = []
     #keeping track of time
     trial_clock = core.Clock()
+
+    tracker.comment('%s hemifield'%(hemifield))
 
     total_trials = 1
     break_trials = 1
@@ -431,6 +437,13 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                     'point 3', 
                     'point 4']
 
+
+        tracker.waitForFixation()
+        gaze_out = False
+
+
+        tracker.comment('start trial %d'%(total_trials))
+
         
         tp = trial_clock.getTime()
         while tp < 1.3:
@@ -450,7 +463,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             if len(msg_time):
                 if tp > msg_time[0]:
-                    # tracker.comment(msg_text[0])
+                    tracker.comment(msg_text[0])
                     msg_time.pop(0)
                     msg_text.pop(0)
 
@@ -460,7 +473,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         xfix.draw()
         win.flip()
 
-        # tracker.comment('wait for response')
+        tracker.comment('wait for response')
 
         #Wait for responses
         k = ['wait']
@@ -470,18 +483,18 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         # deal with q/quit:
         if k[0] in ['q']:
             abort = True
-            # tracker.comment('quit task')
+            tracker.comment('quit task')
             break
         # deal with space/abort
         if k[0] in ['space']:
             choice = 'Trial aborted'
             move = 0
-            # tracker.comment('trial aborted')
+            tracker.comment('trial aborted')
             # trial_clock.reset()
         
         # get a move on the staircase:
         if k[0] in ['left', 'right']:
-            # tracker.comment('response '%(k[0]))
+            tracker.comment('response '%(k[0]))
             # register button pressed:
             choice = k[0]
             # pick movement direction on staircase, depending on response: 
@@ -541,6 +554,32 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         # do break here?
 
+        if break_trials => 50:
+            # do a break...
+
+            win.flip()
+            breaktext = visual.TextStim(win, 'take a break!', height = letter_height, color = col_both)
+            print('- break...')
+            breaktext.draw()
+            win.flip()
+            
+            tracker.comment('break')
+
+            on_break = True
+            while on_break:
+                keys = event.getKeys(keyList=['b']) # simpler solution: use a different key... like 'b'
+                if 'b' in keys:
+                    on_break = False
+                breaktext.draw()
+                win.flip()
+
+            event.clearEvents(eventType='keyboard') # just to be sure?
+
+            tracker.comment('continue')
+
+            tracker.calibrate()
+            break_trials = 0
+
         total_trials += 1
         break_trials += 1
 
@@ -561,5 +600,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     win.flip()
     event.waitKeys()
 
+    tracker.shutdown()
     win.close()
 
