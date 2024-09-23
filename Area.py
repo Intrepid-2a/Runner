@@ -214,7 +214,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             "righ-top": [(spot[0] + angup, spot[1])], # BS location + angup, same radians 
             "righ-mid": [(spot[0],  spot[1])], 
         }
-        hiFusion.pos = [-10,0]
+        hiFusion.pos = [-15,0]
     else:
         #angle division between BS and outside locations = polar angle of the BS x and (y + BS size), + angle of the BS location (dev from 0) + 4 (padding) +radious
         angup = one_dva_angle * ( (spot_size[1]/2) + (rad/2) + 2)
@@ -222,7 +222,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             "left-top": [(spot[0] - angup, spot[1])], # BS location + angup, same radians 
             "left-mid": [(spot[0],  spot[1])],
         }
-        hiFusion.pos = [10,0]
+        hiFusion.pos = [15,0]
 
     # positions
     poss = list(positions.items())

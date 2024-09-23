@@ -1629,15 +1629,15 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     if 'back' in colors.keys():
         fcols[1] = colors['back']
 
-    if task == 'area':
+    if task in ['area', 'curvature']:
         fusion = {'hi': fusionStim(win    = win,
-                                   rows    = 15,
+                                   rows    = 7,
                                    columns = 3,
                                    pos    = [0,10],
                                    colors = fcols),
                   'lo': fusionStim(win    = win,
                                    rows    = 3,
-                                   columns = 15,
+                                   columns = 7,
                                    pos    = [0,-10],
                                    colors = fcols)}
 
@@ -1650,13 +1650,13 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                                    colors = fcols)}
 
 
-    if task == 'curvature':
-        fusion = {'hi': fusionStim(win    = win,
-                                   pos    = [0,7],
-                                   colors = fcols),
-                  'lo': fusionStim(win    = win,
-                                   pos    = [0,-7],
-                                   colors = fcols)}
+    # if task == 'curvature':
+    #     fusion = {'hi': fusionStim(win    = win,
+    #                                pos    = [0,7],
+    #                                colors = fcols),
+    #               'lo': fusionStim(win    = win,
+    #                                pos    = [0,-7],
+    #                                colors = fcols)}
 
     # color calibration doesn't use any of this (except the window object?)
     # for either calibration task, the task should not be set

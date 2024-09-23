@@ -292,8 +292,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # at blind spot middle of trajectory:
     if hemifield == 'right':
         bsm_x = bs_prop['cart'][0] - (bs_prop['size'][0]/2) - 0.5 - stim_width
+        hiFusion.pos = [-10,0]
+
     else:
         bsm_x = bs_prop['cart'][0] + (bs_prop['size'][0]/2) + 0.5 + stim_width
+        hiFusion.pos = [ 10,0]
+
     bsm = [bsm_x, bs_prop['cart'][1]]
 
     # positions in cartesian coordinates:
