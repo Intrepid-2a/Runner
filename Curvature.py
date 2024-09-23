@@ -180,7 +180,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         x += 1
 
 
-    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID, noEyeTracker=True) # data path is for the mapping data, not the eye-tracker data!
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID, noEyeTracker=False) # data path is for the mapping data, not the eye-tracker data!
 
     tracker = setup['tracker']
 
@@ -494,7 +494,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         
         # get a move on the staircase:
         if k[0] in ['left', 'right']:
-            tracker.comment('response '%(k[0]))
+            tracker.comment('response %s'%(k[0]))
             # register button pressed:
             choice = k[0]
             # pick movement direction on staircase, depending on response: 
@@ -554,7 +554,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         # do break here?
 
-        if break_trials => 50:
+        if break_trials >= 50:
             # do a break...
 
             win.flip()
