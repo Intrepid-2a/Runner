@@ -467,11 +467,20 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                     msg_time.pop(0)
                     msg_text.pop(0)
 
+            if not tracker.gazeInFixationWindow():
+                gaze_out = True
+                choice = 'trial aborted'
+                tracker.comment('trial auto aborted')
+                break
+
 
         hiFusion.draw()
         loFusion.draw()
         xfix.draw()
         win.flip()
+
+
+        print('messages left: %d'%(len(msg_text)))
 
         tracker.comment('wait for response')
 
@@ -537,6 +546,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            currentcurv * {'left':-1, 'right':1}[hemifield],    # hemifield corrected curvature: negative is curved to the left, positive is curved to the right
                                            staircase,                                          # starting point of the staircase of the current trial (0 or 1)
                                            [1 if k[0] == 'left' else 2][0],                    # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
+                                                                            # this will give an error when trials are aborted due to non-fixation?
                                            choice,                                             # which button was pressed ('left' or 'right' arrow key)
                                            revs,                                               # print of a nested list of lists of lists with number of reversals detected for each condition
                                            trial,                                              # print of a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
@@ -579,6 +589,37 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             tracker.calibrate()
             break_trials = 0
+
+        elif gaze_out:
+
+            hiFusion.draw()
+            loFusion.draw()
+            blindspot.draw() # for re-aligning the head?
+
+            visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
+            print('# auto abort')
+            win.flip()
+            k = ['wait']
+            while k[0] not in ['q', 'up', 'r']:
+                k = event.waitKeys()
+            if k[0] in ['q']:
+                abort = True
+                break
+    
+            # manual recalibrate
+            if k[0] in ['r']:
+
+                tracker.calibrate()
+                
+                win.flip()
+                fixation.draw()
+                win.flip()
+                k = event.waitKeys()
+
+                if k[0] in ['q']:
+                    abort = True
+                    break
+
 
         total_trials += 1
         break_trials += 1
