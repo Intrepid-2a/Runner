@@ -459,6 +459,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
             else:
                 hiFusion.draw()
                 loFusion.draw()
+                blindspot.draw() # for re-aligning the head?
 
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
                 print('# auto abort')
