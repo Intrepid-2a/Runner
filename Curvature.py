@@ -182,7 +182,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='curvature', ID=ID, noEyeTracker=True) # data path is for the mapping data, not the eye-tracker data!
 
-
+    tracker = setup['tracker']
 
     hiFusion = setup['fusion']['hi']
     loFusion = setup['fusion']['lo']
