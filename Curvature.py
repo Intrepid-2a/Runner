@@ -225,12 +225,13 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                         'Stimulus_position', 
                                         'GreenStim',
                                         'CorrectedCurvature', 
+                                        'StartDirection',
                                         'Staircase', 
                                         'ResponseCode', 
                                         'Response', 
                                         'Reversal', 
                                         'AllTrials', 
-                                        'StairsOngoing'])) + '\n')
+                                        'StairsOngoing' ])) + '\n')
     respFile.close()
 
 
@@ -422,8 +423,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         hiFusion.resetProperties()
         loFusion.resetProperties()
-        
-        trial_clock.reset()
+
+        # preliminaries done
+        tracker.comment('start trial %d'%(total_trials))
+
+        tracker.waitForFixation()
+        gaze_out = False
 
         msg_time = [0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.1, 1.2]
         msg_text = ['point 1', 
@@ -437,12 +442,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                     'point 3', 
                     'point 4']
 
-
-        tracker.waitForFixation()
-        gaze_out = False
-
-
-        tracker.comment('start trial %d'%(total_trials))
+        trial_clock.reset()
+        tracker.comment('fixation detected')
 
         
         tp = trial_clock.getTime()
@@ -478,7 +479,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         loFusion.draw()
         xfix.draw()
         win.flip()
-
 
         print('messages left: %d'%(len(msg_text)))
 
@@ -536,6 +536,12 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         if abort:
             break # in this case: quit the task, not abort the trial
+
+        if len(k):
+            resp_no = [1 if k[0] == 'left' else 2][0]
+        else:
+            resp_no = 0
+
         #writing reponse file
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write('\t'.join(map(str, [total_trials,                                       # total number of trials done (including aborted ones)
@@ -544,8 +550,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            position,                                           # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
                                            eye,                                                # eye to which stimuli fo rthe current staircase are presented (0 or 1)
                                            currentcurv * {'left':-1, 'right':1}[hemifield],    # hemifield corrected curvature: negative is curved to the left, positive is curved to the right
+                                           startdirection,
                                            staircase,                                          # starting point of the staircase of the current trial (0 or 1)
-                                           [1 if k[0] == 'left' else 2][0],                    # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
+                                           resp_no,                         # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
                                                                             # this will give an error when trials are aborted due to non-fixation?
                                            choice,                                             # which button was pressed ('left' or 'right' arrow key)
                                            revs,                                               # print of a nested list of lists of lists with number of reversals detected for each condition
