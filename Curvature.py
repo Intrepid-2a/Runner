@@ -487,6 +487,8 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         tracker.comment('wait for response')
 
+        print('wait for response?')
+
         #Wait for responses
         k = ['wait']
         while k[0] not in ['q', 'space', 'left', 'right']:
