@@ -476,6 +476,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             fixation.color = 'black'
             hiFusion.draw()
             loFusion.draw()
+            blindspot.draw()
             fixation.draw()
             win.flip()
             
