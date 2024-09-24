@@ -483,7 +483,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         xfix.draw()
         win.flip()
 
-        print('messages left: %d'%(len(msg_text)))
+        # print('messages left: %d'%(len(msg_text)))
 
         tracker.comment('wait for response')
 
@@ -561,6 +561,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            revs,                                               # print of a nested list of lists of lists with number of reversals detected for each condition
                                            trial,                                              # print of a nested list of lists of lists with number of (non-aborted) trials per staircase - hard to read in, and probably not so necessary
                                            stairs_ongoing])) + "\n")                           # print of a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
+        
         respFile.close()
         #final updates
         if not choice == 'Trial aborted':
@@ -602,13 +603,14 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         elif gaze_out:
 
+            print('# auto abort')
+
             hiFusion.draw()
             loFusion.draw()
             blindspot.draw() # for re-aligning the head?
-
-            visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
-            print('# auto abort')
+            visual.TextStim(win, '#', height = letter_height, color = col_both).draw()            
             win.flip()
+
             k = ['wait']
             while k[0] not in ['q', 'up', 'r']:
                 k = event.waitKeys()
@@ -621,7 +623,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
                 tracker.calibrate()
                 
-                win.flip()
                 fixation.draw()
                 win.flip()
                 k = event.waitKeys()
