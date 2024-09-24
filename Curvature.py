@@ -123,6 +123,8 @@ def placeCurvatureDots(B, C, curvature):
 
 def doCurvatureTask(hemifield=None, ID=None, location=None):
 
+    letter_height = 1
+
     ## path
     # main_path = "."
     # data_path = main_path + "/data/"
@@ -371,6 +373,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     while not stairs_ongoing == not_ongoing:
 
+        k = ['empty']
 
         #1. Select the position to draw on
         if  stairs_ongoing[0] == [[False, False], [False, False]]: # doing all(stairs_ongoing[1]) leads to error = 'list indices must be integers or slices, not list'
@@ -470,7 +473,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             if not tracker.gazeInFixationWindow():
                 gaze_out = True
-                choice = 'trial aborted'
+                choice = 'Trial aborted'
                 tracker.comment('trial auto aborted')
                 break
 
@@ -537,7 +540,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         if abort:
             break # in this case: quit the task, not abort the trial
 
-        if len(k):
+        if k[0] in ['left', 'right']:
             resp_no = [1 if k[0] == 'left' else 2][0]
         else:
             resp_no = 0
