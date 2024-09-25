@@ -343,6 +343,12 @@ def doBlindSpotMapping(ID=None,task=None,location=None):
 
     fixation_yes = setup['fixation']
     fixation_no  = setup['fixation_x']
+
+    cfg['hw']['fusion']['hi'].rows = 7
+    cfg['hw']['fusion']['hi'].columns = 3
+    cfg['hw']['fusion']['lo'].rows = 7
+    cfg['hw']['fusion']['lo'].columns = 3
+
     
 
     for hemifield in ['left', 'right']:
