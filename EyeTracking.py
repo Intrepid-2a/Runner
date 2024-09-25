@@ -1631,13 +1631,13 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
     if task in ['area', 'curvature']:
         fusion = {'hi': fusionStim(win    = win,
-                                   rows    = 7,
-                                   columns = 3,
+                                   rows    = 9,
+                                   columns = 2,
                                    pos    = [0,10],
                                    colors = fcols),
                   'lo': fusionStim(win    = win,
-                                   rows    = 3,
-                                   columns = 7,
+                                   rows    = 2,
+                                   columns = 9,
                                    pos    = [0,-10],
                                    colors = fcols)}
 
