@@ -216,7 +216,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = ID.lower() + '_curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield] + '_'
+    filename = ID.lower() + '_curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield]
     while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
     respFile = open(data_path + filename + str(x) + '.txt','w')
 
@@ -531,7 +531,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                 choice = 'NA'
 
         else:      # if gaze was out... we need to auto-abort the trial... around here?
-        
+
             print('# auto abort')
 
             hiFusion.draw()
