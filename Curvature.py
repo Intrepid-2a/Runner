@@ -480,6 +480,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         hiFusion.draw()
         loFusion.draw()
+        blindspot.draw()
         xfix.draw()
         win.flip()
 
