@@ -115,12 +115,6 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_left)
         self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_right)
 
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='color',    self.curve_color)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='mapping',  self.curve_mapping)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='left',     self.curve_left)
-        # self.Bind(wx.EVT_BUTTON, self.runTask, task='curve', subtask='right',    self.curve_right)
-        
-
 
         # more advanced stuff ?
         self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
@@ -337,7 +331,7 @@ class MyFrame(wx.Frame):
             return
 
         if task == 'curvature':
-            print('do curvature task')
+            # print('do curvature task')
             doCurvatureTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
             return
 

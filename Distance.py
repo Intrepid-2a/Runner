@@ -546,6 +546,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
             else:
                 hiFusion.draw()
                 loFusion.draw()
+                blindspot.draw()
                 visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
                 print('# auto abort')
                 win.flip()

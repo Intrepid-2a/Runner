@@ -216,7 +216,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     
     x = 1
-    filename = ID.lower() + '_curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield] + '_'
+    filename = ID.lower() + '_curvature_' + {'left':'LH_', 'right':'RH_'}[hemifield]
     while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
     respFile = open(data_path + filename + str(x) + '.txt','w')
 
@@ -480,55 +480,88 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
         hiFusion.draw()
         loFusion.draw()
+        blindspot.draw()
         xfix.draw()
         win.flip()
 
         # print('messages left: %d'%(len(msg_text)))
 
-        tracker.comment('wait for response')
+        if not gaze_out:
 
-        print('wait for response?')
+            tracker.comment('wait for response')
 
-        #Wait for responses
-        k = ['wait']
-        while k[0] not in ['q', 'space', 'left', 'right']:
-            k = event.waitKeys()
+            print('wait for response?')
 
-        # deal with q/quit:
-        if k[0] in ['q']:
-            abort = True
-            tracker.comment('quit task')
-            break
-        # deal with space/abort
-        if k[0] in ['space']:
-            choice = 'Trial aborted'
-            move = 0
-            tracker.comment('trial aborted')
-            # trial_clock.reset()
-        
-        # get a move on the staircase:
-        if k[0] in ['left', 'right']:
-            tracker.comment('response %s'%(k[0]))
-            # register button pressed:
-            choice = k[0]
-            # pick movement direction on staircase, depending on response: 
-            move = {'right':-1, 'left':+1}[k[0]]
-            # invert for inverted dircetions:
-            move = move * direction[position][eye][staircase]
-            # invert for left hemifield:
-            move = move * {'right':1, 'left':-1}[hemifield]
-            # make the move:
-            step[position][eye][staircase] += move
+            #Wait for responses
+            k = ['wait']
+            while k[0] not in ['q', 'space', 'left', 'right']:
+                k = event.waitKeys()
 
-        # now correct out of bounds moves:
-        if step[position][eye][staircase] < 0:
-            step[position][eye][staircase] == 0
-            choice = 'NA'
-        if step[position][eye][staircase] >= len(curvature):
-            step[position][eye][staircase] = len(curvature) - 1
-            choice = 'NA'
+            # deal with q/quit:
+            if k[0] in ['q']:
+                abort = True
+                tracker.comment('quit task')
+                break
+            # deal with space/abort
+            if k[0] in ['space']:
+                choice = 'Trial aborted'
+                move = 0
+                tracker.comment('trial aborted')
+                # trial_clock.reset()
+            
+            # get a move on the staircase:
+            if k[0] in ['left', 'right']:
+                tracker.comment('response %s'%(k[0]))
+                # register button pressed:
+                choice = k[0]
+                # pick movement direction on staircase, depending on response: 
+                move = {'right':-1, 'left':+1}[k[0]]
+                # invert for inverted dircetions:
+                move = move * direction[position][eye][staircase]
+                # invert for left hemifield:
+                move = move * {'right':1, 'left':-1}[hemifield]
+                # make the move:
+                step[position][eye][staircase] += move
 
+            # now correct out of bounds moves:
+            if step[position][eye][staircase] < 0:
+                step[position][eye][staircase] == 0
+                choice = 'NA'
+            if step[position][eye][staircase] >= len(curvature):
+                step[position][eye][staircase] = len(curvature) - 1
+                choice = 'NA'
+
+        else:      # if gaze was out... we need to auto-abort the trial... around here?
+
+            print('# auto abort')
+
+            hiFusion.draw()
+            loFusion.draw()
+            blindspot.draw() # for re-aligning the head?
+            visual.TextStim(win, '#', height = letter_height, color = col_both).draw()            
+            win.flip()
+
+            k = ['wait']
+            while k[0] not in ['q', 'up', 'r']:
+                k = event.waitKeys()
+            if k[0] in ['q']:
+                abort = True
+                break
+    
+            # manual recalibrate
+            if k[0] in ['r']:
+
+                tracker.calibrate()
                 
+                fixation.draw()
+                win.flip()
+                k = event.waitKeys()
+
+                if k[0] in ['q']:
+                    abort = True
+                    break
+
+        
         ##Adapting the staircase
         if choice in ['left', 'right']:
             resps[position][eye][staircase]  = resps[position][eye][staircase]  + [choice]
@@ -602,36 +635,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             tracker.calibrate()
             break_trials = 0
-
-        elif gaze_out:
-
-            print('# auto abort')
-
-            hiFusion.draw()
-            loFusion.draw()
-            blindspot.draw() # for re-aligning the head?
-            visual.TextStim(win, '#', height = letter_height, color = col_both).draw()            
-            win.flip()
-
-            k = ['wait']
-            while k[0] not in ['q', 'up', 'r']:
-                k = event.waitKeys()
-            if k[0] in ['q']:
-                abort = True
-                break
-    
-            # manual recalibrate
-            if k[0] in ['r']:
-
-                tracker.calibrate()
-                
-                fixation.draw()
-                win.flip()
-                k = event.waitKeys()
-
-                if k[0] in ['q']:
-                    abort = True
-                    break
 
 
         total_trials += 1
