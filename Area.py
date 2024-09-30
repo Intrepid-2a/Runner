@@ -163,8 +163,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                         'StimulusPosition',
                                         'EyeStim',
                                         'FixationSize',
-                                        'FixXoffset',
-                                        'FixYoffset',
+                                        'FixCirclePos',
+                                        'PerCirclePos',
+                                        'hiFusionPos',
+                                        'loFusionPos',
                                         'FixOrigSize',
                                         'PeriOrigSize',
                                         'OriginalDiff',
@@ -497,8 +499,10 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                            position,                               # Stimulus location [0|1]
                                            col,                                    # condition?
                                            '%0.2f'%(fixation.size[0]),                # size of fixation plus
-                                           '%0.2f'%(fov_point.pos[0]),             # X offset of foveal circle
-                                           '%0.2f'%(fov_point.pos[1]),             # Y offset of foveal circle
+                                           fov_point.pos,
+                                           per_point.pos,
+                                           hiFusion.pos,
+                                           loFusion.pos,
                                            #round(ogp2, 3), #change
                                            '%0.4f'%(ogp2),                         # FixOrigSize (one of 10 values)
                                            # round(fov_point.size, 3),
