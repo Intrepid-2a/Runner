@@ -499,7 +499,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                                            position,                               # Stimulus location [0|1]
                                            col,                                    # condition?
                                            '%0.2f'%(fixation.size[0]),                # size of fixation plus
-                                           fov_point.pos,
+                                           list(fov_point.pos),
                                            per_point.pos,
                                            hiFusion.pos,
                                            loFusion.pos,
