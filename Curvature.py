@@ -226,9 +226,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                         'Curvature',
                                         'Stimulus_position', 
                                         'GreenStim',
+                                        'Staircase', 
                                         'CorrectedCurvature', 
                                         'StartDirection',
-                                        'Staircase', 
                                         'ResponseCode', 
                                         'Response', 
                                         'Reversal', 
@@ -587,9 +587,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            currentcurv,                                        # curvature used in the current trial (uncorrected for hemifield)
                                            position,                                           # position at which stimuli for the current staircase are presented (at blind spot or away from blind spot)
                                            eye,                                                # eye to which stimuli fo rthe current staircase are presented (0 or 1)
+                                           staircase,                                          # starting point of the staircase of the current trial (0 or 1)
                                            currentcurv * {'left':-1, 'right':1}[hemifield],    # hemifield corrected curvature: negative is curved to the left, positive is curved to the right
                                            startdirection,
-                                           staircase,                                          # starting point of the staircase of the current trial (0 or 1)
                                            resp_no,                         # 1 for left button presses, 2 for right button presses (superfluous with the next variable)
                                                                             # this will give an error when trials are aborted due to non-fixation?
                                            choice,                                             # which button was pressed ('left' or 'right' arrow key)
@@ -598,6 +598,19 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
                                            stairs_ongoing])) + "\n")                           # print of a nested list of lists of lists with booleans... printed - so hard to read back in, and probably not so necessary
         
         respFile.close()
+
+
+        print('\t'.join(map(str, [  total_trials,                                   
+                                    trial[position][eye][staircase],                
+                                    position,                                       
+                                    eye,                                            
+                                    staircase,
+                                    currentcurv * {'left':-1, 'right':1}[hemifield],
+                                    startdirection,
+                                    resp_no,
+                                    choice,
+                                    ['FINISHED', 'ongoing'][stairs_ongoing[position][eye][staircase]]])))
+
         #final updates
         if not choice == 'Trial aborted':
             trial[position][eye][staircase]  = trial[position][eye][staircase]  +1
@@ -609,7 +622,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
 
         # do break here?
-
         if break_trials >= 50:
             # do a break...
 
