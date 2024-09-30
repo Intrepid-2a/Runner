@@ -573,6 +573,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
             m = mouse.getPressed()
             xfix.draw()
+            blindspot.draw()
             win.flip()
 
             if m[2]:
