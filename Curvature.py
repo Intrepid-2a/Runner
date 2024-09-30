@@ -490,8 +490,6 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             tracker.comment('wait for response')
 
-            print('wait for response?')
-
             #Wait for responses
             k = ['wait']
             while k[0] not in ['q', 'space', 'left', 'right']:
@@ -600,15 +598,16 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         respFile.close()
 
 
-        print('\t'.join(map(str, [  total_trials,                                   
-                                    trial[position][eye][staircase],                
-                                    position,                                       
-                                    eye,                                            
-                                    staircase,
+        print(' '.join(map(str, [  total_trials,                                   
+                                    trial[position][eye][staircase],
+                                    # position,
+                                    # eye,
+                                    # staircase,
                                     currentcurv * {'left':-1, 'right':1}[hemifield],
                                     startdirection,
                                     resp_no,
                                     choice,
+                                    (position * 4 + eye * 2 + staircase),
                                     ['FINISHED', 'ongoing'][stairs_ongoing[position][eye][staircase]]])))
 
         #final updates
