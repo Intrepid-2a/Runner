@@ -208,20 +208,3 @@ def generateRandomParticipantID(prepend='', nbytes=3):
         newID = prepend + secrets.token_hex(nbytes)
 
     return(newID)
-
-import requests, sys
-
-def downloadDemographics():
-
-    # https://docs.google.com/spreadsheets/d/1MCQRvkfyx_-8UVFORcZGuzJCDev5g6krjp3LDoIcars/edit?usp=sharing
-
-    url = f'https://docs.google.com/spreadsheets/d/1MCQRvkfyx_-8UVFORcZGuzJCDev5g6krjp3LDoIcars/export?format=csv'
-    response = requests.get(url)
-    if response.status_code == 200:
-        filepath = os.path.join('.', 'demographics.csv')
-        with open(filepath, 'wb') as f:
-            f.write(response.content)
-            print('CSV file saved to: {}'.format(filepath))    
-    else:
-        print(f'Error downloading Google Sheet: {response.status_code}')
-        sys.exit(1) # what does this do?

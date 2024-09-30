@@ -507,7 +507,7 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
                 
             fixation.ori -= 45
             
-        else: # we should NEVER get here...
+        else:
         
             ## dealing with auto-aborted trials
         
