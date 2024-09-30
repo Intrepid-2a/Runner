@@ -514,7 +514,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         # check if we finished this condition:
         ongoing[position][col] =  trial[position][col] <= len(adaptposs[position][col]) -1
 
-        print('\t'.join(map(str, [         ntrial,                                 # total trials
+        print(' '.join(map(str, [          ntrial,                                 # total trials
                                            trial[position][col],                   # which eye was used? SHOULD be trial number?
                                                                                    # its the number of completed trials in this condition
                                            position,                               # Stimulus location [0|1]
