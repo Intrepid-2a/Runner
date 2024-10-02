@@ -10,6 +10,7 @@ Authors: Belén María Montabes de la Cruz, Clement Abbatecola, in collaboration
 from psychopy import core, visual, gui, data, event
 from psychopy.tools.coordinatetools import pol2cart, cart2pol
 from psychopy.tools.mathtools import distance
+from psychopy.tools import monitorunittools
 import numpy as np
 from numpy import ndarray
 import random, datetime, os
@@ -125,6 +126,12 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     blindspot = setup['blindspotmarkers'][hemifield]
     bs_prop = setup['blindspotmarkers'][hemifield+'_prop']
+
+
+    p2d = monitorunittools.pix2deg(1, win.monitor)
+    winsize = win.monitor.getSizePix()
+    vertical_range = winsize[1] * p2d
+
 
     # called rad... but it's diameter, not radius
     rad = max(bs_prop['size']) + 3 # 1.5 dva padding? (effectively 0.5... could be OK)
@@ -297,7 +304,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
 
     # how finegrained / sensitive is the mouse position?
     # you need to move the mouse by X dva to get a 1 dva size change in the foveal circle
-    mouse_scale = 3
+    mouse_scale = 1.5
     
     #k = ['wait']
     #while k[0] not in ['q','space']:
@@ -345,7 +352,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
         fov_point.pos  = [random.choice(posjit), random.choice(posjit)]
 
         mouse_offset = fov_size * mouse_scale
-        mouse.setPos([0,0])
+        mouse.setPos([0,(-vertical_range/2)+mouse_offset])
 
         #color of dots - which eye to stimulate
         if eye[col] == hemifield: #add col
@@ -416,7 +423,7 @@ def doAreaTask(ID=None, hemifield=None, location=None):
                 
                 # taking participant input:
                 mousepos = mouse.getPos()
-                fov_point.size = abs(mousepos[0] + mouse_offset) / mouse_scale
+                fov_point.size = abs((mousepos[1] + (vertical_range/2))) / mouse_scale
                 
                 per_point.ori = 15 * np.floor((t * (2/.366)) % 2)
 
