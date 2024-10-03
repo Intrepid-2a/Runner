@@ -99,10 +99,7 @@ def doColorCalibration(ID=None, task=None, location=None):
     # print(cfg['hw']['win'].monitor.getGammaGrid())
     # print(cfg['hw']['win'].color)
 
-    # open file here:
-    x = 1
-    while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
-    respFile = open(data_path + filename + str(x) + '.txt','w')
+
 
     # add pyglet keyboard stuff:
     pyg_keyboard = key.KeyStateHandler()
@@ -224,7 +221,11 @@ def doColorCalibration(ID=None, task=None, location=None):
 
         #     calibration_triggered = False
 
-
+    # open file here:
+    x = 1
+    while (filename + str(x) + '.txt') in os.listdir(data_path): x += 1
+    respFile = open(data_path + filename + str(x) + '.txt','w')
+    # write data to file:
     respFile.write('background:\t[{:.8f},{:.8f},{:.8f}]\nred:\t[{:.8f},{:.8f},{:.8f}]\ngreen:\t[{:.8f},{:.8f},{:.8f}]'.format( \
     back_col[0], back_col[1], back_col[2], \
     red_col[0],  red_col[1],  red_col[2],  \
