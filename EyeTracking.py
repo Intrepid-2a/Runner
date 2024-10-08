@@ -1633,12 +1633,12 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
         fusion = {'hi': fusionStim(win    = win,
                                    rows    = 9,
                                    columns = 2,
-                                   pos    = [0,10],
+                                   pos    = [0,15],
                                    colors = fcols),
                   'lo': fusionStim(win    = win,
                                    rows    = 2,
                                    columns = 9,
-                                   pos    = [0,-10],
+                                   pos    = [0,-15],
                                    colors = fcols)}
 
     if task in ['distance']:
