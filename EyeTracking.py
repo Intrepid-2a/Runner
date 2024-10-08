@@ -1629,7 +1629,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     if 'back' in colors.keys():
         fcols[1] = colors['back']
 
-    if task in ['area', 'curvature']:
+    if task in ['area', 'curvature', 'vanbalen']:
         fusion = {'hi': fusionStim(win    = win,
                                    rows    = 9,
                                    columns = 2,
@@ -1641,7 +1641,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
                                    pos    = [0,-10],
                                    colors = fcols)}
 
-    if task in ['distance', 'vanbaelen']:
+    if task in ['distance']:
         fusion = {'hi': fusionStim(win    = win,
                                    pos    = [0,7],
                                    colors = fcols),

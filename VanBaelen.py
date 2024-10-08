@@ -215,15 +215,15 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
 
 
 
-    ## prepare trials
-    positions = {
-        "left-top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
-        "left-mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)],
-        "left-bot": [(spot_left[0]  + ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  + ang_up_left,  spot_left[1]  + tar_left/2)],
-        "righ-top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
-        "righ-mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
-        "righ-bot": [(spot_right[0] - ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] - ang_up_right, spot_right[1] + tar_right/2)],
-    }
+    # ## prepare trials
+    # positions = {
+    #     "left-top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
+    #     "left-mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)],
+    #     "left-bot": [(spot_left[0]  + ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  + ang_up_left,  spot_left[1]  + tar_left/2)],
+    #     "righ-top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
+    #     "righ-mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
+    #     "righ-bot": [(spot_right[0] - ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] - ang_up_right, spot_right[1] + tar_right/2)],
+    # }
 
 
     # blind spot properties:
@@ -237,35 +237,53 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
     # how many degrees does one dva at the blind spot span, as relative from fixation
     one_dva_angle = cart2pol(abs(spot_cart[0]), 1)[0]
 
-    # get distance
-    r = spot[1]
+    # get distance for across blind spot stimuli (in dva):
+    r_bsa = abs(spot[1]) # should already be absolute, but just in case
 
-    angup = 
+    # this is where the main point would be:
+    ang_up = one_dva_angle * ((spot_size[1]/2) + 3)
+    # we could add a little jitter on the angle of the main point:
+    ang_jit = [one_dva_angle * x for x in [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75]]
 
-    # we want a little jitter on the angle
-    ang_jit = [one_dva_angle * x for x in [-1, -0.5, 0, 0.5, 1]]
+    # this is the default (0 diff) angle between each of the outer points, and the inner point
+    base_angle = one_dva_angle * (spot_size[1] + 6)
 
+    # away from blind spot arrays, would be closer to fixation
+    # such that they do not span the blind spot:
+    r_out = r_bsa - (spot_size[0]/2) - 2
 
-
-
-
+    bs_ang = spot[0]
 
     if hemifield == 'left':
-        # First column is target, second column is foil
-        pos_array = [["left-mid", "left-top"],
-                     ["left-mid", "left-bot"],
-                     ["left-top", "left-bot"],
-                     ["left-bot", "left-top"]]
-        tar = tar_left
-    else:
-        pos_array = [["righ-mid", "righ-top"],
-                     ["righ-mid", "righ-bot"],
-                     ["righ-top", "righ-bot"],
-                     ["righ-bot", "righ-top"]]
-        tar = tar_right
+        bs_ang = bs_ang % 360
+        positions = [[bs_ang - ang_up, r_bsa],
+                     [bs_ang - ang_up, r_out]]
+        hem_ang = 1
+    if hemifield == 'right':
+        positions = [[bs_ang + ang_up, r_bsa],
+                     [bs_ang + ang_up, r_out]]
+        hem_ang = -1
 
-    pos_array_bsa = pos_array[0:2]
-    pos_array_out = pos_array[2:4]
+    # base_angle *= hem_ang
+
+
+
+    # if hemifield == 'left':
+    #     # First column is target, second column is foil
+    #     pos_array = [["left-mid", "left-top"],
+    #                  ["left-mid", "left-bot"],
+    #                  ["left-top", "left-bot"],
+    #                  ["left-bot", "left-top"]]
+    #     tar = tar_left
+    # else:
+    #     pos_array = [["righ-mid", "righ-top"],
+    #                  ["righ-mid", "righ-bot"],
+    #                  ["righ-top", "righ-bot"],
+    #                  ["righ-bot", "righ-top"]]
+    #     tar = tar_right
+
+    pos_array_bsa = positions[0]
+    pos_array_out = positions[1]
 
 
     ######
@@ -352,6 +370,8 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
 
 
     intervals = [3.5, 3, 2.5, 2, 1.5, 1, .5, 0, -.5, -1, -1.5, -2, -2.5, -3, -3.5]
+
+    
     position = [[]] * 8
     trial_stair = [0] * 8
     revs = [0] * 8
@@ -376,37 +396,45 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
         which_stair = random.choice(list(compress([x for x in range(len(stairs_ongoing))], stairs_ongoing)))
 
         ## set trial
-        if position[which_stair] == []:
-            random.shuffle(pos_arrays[which_stair])
-            position[which_stair] = pos_arrays[which_stair][:]
-        pos = position[which_stair].pop()
+        pos = pos_arrays[which_stair]
 
-        shift = random.sample([-1, -.5, 0, .5, .1], 2)
-        dif = intervals[cur_int[which_stair]] * foil_type[which_stair]
-        which_first = random.choice(['Targ', 'Foil'])
+        # if position[which_stair] == []:
+        #     random.shuffle(pos_arrays[which_stair])
+        #     position[which_stair] = pos_arrays[which_stair][:]
+        # pos = position[which_stair].pop()
 
-        if which_first == 'Targ':
-            point_1.pos = pol2cart(positions[pos[0]][0][0], positions[pos[0]][0][1]       + shift[0])
-            point_2.pos = pol2cart(positions[pos[0]][1][0], positions[pos[0]][1][1]       + shift[0])
-            point_3.pos = pol2cart(positions[pos[1]][0][0], positions[pos[1]][0][1]       + shift[1])
-            point_4.pos = pol2cart(positions[pos[1]][1][0], positions[pos[1]][1][1] + dif + shift[1])
+
+
+        # shift = random.sample([-1, -.5, 0, .5, .1], 2)
+        dif = intervals[cur_int[which_stair]] * foil_type[which_stair] * one_dva_angle
+        # which_first = random.choice(['Targ', 'Foil'])
+
+        mid_ang = pos[0] + random.choice(ang_jit)
+        distance = pos[1]
+
+        if dif > 0:
+            p1_add = abs(dif)
+            p3_add = 0
         else:
-            point_3.pos = pol2cart(positions[pos[0]][0][0], positions[pos[0]][0][1]       + shift[0])
-            point_4.pos = pol2cart(positions[pos[0]][1][0], positions[pos[0]][1][1]       + shift[0])
-            point_1.pos = pol2cart(positions[pos[1]][0][0], positions[pos[1]][0][1]       + shift[1])
-            point_2.pos = pol2cart(positions[pos[1]][1][0], positions[pos[1]][1][1] + dif + shift[1])
+            p1_add = 0
+            p3_add = abs(dif)
 
-        if eye[which_stair] == hemifield:
+
+        point_1.pos = pol2cart(mid_ang - ((base_angle + p1_add) * hem_ang), distance)
+        point_2.pos = pol2cart(mid_ang,                       distance)
+        point_3.pos = pol2cart(mid_ang + ((base_angle + p3_add) * hem_ang), distance)
+
+
+        if eye[which_stair] == 'ipsi':
             point_1.fillColor = col_ipsi
             point_2.fillColor = col_ipsi
             point_3.fillColor = col_ipsi
-            point_4.fillColor = col_ipsi
         else:
             point_1.fillColor = col_contra
             point_2.fillColor = col_contra
             point_3.fillColor = col_contra
-            point_4.fillColor = col_contra
         
+
         hiFusion.resetProperties()
         loFusion.resetProperties()
 
@@ -414,45 +442,12 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
         tracker.waitForFixation()
         gaze_out = False #? not sure what this variable is for but it needs to exist?
 
-        # not sure, but the next while loop seems to be doing the same thing as "waitForFixation()"
-        # 
 
-        # trial_clock.reset()
-        # gaze_out = False
-        # while True and not abort:
-        #     # Start detecting time
-        #     t = trial_clock.getTime()
-            
-        #     #!!# get position at each t
-        #     #!!# every 100 ms, check that positions were on average <2 dva from center
-        #     #!!# after 5 consecutive intervals (500 ms) with correct fixation, break to start trial
-        #     #!!# for now we break automatically:
-        #     if t > .5:
-        #         break
-        #     #!!#
-
-        #     hiFusion.draw()
-        #     loFusion.draw()
-        #     fixation.draw()
-        #     win.flip()
-
-        #     k = event.getKeys(['q'])
-        #     if k:
-        #         if 'q' in k:
-        #             abort = True
-        #             break
-            
-        #     # set up auto recalibrate after 5s
-        #     if t > 5:
-        #         recalibrate = True
-        #         gaze_out = True
-        #         break
-        
         # should the trial start be here, or maybe when waiting for fixation?
         tracker.comment('start trial %d'%(trial))
 
         # in reverse order, so we can pop() them off:
-        stim_comments = ['pair 2 off', 'pair 1 off', 'pair 2 on', 'pair 1 on']
+        stim_comments = ['stim off', 'stim on']
 
 
         if not gaze_out:
@@ -466,7 +461,7 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
             trial_clock.reset()
             gaze_in_region = True
         
-            while trial_clock.getTime() < 1.3 and not abort:
+            while trial_clock.getTime() < .9 and not abort:
                 t = trial_clock.getTime()
                 
                 #!!# get position at each t
@@ -483,25 +478,16 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
                 hiFusion.draw()
                 loFusion.draw()
 
-                if .1 <= trial_clock.getTime() < .5:
-                    if len(stim_comments) == 4:
-                        tracker.comment(stim_comments.pop()) # pair 1 on
-                    point_1.draw()
-                    point_2.draw()
-                elif .5 <= trial_clock.getTime() < 0.9:
-                    if len(stim_comments) == 3:
-                        tracker.comment(stim_comments.pop()) # pair 2 on
-                    point_1.draw()
-                    point_2.draw()
-                    point_3.draw()
-                    point_4.draw()
-                elif 0.9 <= trial_clock.getTime() < 1.3:
+
+                if .1 <= trial_clock.getTime() < .9:
                     if len(stim_comments) == 2:
-                        tracker.comment(stim_comments.pop()) # pair 1 off
+                        tracker.comment(stim_comments.pop()) # stimulus on
+                    point_1.draw()
+                    point_2.draw()
                     point_3.draw()
-                    point_4.draw()
+
         
-                blindspot.draw()
+                # blindspot.draw()
                 win.flip()
                 
                 k = event.getKeys(['q']) # shouldn't this be space? like after the stimulus? this is confusing...
@@ -513,7 +499,7 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
                 event.clearEvents(eventType='keyboard') # just to be sure?
 
             if len(stim_comments) == 1:
-                tracker.comment(stim_comments.pop()) # pair 2 off
+                tracker.comment(stim_comments.pop()) # stimulus off
 
         if abort:
             break
@@ -531,7 +517,7 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
             
             k = ['wait']
             #! empty buffer?
-            while k[0] not in ['q', 'space', 'left', 'right', 'num_left', 'num_right', 'num_insert']:
+            while k[0] not in ['q', 'space', 'up', 'down']:
                 k = event.waitKeys()
 
             if k[0] in ['q']:
@@ -539,7 +525,7 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
                 tracker.comment('trial aborted') # this could be more like: "task aborted"?
                 break
                 #! empty buffer?
-            elif k[0] in ['space', 'num_insert']:
+            elif k[0] in ['space']:
                 position[which_stair] = position[which_stair] + [pos]
                 increment = False
                 resp = 'abort'
@@ -548,7 +534,7 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
                 tracker.comment('trial aborted')
                 #! empty buffer?
             else:
-                resp = 1 if k[0] in ['left', 'num_left'] else 2
+                resp = 1 if k[0] in ['up'] else 2
                 tracker.comment('response')
                 #! empty buffer?
 
@@ -650,28 +636,47 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
             (which_first == 'Targ') == (k[0] == 'left') => was target chosen?
             '''
             
-            targ_chosen = (which_first == 'Targ') == (k[0] == 'left')
+            # targ_chosen = (which_first == 'Targ') == (k[0] == 'left')
 
-            ## update staircase (which direction, is there a reversal?)
+            # ## update staircase (which direction, is there a reversal?)
+            # reversal = False
+            # resps[which_stair] = resps[which_stair] + [targ_chosen]
+            # if  resps[which_stair][-2] != resps[which_stair][-1]:
+            #     reversal = True
+            #     direction[which_stair] *= -1
+            #     revs[which_stair] += len(resps[which_stair]) > 2
+            
+            # ## increment/update
+            # cur_int[which_stair] = max(min(cur_int[which_stair] + direction[which_stair], len(intervals) - 1), 0)
+            # trial_stair[which_stair] = trial_stair[which_stair] + 1
+            # stairs_ongoing[which_stair] = revs[which_stair] <= nRevs or trial_stair[which_stair] < nTrials
+
+            # Van Baelen version:
+            # should be identical?
+
+            targ_chosen = k[0] == 'down'
+
             reversal = False
             resps[which_stair] = resps[which_stair] + [targ_chosen]
             if  resps[which_stair][-2] != resps[which_stair][-1]:
                 reversal = True
                 direction[which_stair] *= -1
                 revs[which_stair] += len(resps[which_stair]) > 2
-                
+
             ## increment/update
             cur_int[which_stair] = max(min(cur_int[which_stair] + direction[which_stair], len(intervals) - 1), 0)
             trial_stair[which_stair] = trial_stair[which_stair] + 1
             stairs_ongoing[which_stair] = revs[which_stair] <= nRevs or trial_stair[which_stair] < nTrials
 
+
+
         ## print trial
         print(resp,
             pos[0],
             pos[1],
-            tar,
-            dif,
-            which_first,
+            mid_ang,
+            base_angle + dif,
+            0,
             targ_chosen,
             reversal,
             foil_type[which_stair],
@@ -683,9 +688,9 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
         respFile.write('\t'.join(map(str, [resp,
                                         pos[0],
                                         pos[1],
-                                        tar,
-                                        dif,
-                                        which_first,
+                                        mid_ang,
+                                        base_angle + dif,
+                                        0,
                                         targ_chosen,
                                         reversal,
                                         foil_type[which_stair],
