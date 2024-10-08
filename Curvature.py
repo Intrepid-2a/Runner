@@ -288,6 +288,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
     # and with a radius that moves away from the blind spot center, toward fixation with enough padding (stim width and 2 dva extra)
     r = np.sqrt( (abs(bs_prop['cart'][0]) - (bs_prop['size'][0]/2) - 0.5 - stim_width)**2 + bs_prop['cart'][1]**2 )
+
+
+
     C = 2*np.pi*r                 # total circumference
     ang_up = (arc_length/C)*360   # is this correct? (propertion of total circumference * 360)
 
@@ -297,11 +300,11 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # at blind spot middle of trajectory:
     if hemifield == 'right':
         bsm_x = bs_prop['cart'][0] - (bs_prop['size'][0]/2) - 0.5 - stim_width
-        hiFusion.pos = [-10,0]
+        hiFusion.pos = [-15,0]
 
     else:
         bsm_x = bs_prop['cart'][0] + (bs_prop['size'][0]/2) + 0.5 + stim_width
-        hiFusion.pos = [ 10,0]
+        hiFusion.pos = [ 15,0]
 
     bsm = [bsm_x, bs_prop['cart'][1]]
 

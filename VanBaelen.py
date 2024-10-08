@@ -259,10 +259,12 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
         positions = [[bs_ang - ang_up, r_bsa],
                      [bs_ang - ang_up, r_out]]
         hem_ang = 1
+        hiFusion.pos = [ 15,0]
     if hemifield == 'right':
         positions = [[bs_ang + ang_up, r_bsa],
                      [bs_ang + ang_up, r_out]]
         hem_ang = -1
+        hiFusion.pos = [-15,0]
 
     # base_angle *= hem_ang
 
