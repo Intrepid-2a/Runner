@@ -315,7 +315,6 @@ def doBlindSpotMapping(ID=None,task=None,location=None):
     glasses = 'RG'
     trackEyes = [True, True]
 
-
     setup = localizeSetup(location=location, glasses=glasses, trackEyes=trackEyes, filefolder=None, filename=None, task=task, ID=ID) # data path is for the mapping data, not the eye-tracker data!
     print(setup['paths'])
 
@@ -338,8 +337,10 @@ def doBlindSpotMapping(ID=None,task=None,location=None):
         # initialization should've already been done for the case of Toronto?
         print('not toronto?')
         # cfg['hw']['tracker'].initialize()
+    
     cfg['hw']['tracker'].calibrate()
     cfg['hw']['tracker'].startcollecting()
+    
     # print('tracking...')
 
     fixation_yes = setup['fixation']
@@ -457,7 +458,8 @@ def doBlindSpotMapping(ID=None,task=None,location=None):
             cfg['hw']['fusion']['hi'].draw()
             cfg['hw']['fusion']['lo'].draw()
             fixation.draw()
-            point.draw()
+            if ((time.time() % 1) > 0.4):
+                point.draw()
             cfg['hw']['win'].flip()
 
             # print(point.pos)
