@@ -241,33 +241,36 @@ def doVanBaelenTask(ID=None, hemifield=None, location=None):
     r_bsa = abs(spot[1]) # should already be absolute, but just in case
 
     # this is where the main point would be:
-    ang_up = one_dva_angle * ((spot_size[1]/2) + 3)
-    # we could add a little jitter on the angle of the main point:
-    ang_jit = [one_dva_angle * x for x in [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75]]
+    mid_angle = cart2pol(spot_cart[0], spot_cart[1] + (spot_size[1]/2))[1] + (2 * one_dva_angle)
 
-    # this is the default (0 diff) angle between each of the outer points, and the inner point
-    base_angle = one_dva_angle * (spot_size[1] + 6)
+    # we could add a little jitter on the angle of the main point:
+    # ang_jit = [one_dva_angle * x for x in [-0.5, -0.25, 0, 0.25, 0.5]]
+    ang_jit = [0]
+
+    # now we need the basic distance that's going to be varied...
+    bot_angle = cart2pol(spot_cart[0], spot_cart[1] - (spot_size[1]/2))[1] - (2 * one_dva_angle)
+    mid_cart = pol2cart(r_bsa, mid_angle)
+    bot_cart = pol2cart(r_bsa, bot_angle)
+    base_dist = np.sqrt((mid_cart[0] - bot_cart[0])**2 + (mid_cart[1] - bot_cart[1])**2)
 
     # away from blind spot arrays, would be closer to fixation
     # such that they do not span the blind spot:
     r_out = r_bsa - (spot_size[0]/2) - 2
 
-    bs_ang = spot[0]
-
     if hemifield == 'left':
-        bs_ang = bs_ang % 360
-        positions = [[bs_ang - ang_up, r_bsa],
-                     [bs_ang - ang_up, r_out]]
+        # bs_ang = bs_ang % 360
         hem_ang = 1
         hiFusion.pos = [ 15,0]
     if hemifield == 'right':
-        positions = [[bs_ang + ang_up, r_bsa],
-                     [bs_ang + ang_up, r_out]]
         hem_ang = -1
         hiFusion.pos = [-15,0]
 
-    # base_angle *= hem_ang
+    
+    positions = [[base_angle, r_bsa],
+                 [base_angle, r_out]]
 
+    
+    ##########################################################################################################################################
 
 
     # if hemifield == 'left':
