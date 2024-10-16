@@ -1558,6 +1558,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
 
         tracker = 'livetrack'
 
+
     mymonitor = monitors.Monitor(name='temp',
                                  distance=distance,
                                  width=size[0])
@@ -1629,7 +1630,7 @@ def localizeSetup( trackEyes, filefolder, filename, location=None, glasses='RG',
     if 'back' in colors.keys():
         fcols[1] = colors['back']
 
-    if task in ['area', 'curvature', 'vanbaelen']:
+    if task in ['area', 'curvature', 'orientation']:
         fusion = {'hi': fusionStim(win    = win,
                                    rows    = 9,
                                    columns = 2,
@@ -1784,7 +1785,7 @@ def makeBlindSpotMarkers(win, task, ID, colors):
                                                 'ang_up' : ang_up       }
 
         print(spot_size)
-        spot_size = [max(min(1,x),x-1) for x in spot_size]
+        spot_size = [max(min(1,x),x-1.5) for x in spot_size]
         print(spot_size)
 
 
