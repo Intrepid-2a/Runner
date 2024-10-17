@@ -167,8 +167,8 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
     # - orientation offsets: 15 degrees for horizontal, 45 degrees for vertical pairs
     # - applied either to the pairs spanning the blind spot, or the adjustable pair, not spanning the blind spot
     ref_ori        = [0,  0,  0, 90, 90, 90] * 8
-    adj_ori_offset = [0, 10,  0,  0, 30,  0] * 8
-    ref_ori_offset = [0,  0, 10,  0,  0, 30] * 8
+    adj_ori_offset = [0, 10,  0,  0, 40,  0] * 8
+    ref_ori_offset = [0,  0, 10,  0,  0, 40] * 8
 
     # the offsets can be in either direction (probably doesn't matter)
     offset_dir     = [1] * 12 + [-1] * 12 + [1] * 12 + [-1] * 12
@@ -348,9 +348,9 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
             adj_offset = [0, rad + 1]
         if ref_ori == 90:
             if hemifield == 'left':
-                adj_offset = [ 3 + rad, 0]
+                adj_offset = [ 2 + (1.414 * rad), 0]
             if hemifield == 'right':
-                adj_offset = [-3 - rad, 0]
+                adj_offset = [-2 - (1.414 * rad), 0]
 
 
         adj_centre = [ ref_centre[0] + (adj_offset[0]) + adj_jitter[0], 
