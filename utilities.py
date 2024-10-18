@@ -179,7 +179,7 @@ def getParticipantTaskInfo(ID):
 
     info = {}
 
-    for task in ['area', 'curvature', 'distance']:
+    for task in ['area', 'curvature', 'distance', 'orientation']:
         info[task] = {}
         for subtask in ['color','mapping','RH','LH']:
 
