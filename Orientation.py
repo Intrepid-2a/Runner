@@ -34,6 +34,7 @@ from EyeTracking import localizeSetup, EyeTracker
 
 def doOrientationTask(ID=None, location=None, hemifield=None):
 
+    letter_height = 1
 
     # way simpler site specific handling
     expInfo = {}
@@ -482,7 +483,8 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
                 blindspot.draw() # for re-aligning the head?
 
-                visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
+                # visual.TextStim(win, '#', height = letter_height, color = col_both).draw()
+                visual.TextStim(win, '#', color = col_both).draw()
                 print('# auto abort')
                 win.flip()
                 k = ['wait']
