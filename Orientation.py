@@ -14,7 +14,7 @@ from psychopy.tools import monitorunittools
 import numpy as np
 from numpy import ndarray
 import random, datetime, os
-import math
+import math, time
 from math import sin, cos, radians, pi 
 from glob import glob
 from itertools import compress
@@ -438,10 +438,11 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
                 loFusion.draw()
                 blindspot.draw()
 
-                point1.draw()
-                point2.draw()
-                point3.draw()
-                point4.draw()
+                if ((time.time() % 1) > 0.2):
+                    point1.draw()
+                    point2.draw()
+                    point3.draw()
+                    point4.draw()
 
                 win.flip()
 
