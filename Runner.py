@@ -9,10 +9,12 @@ import webbrowser as wb
 # functions for Runner
 from utilities import *
 
+# psychophysics:
 from calibration import *
 from Distance import *
 from Curvature import *
 from Area import *
+from Orientation import *
 
 
 class MyFrame(wx.Frame):
