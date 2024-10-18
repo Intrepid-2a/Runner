@@ -465,6 +465,12 @@ def doBlindSpotMapping(ID=None,task=None,location=None):
             # print(point.pos)
 
         if not abort:
+            cfg['hw']['fusion']['hi'].draw()
+            cfg['hw']['fusion']['lo'].draw()
+            fixation.draw()
+            point.draw()
+            
+            cfg['hw']['win'].flip()
             cfg['hw']['win'].getMovieFrame()
             cfg['hw']['win'].saveMovieFrames(data_path + filename + str(x) + '.png')
 
