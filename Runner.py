@@ -71,18 +71,26 @@ class MyFrame(wx.Frame):
         self.dist_left = wx.Button(self, -1, "left")
         self.dist_right = wx.Button(self, -1, "right")
 
-        # synchronization elements:
-        self.folder_check = wx.CheckBox(self, -1, "folders")
-        self.folder_button = wx.Button(self, -1, "make")
 
-        self.clone_check = wx.CheckBox(self, -1, "GitHub")
-        self.clone_button = wx.Button(self, -1, "clone")
+        # control elements:
+        self.ori_text = wx.StaticText(self, -1, "Orientation:")
+        self.ori_color = wx.Button(self, -1, "color")
+        self.ori_mapping = wx.Button(self, -1, "mapping")
+        self.ori_task = wx.Button(self, -1, "task")
 
-        self.pull_check = wx.CheckBox(self, -1, "GitHub")
-        self.pull_button = wx.Button(self, -1, "pull")
 
-        self.upload_check = wx.CheckBox(self, -1, "to OSF")
-        self.upload_button = wx.Button(self, -1, "upload")
+        # # synchronization elements:
+        # self.folder_check = wx.CheckBox(self, -1, "folders")
+        # self.folder_button = wx.Button(self, -1, "make")
+
+        # self.clone_check = wx.CheckBox(self, -1, "GitHub")
+        # self.clone_button = wx.Button(self, -1, "clone")
+
+        # self.pull_check = wx.CheckBox(self, -1, "GitHub")
+        # self.pull_button = wx.Button(self, -1, "pull")
+
+        # self.upload_check = wx.CheckBox(self, -1, "to OSF")
+        # self.upload_button = wx.Button(self, -1, "upload")
 
         self.__set_properties()
         self.__do_layout()
@@ -116,12 +124,18 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.runTask, self.curve_right)
 
 
-        # more advanced stuff ?
-        self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
-        self.Bind(wx.EVT_BUTTON, self.cloneGitHub, self.clone_button)
-        self.Bind(wx.EVT_BUTTON, self.pullGitHub, self.pull_button)
+        # control button functionality:        
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_color)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_mapping)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_task)
 
-        # UPLOAD functionality needs to be figured out still...
+
+        # # more advanced stuff ?
+        # self.Bind(wx.EVT_BUTTON, self.makeDataFolders, self.folder_button)
+        # self.Bind(wx.EVT_BUTTON, self.cloneGitHub, self.clone_button)
+        # self.Bind(wx.EVT_BUTTON, self.pullGitHub, self.pull_button)
+
+        # # UPLOAD functionality needs to be figured out still...
 
 
 
@@ -144,11 +158,19 @@ class MyFrame(wx.Frame):
         # these will be placed into the main grid afterwards
 
         main_grid        = wx.GridSizer(4, 1, 0, 0)
+        
+        # other grids, to put in main grid:
         # location thing is 1 item, no grid needed...
         participant_grid = wx.GridSizer(2, 4, 0, 0)
-        taskrun_grid     = wx.GridSizer(3, 6, 0, 0)
+
+        taskrun_grid     = wx.GridSizer(4, 6, 0, 0)
+
+        # control_grid     = wx.GridSizer(1, 6, 0, 0)
+
         synch_grid       = wx.GridSizer(2, 4, 0, 0)  # too much?
 
+
+        # fill main gird:
         main_grid.Add(self.location_radiobox, 0, wx.ALIGN_LEFT, 0)
 
         # add elements to participant grid:
@@ -185,23 +207,38 @@ class MyFrame(wx.Frame):
         taskrun_grid.Add(self.dist_mapping, -1, wx.ALIGN_LEFT, 0)
         taskrun_grid.Add(self.dist_left, -1, wx.ALIGN_LEFT, 0)
         taskrun_grid.Add(self.dist_right, -1, wx.ALIGN_LEFT, 0)
+
+
+        # add elements to control grid:
+        taskrun_grid.Add((0,0), -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add(self.ori_text, -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add(self.ori_color, -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add(self.ori_mapping, -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add(self.ori_task, -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add((0,0), -1, wx.ALIGN_LEFT, 0)
+
+
         # add task-run grid to main grid:
         main_grid.Add(taskrun_grid)
 
-        # add elements to synch grid:
-        synch_grid.Add(self.folder_button, -1, wx.ALIGN_LEFT, 0)
-        synch_grid.Add(self.folder_check, -1, wx.ALIGN_LEFT, 0)
 
-        synch_grid.Add(self.clone_button, -1, wx.ALIGN_LEFT, 0)
-        synch_grid.Add(self.clone_check, -1, wx.ALIGN_LEFT, 0)
+        # # add control grid to main grid:
+        # main_grid.Add(control_grid)
 
-        synch_grid.Add(self.pull_button, -1, wx.ALIGN_LEFT, 0)
-        synch_grid.Add(self.pull_check, -1, wx.ALIGN_LEFT, 0)
+        # # add elements to synch grid:
+        # synch_grid.Add(self.folder_button, -1, wx.ALIGN_LEFT, 0)
+        # synch_grid.Add(self.folder_check, -1, wx.ALIGN_LEFT, 0)
 
-        synch_grid.Add(self.upload_button, -1, wx.ALIGN_LEFT, 0)
-        synch_grid.Add(self.upload_check, -1, wx.ALIGN_LEFT, 0)
-        # add synch grid to main grid:
-        main_grid.Add(synch_grid)
+        # synch_grid.Add(self.clone_button, -1, wx.ALIGN_LEFT, 0)
+        # synch_grid.Add(self.clone_check, -1, wx.ALIGN_LEFT, 0)
+
+        # synch_grid.Add(self.pull_button, -1, wx.ALIGN_LEFT, 0)
+        # synch_grid.Add(self.pull_check, -1, wx.ALIGN_LEFT, 0)
+
+        # synch_grid.Add(self.upload_button, -1, wx.ALIGN_LEFT, 0)
+        # synch_grid.Add(self.upload_check, -1, wx.ALIGN_LEFT, 0)
+        # # add synch grid to main grid:
+        # main_grid.Add(synch_grid)
 
 
 
@@ -274,6 +311,14 @@ class MyFrame(wx.Frame):
             self.curve_left.Enable()
             self.curve_right.Enable()
 
+        self.ori_color.Enable()
+        self.ori_mapping.Disable()
+        if info['orientation']['color']:
+            self.ori_mapping.Enable()
+        self.ori_task.Disable()
+        if info['orientation']['mapping']:
+            self.ori_task.Enable()
+
 
     def runTask(self, event):
 
@@ -291,15 +336,20 @@ class MyFrame(wx.Frame):
             task = 'area'
         if buttonId in [self.curve_color.Id, self.curve_mapping.Id, self.curve_left.Id, self.curve_right.Id]:
             task = 'curvature'
+        if buttonId in [self.ori_color.Id, self.ori_mapping.Id, self.ori_task.Id]:
+            task = 'orientation'
 
-        if buttonId in [self.dist_color.Id,   self.area_color.Id,   self.curve_color.Id]:
+        if buttonId in [self.dist_color.Id,   self.area_color.Id,   self.curve_color.Id,   self.ori_color.Id]:
             subtask = 'color'
-        if buttonId in [self.dist_mapping.Id, self.area_mapping.Id, self.curve_mapping.Id]:
+        if buttonId in [self.dist_mapping.Id, self.area_mapping.Id, self.curve_mapping.Id, self.ori_mapping.Id]:
             subtask = 'mapping'
         if buttonId in [self.dist_left.Id,    self.area_left.Id,    self.curve_left.Id]:
             subtask = 'left'
         if buttonId in [self.dist_right.Id,   self.area_right.Id,   self.curve_right.Id]:
             subtask = 'right'
+        if buttonId in [self.ori_task.Id]:
+            subtask = 'orientation'
+        # NO SUBTASKS in the orientation control !
 
         if subtask == None:
             print('no subtask')
@@ -335,29 +385,35 @@ class MyFrame(wx.Frame):
             doCurvatureTask(ID=self.participantID.GetValue(), hemifield=subtask, location=self.location)
             return
 
+        if task == 'orientation':
+            doOrientationTask(ID=self.participantID.GetValue(), location=self.location)
+            return
+
 
     def disableChecks(self):
-        self.folder_check.SetValue(False)
-        self.clone_check.SetValue(False)
-        self.pull_check.SetValue(False)
-        self.upload_check.SetValue(False)
+        pass
+        # self.folder_check.SetValue(False)
+        # self.clone_check.SetValue(False)
+        # self.pull_check.SetValue(False)
+        # self.upload_check.SetValue(False)
 
     def makeDataFolders(self, event):
-
-        if self.folder_check.GetValue():
-            utilities.setupDataFolders()
-        self.disableChecks()
+        pass
+        # if self.folder_check.GetValue():
+        #     utilities.setupDataFolders()
+        # self.disableChecks()
 
     def cloneGitHub(self, event):
-
-        if self.clone_check.GetValue():
-            utilities.pullGitRepos(repos='all', main=True, clone=True)
-        self.disableChecks()
+        pass
+        # if self.clone_check.GetValue():
+        #     utilities.pullGitRepos(repos='all', main=True, clone=True)
+        # self.disableChecks()
 
     def pullGitHub(self, event):
-        if self.pull_check.GetValue():
-            utilities.pullGitRepos(repos='all', main=True, clone=False)
-        self.disableChecks()
+        pass
+        # if self.pull_check.GetValue():
+        #     utilities.pullGitRepos(repos='all', main=True, clone=False)
+        # self.disableChecks()
 
 
 
