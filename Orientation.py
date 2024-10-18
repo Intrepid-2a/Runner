@@ -94,8 +94,8 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
         x += 1
 
 
-    # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='orientation', ID=ID) 
-    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='orientation', ID=ID, noEyeTracker=True) 
+    setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='orientation', ID=ID) 
+    # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename + str(x), task='orientation', ID=ID, noEyeTracker=True) 
 
     tracker = setup['tracker']
 
@@ -283,9 +283,9 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
     ## setup and initialize eye-tracker
 
-    # tracker.openfile()
-    # tracker.startcollecting()
-    # tracker.calibrate()
+    tracker.openfile()
+    tracker.startcollecting()
+    tracker.calibrate()
 
 
     win.flip()
@@ -380,11 +380,11 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
         loFusion.resetProperties()
 
 
-        # tracker.waitForFixation()
+        tracker.waitForFixation()
         gaze_out = False
 
 
-        # tracker.comment('start trial %d'%(ntrial))
+        tracker.comment('start trial %d'%(ntrial))
 
         ## commencing trial 
 
@@ -399,11 +399,11 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
             while 1 and not abort:
                 t = trial_clock.getTime()
 
-                # if not tracker.gazeInFixationWindow():
-                #     gaze_out = True
-                #     finaldiff = 'Trial aborted'
-                #     tracker.comment('trial auto aborted')
-                #     break
+                if not tracker.gazeInFixationWindow():
+                    gaze_out = True
+                    finaldiff = 'Trial aborted'
+                    tracker.comment('trial auto aborted')
+                    break
 
                 #drawing the stimuli
 
@@ -411,11 +411,11 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
                 if k:
                     if 'q' in k:
                         abort = True # abort task
-                        # tracker.comment('task aborted')
+                        tracker.comment('task aborted')
                         break
                     elif 'space' in k:
                         finaldiff = 'Trial aborted' # abort trial
-                        # tracker.comment('trial aborted')
+                        tracker.comment('trial aborted')
                         break
                 
                 
@@ -450,7 +450,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
                     adj_dist = adj_rad * 2
                     finaldiff = diam - adj_dist
-                    # tracker.comment('final size %0.4f'%fov_point.size)
+                    tracker.comment('final distance %0.4f'%adj_dist)
                     mouse.clickReset()
                     break
 
@@ -495,7 +495,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
                 # manual recalibrate
                 if k[0] in ['r']:
 
-                    # tracker.calibrate()
+                    tracker.calibrate()
                     
                     win.flip()
                     fixation.draw()
@@ -551,7 +551,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
             breaktext.draw()
             win.flip()
             
-            # tracker.comment('break')
+            tracker.comment('break')
 
             on_break = True
             while on_break:
@@ -563,9 +563,9 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
             event.clearEvents(eventType='keyboard') # just to be sure?
 
-            # tracker.comment('continue')
+            tracker.comment('continue')
 
-            # tracker.calibrate()
+            tracker.calibrate()
             break_trial = 1
 
         # wait until mouse button is no longer pressed:
@@ -596,17 +596,17 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("Run manually ended at " + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M") + "!")
         respFile.close()
-        # tracker.comment('run aborted')
+        tracker.comment('run aborted')
         bye = visual.TextStim(win, text="Run manually ended")
     elif ongoing == not_ongoing:
-        # tracker.comment('run finished')
+        tracker.comment('run finished')
         print('run ended properly!')
         bye = visual.TextStim(win, text="Run completed.\n\nThank you for your participation!!") # it will exit after 4 seconds?
     else:
         respFile = open(data_path + filename + str(x) + '.txt','a')
         respFile.write("something weird happened")
         respFile.close()
-        # tracker.comments('unknown abort')
+        tracker.comments('unknown abort')
         print('something weird happened')
 
     print(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"))
@@ -616,7 +616,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
     win.flip()
     core.wait(4)
     
-    # tracker.shutdown()
+    tracker.shutdown()
     win.close()
     # core.quit()
 
