@@ -601,7 +601,8 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
         respFile.close()
         tracker.comment('run aborted')
         bye = visual.TextStim(win, text="Run manually ended")
-    elif ongoing == not_ongoing:
+    # elif ongoing == not_ongoing:
+    elif len(condition_order) == 0:
         tracker.comment('run finished')
         print('run ended properly!')
         bye = visual.TextStim(win, text="Run completed.\n\nThank you for your participation!!") # it will exit after 4 seconds?
