@@ -232,30 +232,33 @@ def doDistanceTask(ID=None, location=None):
 
     ## prepare trials
     positions = {
-        "left-top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
-        "left-mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)],
-        "left-bot": [(spot_left[0]  + ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  + ang_up_left,  spot_left[1]  + tar_left/2)],
-        "righ-top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
-        "righ-mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
-        "righ-bot": [(spot_right[0] - ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] - ang_up_right, spot_right[1] + tar_right/2)],
+        'left' : {
+            "top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
+            "mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)]
+        },
+        'right' : {
+            "top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
+            "mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
+        }
     }
 
-    if hemifield == 'left':
-        # First column is target, second column is foil
-        pos_array = [["left-mid", "left-top"],
-                     ["left-mid", "left-bot"],
-                     ["left-top", "left-bot"],
-                     ["left-bot", "left-top"]]
-        tar = tar_left
-    else:
-        pos_array = [["righ-mid", "righ-top"],
-                     ["righ-mid", "righ-bot"],
-                     ["righ-top", "righ-bot"],
-                     ["righ-bot", "righ-top"]]
-        tar = tar_right
+    # if hemifield == 'left':
+    #     # First column is target, second column is foil
+    #     pos_array = [["left-mid", "left-top"],
+    #                 #  ["left-mid", "left-bot"],
+    #                 #  ["left-top", "left-bot"],
+    #                 #  ["left-bot", "left-top"]
+    #                  ]
+    #     tar = tar_left
+    # else:
+    #     pos_array = [["righ-mid", "righ-top"],
+    #                  ["righ-mid", "righ-bot"],
+    #                  ["righ-top", "righ-bot"],
+    #                  ["righ-bot", "righ-top"]]
+    #     tar = tar_right
 
-    pos_array_bsa = pos_array[0:2]
-    pos_array_out = pos_array[2:4]
+    # pos_array_bsa = pos_array[0:2]
+    # pos_array_out = pos_array[2:4]
 
 
     ######
@@ -317,24 +320,28 @@ def doDistanceTask(ID=None, location=None):
 
     trial_clock = core.Clock()
 
+    hemifields = ['left'] * 4 + ['right'] * 4
     foil_type = [1, -1] * 4
-    eye = ['left', 'left', 'right', 'right'] * 2
-    pos_arrays = [pos_array_bsa[:]] * 4 + [pos_array_out[:]] * 4
+    orientation = [1,1,0,0] * 2
+    # eye = ['left', 'left', 'right', 'right'] * 4
+    # pos_arrays = [pos_array_bsa[:]] * 4 + [pos_array_out[:]] * 4
 
     intervals = [3.5,3, 2.5, 2, 1.5, 1, .5, 0, -.5, -1, -1.5, -2, -2.5, -3, -3.5]
-    position = [[]] * 8
+    # position = [[]] * 8
     trial_stair = [0] * 8
     revs = [0] * 8
     direction = [1] * 8
     cur_int = [0] * 8
     reversal = False
-    resps = [[True],[False]] * 4
+    resps = [[True],[False]] * 4 # has to match foil type order?
     stairs_ongoing = [True] * 8
 
     trial = 1
     abort = False
     recalibrate = False
     break_trial = 1
+
+    loFusion.pos = [0,-15]
 
     while any(stairs_ongoing):
 
@@ -343,38 +350,55 @@ def doDistanceTask(ID=None, location=None):
         ## choose staircase
         which_stair = random.choice(list(compress([x for x in range(len(stairs_ongoing))], stairs_ongoing)))
 
-        ## set trial
-        if position[which_stair] == []:
-            random.shuffle(pos_arrays[which_stair])
-            position[which_stair] = pos_arrays[which_stair][:]
-        pos = position[which_stair].pop()
+        # trial parameters depending on staircase:
+        hemifield = hemifields[which_stair]
+        pos = positions[hemifield]
+
+        # colors, depending on hemifield:
+
+        if hemifield == 'left':
+            hiFusion.pos = [15,0]
+            col_ipsi, col_contra = colors['right'], colors['left']
+
+        if hemifield == 'right':
+            hiFusion.pos = [-15,0]
+            col_contra, col_ipsi = colors['right'], colors['left']
+
+        blindspot = setup['blindspotmarkers'][hemifield]
 
         shift = random.sample([-1, -.5, 0, .5, .1], 2)
         dif = intervals[cur_int[which_stair]] * foil_type[which_stair]
         which_first = random.choice(['Targ', 'Foil'])
 
         if which_first == 'Targ':
-            point_1.pos = pol2cart(positions[pos[0]][0][0], positions[pos[0]][0][1]       + shift[0])
-            point_2.pos = pol2cart(positions[pos[0]][1][0], positions[pos[0]][1][1]       + shift[0])
-            point_3.pos = pol2cart(positions[pos[1]][0][0], positions[pos[1]][0][1]       + shift[1])
-            point_4.pos = pol2cart(positions[pos[1]][1][0], positions[pos[1]][1][1] + dif + shift[1])
+            point_1.pos = pol2cart(pos['mid'][0][0], pos['mid'][0][1]       + shift[0]) # target points
+            point_2.pos = pol2cart(pos['mid'][1][0], pos['mid'][1][1]       + shift[0])
+            point_3.pos = pol2cart(pos['top'][0][0], pos['top'][0][1]       + shift[1]) # foil points
+            point_4.pos = pol2cart(pos['top'][1][0], pos['top'][1][1] + dif + shift[1])
         else:
-            point_3.pos = pol2cart(positions[pos[0]][0][0], positions[pos[0]][0][1]       + shift[0])
-            point_4.pos = pol2cart(positions[pos[0]][1][0], positions[pos[0]][1][1]       + shift[0])
-            point_1.pos = pol2cart(positions[pos[1]][0][0], positions[pos[1]][0][1]       + shift[1])
-            point_2.pos = pol2cart(positions[pos[1]][1][0], positions[pos[1]][1][1] + dif + shift[1])
-
-        if eye[which_stair] == hemifield:
-            point_1.fillColor = col_ipsi
-            point_2.fillColor = col_ipsi
-            point_3.fillColor = col_ipsi
-            point_4.fillColor = col_ipsi
-        else:
-            point_1.fillColor = col_contra
-            point_2.fillColor = col_contra
-            point_3.fillColor = col_contra
-            point_4.fillColor = col_contra
+            point_3.pos = pol2cart(pos['mid'][0][0], pos['mid'][0][1]       + shift[0]) # target points
+            point_4.pos = pol2cart(pos['mid'][1][0], pos['mid'][1][1]       + shift[0])
+            point_1.pos = pol2cart(pos['top'][0][0], pos['top'][0][1]       + shift[1]) # foil points
+            point_2.pos = pol2cart(pos['top'][1][0], pos['top'][1][1] + dif + shift[1])
         
+        # if eye[which_stair] == hemifield:
+        #     point_1.fillColor = col_ipsi
+        #     point_2.fillColor = col_ipsi
+        #     point_3.fillColor = col_ipsi
+        #     point_4.fillColor = col_ipsi
+        # else:
+        #     point_1.fillColor = col_contra
+        #     point_2.fillColor = col_contra
+        #     point_3.fillColor = col_contra
+        #     point_4.fillColor = col_contra
+
+        # we only use ipsilateral stimuli:   
+        point_1.fillColor = col_ipsi
+        point_2.fillColor = col_ipsi
+        point_3.fillColor = col_ipsi
+        point_4.fillColor = col_ipsi
+
+
         hiFusion.resetProperties()
         loFusion.resetProperties()
 
@@ -499,7 +523,7 @@ def doDistanceTask(ID=None, location=None):
             
             k = ['wait']
             #! empty buffer?
-            while k[0] not in ['q', 'space', 'left', 'right', 'num_left', 'num_right', 'num_insert']:
+            while k[0] not in ['q', 'space', 'left', 'right']:
                 k = event.waitKeys()
 
             if k[0] in ['q']:
