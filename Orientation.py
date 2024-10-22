@@ -90,7 +90,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
     # add functionality to name new eye-tracking file (make into generic function so it all works the same?):
     x = 1
-    et_filename = 'ori' + ('LH' if hemifield == 'left' else 'RH')
+    et_filename = 'oriMA'
     while len(glob(eyetracking_path + et_filename + str(x) + '.*')):
         x += 1
 
@@ -198,7 +198,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
     # store responses, with the parameters describing the condition:
     x = 1
-    filename = ID + '_orientation_'
+    filename = ID + '_orientation_MA_'
     while (filename + str(x) + '.txt') in os.listdir(data_path):
         x += 1
 
