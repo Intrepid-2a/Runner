@@ -674,3 +674,9 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     tracker.shutdown()
     win.close()
 
+
+if __name__ == "__main__": #BM what's this?
+    doCurvatureTask()           # if you run the file as a script, the function gets defined
+                           # but doesn't run
+                           # however, if this is the __main__ script, this if will run the task (in Glasgow)
+                           # if it is not the __main__ script the task can be imported (in Toronto)
