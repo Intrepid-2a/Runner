@@ -36,7 +36,7 @@ from EyeTracking import localizeSetup, EyeTracker
 #### Initialize experiment
 ######
 
-def doDistanceTask(ID=None, location=None):
+def doHorizontalTask(ID=None, location=None):
 
     ## parameters
     nRevs   = 10   #
@@ -229,18 +229,25 @@ def doDistanceTask(ID=None, location=None):
     spot_right   = right_prop['spot']
     ang_up_right = right_prop['ang_up']
     tar_right    = right_prop['tar']
+    
+    # ang_ups = { 'left'  : ang_up_left,
+    #             'right' : ang_up_right  }
+    tars = { 'left'  : tar_left,
+             'right' : tar_right  }
 
     ## prepare trials
     positions = {
         'left' : {
-            "top": [(spot_left[0]  - ang_up_left,  spot_left[1]  - tar_left/2),  (spot_left[0]  - ang_up_left,  spot_left[1]  + tar_left/2)],
-            "mid": [(spot_left[0]  +          00,  spot_left[1]  - tar_left/2),  (spot_left[0]  +          00,  spot_left[1]  + tar_left/2)]
+            "top": (spot_left[0]  - ang_up_left,  spot_left[1]),
+            "mid": (spot_left[0]  +          00,  spot_left[1])
         },
         'right' : {
-            "top": [(spot_right[0] + ang_up_right, spot_right[1] - tar_right/2), (spot_right[0] + ang_up_right, spot_right[1] + tar_right/2)],
-            "mid": [(spot_right[0] +           00, spot_right[1] - tar_right/2), (spot_right[0] +           00, spot_right[1] + tar_right/2)],
+            "top": (spot_right[0] + ang_up_right, spot_right[1]),
+            "mid": (spot_right[0] +           00, spot_right[1])
         }
     }
+
+
 
     # if hemifield == 'left':
     #     # First column is target, second column is foil
@@ -367,19 +374,42 @@ def doDistanceTask(ID=None, location=None):
         blindspot = setup['blindspotmarkers'][hemifield]
 
         shift = random.sample([-1, -.5, 0, .5, .1], 2)
+
         dif = intervals[cur_int[which_stair]] * foil_type[which_stair]
         which_first = random.choice(['Targ', 'Foil'])
 
+
+
+        pos = positions[hemifield]
+        mid = pos['mid']
+        top = pos['top']
+        tar = tars[hemifield]
+
+        if (orientation[which_stair] == 1):
+            mid_pos = [ pol2cart(mid[0],  mid[1]  - tar/2 + shift[0]      ),  
+                        pol2cart(mid[0],  mid[1]  + tar/2 + shift[0]      )] 
+            top_pos = [ pol2cart(top[0],  top[1]  - tar/2 + shift[1]      ),  
+                        pol2cart(top[0],  top[1]  + tar/2 + shift[1] + dif)]
+        
+        if (orientation[which_stair] == 0):
+            mid = pol2cart(mid)
+            top = pol2cart(top)
+            mid_pos = [ (mid[0],  mid[1]  - tar/2 + shift[0]      ),
+                        (mid[0],  mid[1]  + tar/2 + shift[0]      )]
+            top_pos = [ (top[0],  top[1]  - tar/2 + shift[0]      ),
+                        (top[0],  top[1]  + tar/2 + shift[0] + dif)]
+
+        
         if which_first == 'Targ':
-            point_1.pos = pol2cart(pos['mid'][0][0], pos['mid'][0][1]       + shift[0]) # target points
-            point_2.pos = pol2cart(pos['mid'][1][0], pos['mid'][1][1]       + shift[0])
-            point_3.pos = pol2cart(pos['top'][0][0], pos['top'][0][1]       + shift[1]) # foil points
-            point_4.pos = pol2cart(pos['top'][1][0], pos['top'][1][1] + dif + shift[1])
+            point_1.pos = mid_pos[0] # target points
+            point_2.pos = mid_pos[1]
+            point_3.pos = top_pos[0] # foil points
+            point_4.pos = top_pos[1]
         else:
-            point_3.pos = pol2cart(pos['mid'][0][0], pos['mid'][0][1]       + shift[0]) # target points
-            point_4.pos = pol2cart(pos['mid'][1][0], pos['mid'][1][1]       + shift[0])
-            point_1.pos = pol2cart(pos['top'][0][0], pos['top'][0][1]       + shift[1]) # foil points
-            point_2.pos = pol2cart(pos['top'][1][0], pos['top'][1][1] + dif + shift[1])
+            point_3.pos = mid_pos[0] # target points
+            point_4.pos = mid_pos[1]
+            point_1.pos = top_pos[0] # foil points
+            point_2.pos = top_pos[1]
         
         # if eye[which_stair] == hemifield:
         #     point_1.fillColor = col_ipsi
