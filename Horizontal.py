@@ -64,8 +64,8 @@ def doHorizontalTask(ID=None, location=None):
 
     if ID == None:
         ID = expInfo['ID'].lower()
-    if hemifield == None:
-        hemifield = expInfo['hemifield']
+    # if hemifield == None:
+    #     hemifield = expInfo['hemifield']
 
     # need to know which eye-tracker to use:
     if location == None:
@@ -76,14 +76,14 @@ def doHorizontalTask(ID=None, location=None):
             location = 'glasgow'
 
 
-    random.seed(ID+'distance'+hemifield)
+    random.seed(ID+'orientationSC')
 
     trackEyes = [True, True]
 
     # ## path
     # main_path = 'C:/Users/clementa/Nextcloud/project_blindspot/blindspot_eye_tracker/'
     # data_path = main_path + 'data/'
-    main_path = '../data/distance/'
+    main_path = '../data/orientation/'
     data_path = main_path
     eyetracking_path = main_path + 'eyetracking/' + ID + '/'
     
@@ -153,6 +153,7 @@ def doHorizontalTask(ID=None, location=None):
         x += 1
 
     # get everything shared from central:
+    # setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='orientation', ID=ID, noEyeTracker=True) # data path is for the mapping data, not the eye-tracker data!
     setup = localizeSetup(location=location, trackEyes=trackEyes, filefolder=eyetracking_path, filename=et_filename+str(x), task='orientation', ID=ID) # data path is for the mapping data, not the eye-tracker data!
 
     print(setup['paths']) # not using yet, just testing
@@ -165,25 +166,12 @@ def doHorizontalTask(ID=None, location=None):
     win.winHandle.push_handlers(pyg_keyboard)
 
     colors = setup['colors']
-    col_both = colors['both']
-    # if hemifield == 'left':
-    #     col_ipsi, col_contra = colors['left'], colors['right']
-    # if hemifield == 'right':
-    #     col_contra, col_ipsi = colors['left'], colors['right']
-
-    # if hemifield == 'left':
-    #     col_ipsi, col_contra = colors['right'], colors['left']
-    # if hemifield == 'right':
-    #     col_contra, col_ipsi = colors['right'], colors['left']
-
     # print(colors)
+    col_both = colors['both']
 
     hiFusion = setup['fusion']['hi']
     loFusion = setup['fusion']['lo']
 
-    # blindspot = setup['blindspotmarkers'][hemifield]
-
-    # print(blindspot.fillColor)
     
     fixation = setup['fixation']
 
@@ -295,7 +283,6 @@ def doHorizontalTask(ID=None, location=None):
     event.clearEvents(eventType='keyboard') # just to be sure?
         
     #!!# calibrate
-    #tracker.initialize() # this should be done in the central thing... dependent on location: in Toronto we need to override the calibrationTargets
 
     tracker.openfile()
     tracker.startcollecting()
@@ -392,16 +379,16 @@ def doHorizontalTask(ID=None, location=None):
                         pol2cart(mid[0],  mid[1]  + tar/2 + shift[0]      )] 
             top_pos = [ pol2cart(top[0],  top[1]  - tar/2 + shift[1]      ),  
                         pol2cart(top[0],  top[1]  + tar/2 + shift[1] + dif)]
-            targ_ori = mid[0]
-            foil_ori = top[0]
+            targ_ori = round(mid[0],5)
+            foil_ori = round(top[0],5)
         
         if (orientation[which_stair] == 0):
-            mid = pol2cart(mid)
-            top = pol2cart(top)
-            mid_pos = [ (mid[0],  mid[1]  - tar/2 + shift[0]      ),
-                        (mid[0],  mid[1]  + tar/2 + shift[0]      )]
-            top_pos = [ (top[0],  top[1]  - tar/2 + shift[1]      ),
-                        (top[0],  top[1]  + tar/2 + shift[1] + dif)]
+            mid = pol2cart(mid[0], mid[1])
+            top = pol2cart(top[0], top[1])
+            mid_pos = [ (mid[0]  - tar/2 + shift[0]      ,  mid[1]),
+                        (mid[0]  + tar/2 + shift[0]      ,  mid[1])]
+            top_pos = [ (top[0]  - tar/2 + shift[1]      ,  top[1]),
+                        (top[0]  + tar/2 + shift[1] + dif,  top[1])]
             targ_ori = 0
             foil_ori = 0
 
@@ -442,39 +429,7 @@ def doHorizontalTask(ID=None, location=None):
         tracker.waitForFixation()
         gaze_out = False #? not sure what this variable is for but it needs to exist?
 
-        # not sure, but the next while loop seems to be doing the same thing as "waitForFixation()"
-        # 
-
-        # trial_clock.reset()
-        # gaze_out = False
-        # while True and not abort:
-        #     # Start detecting time
-        #     t = trial_clock.getTime()
-            
-        #     #!!# get position at each t
-        #     #!!# every 100 ms, check that positions were on average <2 dva from center
-        #     #!!# after 5 consecutive intervals (500 ms) with correct fixation, break to start trial
-        #     #!!# for now we break automatically:
-        #     if t > .5:
-        #         break
-        #     #!!#
-
-        #     hiFusion.draw()
-        #     loFusion.draw()
-        #     fixation.draw()
-        #     win.flip()
-
-        #     k = event.getKeys(['q'])
-        #     if k:
-        #         if 'q' in k:
-        #             abort = True
-        #             break
-            
-        #     # set up auto recalibrate after 5s
-        #     if t > 5:
-        #         recalibrate = True
-        #         gaze_out = True
-        #         break
+        
         
         # should the trial start be here, or maybe when waiting for fixation?
         tracker.comment('start trial %d'%(trial))
@@ -603,9 +558,7 @@ def doHorizontalTask(ID=None, location=None):
                 event.clearEvents(eventType='keyboard') # just to be sure?
                     
                 #!!# calibrate
-                # tracker.stopcollecting() # do we even have to stop/start collecting?
                 tracker.calibrate()
-                # tracker.startcollecting()
                 recalibrate = False
 
                 
@@ -647,9 +600,7 @@ def doHorizontalTask(ID=None, location=None):
                         break
 
                     #!!# calibrate
-                    # tracker.stopcollecting() # do we even have to stop/start collecting?
                     tracker.calibrate()
-                    # tracker.startcollecting()
 
                     fixation.draw()
                     win.flip()
@@ -774,9 +725,9 @@ def doHorizontalTask(ID=None, location=None):
 
     #!!# stop recording
 
-    # tracker.stopcollecting()
-    # tracker.closefile()
-    # tracker.shutdown()
+    tracker.stopcollecting()
+    tracker.closefile()
+    tracker.shutdown()
 
 
     ## last screen
