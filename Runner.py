@@ -14,8 +14,9 @@ from calibration import *
 from Distance import *
 from Curvature import *
 from Area import *
+# control tasks:
 from Orientation import *
-
+from Horizontal import *
 
 class MyFrame(wx.Frame):
 
@@ -78,7 +79,8 @@ class MyFrame(wx.Frame):
         self.ori_text = wx.StaticText(self, -1, "Orientation:")
         self.ori_color = wx.Button(self, -1, "color")
         self.ori_mapping = wx.Button(self, -1, "mapping")
-        self.ori_task = wx.Button(self, -1, "task")
+        self.ori_task = wx.Button(self, -1, "adjust")
+        self.hor_task = wx.Button(self, -1, "stairs")
 
 
         # # synchronization elements:
@@ -130,6 +132,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_color)
         self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_mapping)
         self.Bind(wx.EVT_BUTTON, self.runTask, self.ori_task)
+        self.Bind(wx.EVT_BUTTON, self.runTask, self.hor_task)
 
 
         # # more advanced stuff ?
@@ -217,7 +220,8 @@ class MyFrame(wx.Frame):
         taskrun_grid.Add(self.ori_color, -1, wx.ALIGN_LEFT, 0)
         taskrun_grid.Add(self.ori_mapping, -1, wx.ALIGN_LEFT, 0)
         taskrun_grid.Add(self.ori_task, -1, wx.ALIGN_LEFT, 0)
-        taskrun_grid.Add((0,0), -1, wx.ALIGN_LEFT, 0)
+        taskrun_grid.Add(self.hor_task, -1, wx.ALIGN_LEFT, 0)
+        # taskrun_grid.Add((0,0), -1, wx.ALIGN_LEFT, 0)
 
 
         # add task-run grid to main grid:
@@ -318,8 +322,10 @@ class MyFrame(wx.Frame):
         if info['orientation']['color']:
             self.ori_mapping.Enable()
         self.ori_task.Disable()
+        self.hor_task.Disable()
         if info['orientation']['mapping']:
             self.ori_task.Enable()
+            self.hor_task.Enable()
 
 
     def runTask(self, event):
@@ -338,7 +344,7 @@ class MyFrame(wx.Frame):
             task = 'area'
         if buttonId in [self.curve_color.Id, self.curve_mapping.Id, self.curve_left.Id, self.curve_right.Id]:
             task = 'curvature'
-        if buttonId in [self.ori_color.Id, self.ori_mapping.Id, self.ori_task.Id]:
+        if buttonId in [self.ori_color.Id, self.ori_mapping.Id, self.ori_task.Id, self.hor_task.Id]:
             task = 'orientation'
 
         if buttonId in [self.dist_color.Id,   self.area_color.Id,   self.curve_color.Id,   self.ori_color.Id]:
@@ -351,7 +357,8 @@ class MyFrame(wx.Frame):
             subtask = 'right'
         if buttonId in [self.ori_task.Id]:
             subtask = 'orientation'
-        # NO SUBTASKS in the orientation control !
+        if buttonId in [self.hor_task.Id]:
+            subtask = 'horizontal'
 
         if subtask == None:
             print('no subtask')
@@ -388,8 +395,12 @@ class MyFrame(wx.Frame):
             return
 
         if task == 'orientation':
-            doOrientationTask(ID=self.participantID.GetValue(), location=self.location)
-            return
+            if subtask == 'orientation':
+                doOrientationTask(ID=self.participantID.GetValue(), location=self.location)
+                return
+            if subtask == 'horizontal':
+                doHorizontalTask(ID=self.participantID.GetValue(), location=self.location)
+                return
 
 
     def disableChecks(self):
