@@ -1693,6 +1693,8 @@ def getColors(colors={}, task=None, ID=None):
     all_files = glob('../data/' + task + '/color/' + ID + '_col_cal*.txt')
     if len(all_files) == 0:
         # no color calibration done, skip
+        print('NO color calibration founc:')
+        print('../data/' + task + '/color/' + ID + '_col_cal*.txt')
         return(colors)
 
     # find the largest color calibration file index:
@@ -1705,7 +1707,7 @@ def getColors(colors={}, task=None, ID=None):
     # let's flip this depending on the task run, in each of the experiments?
     # col_ipsi = eval(col_param[3]) if hemifield == 'left' else eval(col_param[5]) # left or right
     # col_cont = eval(col_param[5]) if hemifield == 'left' else eval(col_param[3]) # right or left
-
+    
     # so use the left / right things for now
     colors['left']  = eval(col_param[3])
     colors['right'] = eval(col_param[5])
