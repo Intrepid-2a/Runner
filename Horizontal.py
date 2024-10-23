@@ -125,6 +125,7 @@ def doHorizontalTask(ID=None, location=None):
                                         'Targ_Ori',
                                         'Foil_Ori',
                                         'Difference',
+                                        'Jitter',
                                         'Which_first',
                                         'Targ_chosen',
                                         'Reversal',
@@ -330,7 +331,7 @@ def doHorizontalTask(ID=None, location=None):
     hemifields = ['left'] * 4 + ['right'] * 4
     foil_type = [1, -1] * 4
     orientation = [1,1,0,0] * 2
-    # eye = ['left', 'left', 'right', 'right'] * 4
+    # eye = ['left', 'left', 'right', 'right'] * 4   # always ipsi!
     # pos_arrays = [pos_array_bsa[:]] * 4 + [pos_array_out[:]] * 4
 
     intervals = [3.5,3, 2.5, 2, 1.5, 1, .5, 0, -.5, -1, -1.5, -2, -2.5, -3, -3.5]
@@ -379,6 +380,7 @@ def doHorizontalTask(ID=None, location=None):
         which_first = random.choice(['Targ', 'Foil'])
 
 
+        # calculate stimulus positions:
 
         pos = positions[hemifield]
         mid = pos['mid']
@@ -390,14 +392,18 @@ def doHorizontalTask(ID=None, location=None):
                         pol2cart(mid[0],  mid[1]  + tar/2 + shift[0]      )] 
             top_pos = [ pol2cart(top[0],  top[1]  - tar/2 + shift[1]      ),  
                         pol2cart(top[0],  top[1]  + tar/2 + shift[1] + dif)]
+            targ_ori = mid[0]
+            foil_ori = top[0]
         
         if (orientation[which_stair] == 0):
             mid = pol2cart(mid)
             top = pol2cart(top)
             mid_pos = [ (mid[0],  mid[1]  - tar/2 + shift[0]      ),
                         (mid[0],  mid[1]  + tar/2 + shift[0]      )]
-            top_pos = [ (top[0],  top[1]  - tar/2 + shift[0]      ),
-                        (top[0],  top[1]  + tar/2 + shift[0] + dif)]
+            top_pos = [ (top[0],  top[1]  - tar/2 + shift[1]      ),
+                        (top[0],  top[1]  + tar/2 + shift[1] + dif)]
+            targ_ori = 0
+            foil_ori = 0
 
         
         if which_first == 'Targ':
@@ -688,33 +694,37 @@ def doHorizontalTask(ID=None, location=None):
             stairs_ongoing[which_stair] = revs[which_stair] <= nRevs or trial_stair[which_stair] < nTrials
 
         ## print trial
-        print(resp,
-            pos[0],
-            pos[1],
-            tar,
-            dif,
-            which_first,
-            targ_chosen,
-            reversal,
-            foil_type[which_stair],
-            eye[which_stair],
-            gaze_out,
-            which_stair,
-            trial)
+        print(  trial,          # 'Trial',
+                which_stair,    # 'Stair',
+                resp,           # 'Response',
+                hemifield,      # 'Hemifield',
+                hemifield,      # 'Eye',
+                targ_ori,       # 'Targ_Ori',
+                foil_ori,       # 'Foil_Ori',
+                dif,            # 'Difference',
+                shift,          # 'Jitter',
+                which_first,    # 'Which_first',
+                targ_chosen,    # 'Targ_chosen',
+                reversal,       # 'Reversal',
+                gaze_out        # 'Gaze_out'
+                )
+
+
         respFile = open(data_path + filename + str(x) + '.txt','a')
-        respFile.write('\t'.join(map(str, [resp,
-                                        pos[0],
-                                        pos[1],
-                                        tar,
-                                        dif,
-                                        which_first,
-                                        targ_chosen,
-                                        reversal,
-                                        foil_type[which_stair],
-                                        eye[which_stair],
-                                        gaze_out,
-                                        which_stair,
-                                        trial])) + "\n")
+        respFile.write('\t'.join(map(str, [ trial,          # 'Trial',
+                                            which_stair,    # 'Stair',
+                                            resp,           # 'Response',
+                                            hemifield,      # 'Hemifield',
+                                            hemifield,      # 'Eye',
+                                            targ_ori,       # 'Targ_Ori',
+                                            foil_ori,       # 'Foil_Ori',
+                                            dif,            # 'Difference',
+                                            shift,          # 'Jitter',
+                                            which_first,    # 'Which_first',
+                                            targ_chosen,    # 'Targ_chosen',
+                                            reversal,       # 'Reversal',
+                                            gaze_out        # 'Gaze_out'
+                                          ])) + '\n')
         respFile.close()
         trial += 1
         break_trial += 1
