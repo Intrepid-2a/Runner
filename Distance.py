@@ -693,9 +693,9 @@ def doDistanceTask(ID=None, hemifield=None, location=None):
 
     #!!# stop recording
 
-    # tracker.stopcollecting()
-    # tracker.closefile()
-    # tracker.shutdown()
+    tracker.stopcollecting()
+    tracker.closefile()
+    tracker.shutdown()
 
 
     ## last screen
