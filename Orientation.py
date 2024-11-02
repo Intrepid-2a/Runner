@@ -211,7 +211,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
                                         'Condition',
                                         'Location',
                                         'Hemifield',
-                                        'ReferenceDistance'
+                                        'ReferenceDistance',
                                         'ReferenceOrientation',
                                         'AdjustableOffset',
                                         'ReferenceOffset',
