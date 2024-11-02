@@ -458,6 +458,7 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
 
         if finaldiff == 'Trial aborted':
             # aborted trials need to be redone:
+            adj_dist = 'Trial aborted'
             condition_order.append(cidx)
 
         if abort: # M: trial intentionally aborted? or task/experiment aborted?

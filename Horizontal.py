@@ -523,7 +523,7 @@ def doHorizontalTask(ID=None, location=None):
                 break
                 #! empty buffer?
             elif k[0] in ['space', 'num_insert']:
-                position[which_stair] = position[which_stair] + [pos]
+                # position[which_stair] = position[which_stair] + [pos] # not using this in this task
                 increment = False
                 resp = 'abort'
                 targ_chosen = 'abort'
@@ -612,7 +612,7 @@ def doHorizontalTask(ID=None, location=None):
 
                 event.clearEvents(eventType='keyboard') # just to be sure?
                 
-            position[which_stair] = position[which_stair] + [pos]
+            # position[which_stair] = position[which_stair] + [pos] # not using
             increment = False
             resp = 'auto_abort'
             targ_chosen = 'auto_abort'
