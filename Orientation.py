@@ -438,7 +438,8 @@ def doOrientationTask(ID=None, location=None, hemifield=None):
                 loFusion.draw()
                 blindspot.draw()
 
-                if ((time.time() % 1) > 0.2):
+                if ((time.time() % 1) > 0.2): 
+                # if ((time.time() % 0.5) > 0.1):   # faster?
                     point1.draw()
                     point2.draw()
                     point3.draw()
