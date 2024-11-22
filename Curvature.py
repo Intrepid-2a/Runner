@@ -403,8 +403,13 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
         point3.pos = positions[position][1]
         
         ##position of first and fourth dots (mobile, either curved towards or curved away)
-        tstep = step[position][eye][staircase] if step[position][eye][staircase] >0 else step[position][eye][staircase]*-1 #-1 to prevent it from being negative
+        tstep = step[position][eye][staircase] #if step[position][eye][staircase] >0 else step[position][eye][staircase]*-1 #-1 to prevent it from being negative
+        # doesn't solve the case of being too large either...
         # why would it be negative?
+        if tstep < 0:
+            tstep = 0
+        if tstep >= len(curvature):
+            tstep = len(curvature) - 1
 
         currentcurv = direction[position][eye][staircase] * curvature[tstep]
         # print('currently we are at', currentcurv, 'current step =', tstep)
@@ -526,7 +531,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
 
             # now correct out of bounds moves:
             if step[position][eye][staircase] < 0:
-                step[position][eye][staircase] == 0
+                step[position][eye][staircase] = 0
                 choice = 'NA'
             if step[position][eye][staircase] >= len(curvature):
                 step[position][eye][staircase] = len(curvature) - 1
