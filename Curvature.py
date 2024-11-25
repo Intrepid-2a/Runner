@@ -345,7 +345,7 @@ def doCurvatureTask(hemifield=None, ID=None, location=None):
     # this is 33 values, instead of the 15 we use in the distance task... this should affect the staircases: more trials and reversals needed?
 
     curvature = [round((x / 20)-0.4, ndigits=3) for x in list(range(0,17))]   # NEW 17 points only
-
+    curvature = [-0.4,0,0.4]
     ## staircase
     # step has the current index into the list of curvatures for each staircase
     step = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]] #[['left', 'right'], ['left', 'right']]
