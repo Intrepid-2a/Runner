@@ -256,11 +256,17 @@ class MyFrame(wx.Frame):
         self.location = self.location_radiobox.GetStringSelection().lower()
 
     def refresh(self, event=0):
-        self.existingParticipants = findParticipantIDs()
+        dataInfo = getGeneralDataInfo()
+        self.existingParticipants = dataInfo['IDs']
         
         self.pick_existing.Clear()
         self.pick_existing.AppendItems(self.existingParticipants)
         self.toggleParticipantTaskButtons(event)
+
+        counts = dataInfo['counts']
+        self.area_count.SetLabel( '%d (%d)'%(counts['area'], counts['all']) )
+        self.curve_count.SetLabel( '%d (%d)'%(counts['curvature'], counts['all']) )
+        self.dist_count.SetLabel( '%d (%d)'%(counts['distance'], counts['all']) )
 
     def pickExisting(self, event):
         self.participantID.SetValue(self.pick_existing.GetValue())
