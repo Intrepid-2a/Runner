@@ -197,6 +197,64 @@ def getParticipantTaskInfo(ID):
 
     return(info)              
 
+def getGeneralDataInfo():
+    
+    tasks = ['distance',
+             'area',
+             'curvature']
+
+    subtasks = ['',
+                'color',
+                'mapping']
+
+    allParticipantIDs = []
+    taskParticipants = {'distance':[],
+                        'area':[],
+                        'curvature':[]}
+
+
+    for task in tasks:
+        taskIDs = []
+        for subtask in subtasks:
+            fullpathnames = glob.glob(os.path.join('..', 'data', task, subtask, '*.txt'))
+            filenames = [os.path.basename(x) for x in fullpathnames]
+            taskIDs = taskIDs + [x.split('_')[0] for x in filenames]
+
+            allParticipantIDs = list(set(allParticipantIDs + taskIDs))
+            if '' in allParticipantIDs:
+                allParticipantIDs.remove('')
+
+        for ID in list(set(taskIDs)):
+            # check if there exists a LH and RH file for each participant for this task
+            if task == 'distance':
+                basename = os.path.join('..', 'data', task, ID + '_dist')
+            else:
+                basename = os.path.join('..', 'data', task, ID + '_' + task)
+
+            # are there any left hand files?
+            left_done = False
+            left  = glob.glob(basename + '_LH_*.txt')
+            if len(left):
+                left_done = True
+
+            right_done = False
+            right = glob.glob(basename + '_RH_*.txt')
+            if len(right):
+                right_done = True
+            
+            if all([right_done, left_done]):
+                taskParticipants[task] += [ID]
+
+    taskParticipants['all'] = list(set(taskParticipants['area']).intersection(set(taskParticipants['curvature'])).intersection(set(taskParticipants['distance'])))
+
+    for key in taskParticipants.keys():
+        taskParticipants[key] = len(taskParticipants[key])
+
+    allParticipantIDs.sort()
+
+
+    return({'IDs':allParticipantIDs,
+            'counts':taskParticipants})
 
 
 def generateRandomParticipantID(prepend='', nbytes=3):
