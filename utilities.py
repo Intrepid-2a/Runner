@@ -242,6 +242,13 @@ def getGeneralDataInfo():
             if len(right):
                 right_done = True
             
+            # NOT CHECKED:
+            #
+            # - calibration (color & blindspot mapping)
+            # - completeness of behavioral files
+            # - informed consent / demographics
+
+
             if all([right_done, left_done]):
                 taskParticipants[task] += [ID]
 
