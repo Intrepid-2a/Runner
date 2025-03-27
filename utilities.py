@@ -247,14 +247,16 @@ def getGeneralDataInfo():
 
     taskParticipants['all'] = list(set(taskParticipants['area']).intersection(set(taskParticipants['curvature'])).intersection(set(taskParticipants['distance'])))
 
+    bytask = {'area':taskParticipants['area'], 'curvature':taskParticipants['curvature'], 'distance': taskParticipants['distance']}
+
     for key in taskParticipants.keys():
         taskParticipants[key] = len(taskParticipants[key])
 
     allParticipantIDs.sort()
 
-
     return({'IDs':allParticipantIDs,
-            'counts':taskParticipants})
+            'counts':taskParticipants,
+            'IDbyTask':bytask})
 
 
 def generateRandomParticipantID(prepend='', nbytes=3):
